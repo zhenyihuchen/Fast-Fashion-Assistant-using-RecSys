@@ -1,0 +1,49 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+pyvenv.cfg
+activate
+activate.bat
+activate.ps1
+deactivate.bat
+Lib/
+Scripts/
+bin/
+include/
+share/
+pip-selfcheck.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
