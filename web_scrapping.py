@@ -3,6 +3,8 @@
 
 
 # Importing the required libraries
+import re
+from concurrent.futures import ThreadPoolExecutor
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -21,148 +23,129 @@ from selenium.common.exceptions import (
 
 
 print("Starting web scraper...")
-print("Initializing Chrome driver...")
 
-# Chrome options for stability
-chrome_options = Options()
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-chrome_options.add_experimental_option('useAutomationExtension', False)
+# Categories with direct URLs
+category_urls = {
+    "JACKETS": "https://www.zara.com/es/en/woman-jackets-l1114.html?v1=2536936",
+    "COATS": "https://www.zara.com/es/en/woman-outerwear-l1184.html?v1=2419032",
+    "DRESSES": "https://www.zara.com/es/en/woman-dresses-l1066.html?v1=2420896",
+    "TOPS": "https://www.zara.com/es/en/woman-tops-l1322.html?v1=2419940",
+    "SHIRTS": "https://www.zara.com/es/en/woman-shirts-l1217.html?v1=2420369",
+    "BODIES": "https://www.zara.com/es/en/woman-body-l1057.html?v1=2420490",
+    "JEANS": "https://www.zara.com/es/en/woman-jeans-l1119.html?v1=2419185",
+    "TROUSERS": "https://www.zara.com/es/en/woman-trousers-l1335.html?v1=2420795",
+    "T-SHIRTS": "https://www.zara.com/es/en/woman-tshirts-l1362.html?v1=2420417",
+    "CARDIGANS": "https://www.zara.com/es/en/woman-cardigans-sweaters-l8322.html?v1=2419844",
+    "SKIRTS": "https://www.zara.com/es/en/woman-skirts-l1299.html?v1=2420454",
+    "SWEATSHIRTS": "https://www.zara.com/es/en/woman-sweatshirts-l1320.html?v1=2467841",
+    "SHOES": "https://www.zara.com/es/en/woman-shoes-l1251.html?v1=2419160",
+    "BAGS": "https://www.zara.com/es/en/woman-bags-l1024.html?v1=2417728"
+}
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-wait = WebDriverWait(driver, 10)
+def create_driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-print("Navigating to Zara website...")
-driver.get('https://www.zara.com/es/en/')
-driver.maximize_window()
-sleep(5)
-print("Page loaded!")
 
-# Handle cookie consent popup
-try:
-    print("Handling cookie consent...")
-    accept_cookies = driver.find_element(By.XPATH, '//button[contains(text(), "Accept") or contains(text(), "Aceptar")]')
-    accept_cookies.click()
-    sleep(2)
-    print("Cookies accepted!")
-except:
-    print("No cookie popup found or already handled")
 
-# Categories to scrape
-categories = [
-    # "JACKETS | BLAZERS",
-    # "COATS",
-    # "DRESSES",
-    "TOPS",
-    # "SHIRTS",
-    # "BODIES"
-    # "JEANS",
-    # "TROUSERS",
-    # "T-SHIRTS",
-    # "CARDIGANS | JUMPERS",
-    # "SKIRTS | BERMUDAS",
-    # "SWEATSHIRTS | JOGGERS",
-    # "SHOES",
-    # "BAGS"
-]
-
-# Function to navigate to category
-def navigate_to_category(category_name):
+# Direct navigation to category URL
+def navigate_to_category(category_name, category_url, driver):
     print(f"Navigating to {category_name}...")
-    driver.get('https://www.zara.com/es/en/')
-    sleep(3)
+    driver.get(category_url)
+    sleep(2)
     
+    # Handle cookie consent popup if present
     try:
-        # Click menu icon
-        print("Looking for menu icon...")
-        menu_icon = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='theme-app']//header//button")))
-        menu_icon.click()
-        sleep(3)
-        print("Menu opened")
-        
-        # Click WOMAN
-        print("Looking for WOMAN section...")
-        # Try multiple selectors for WOMAN
-        woman_selectors = [
-            '//span[@class="layout-categories-category-name" and text()="WOMAN"]',
-            '//span[contains(@class,"layout-categories-category-name") and text()="WOMAN"]',
-            '//span[contains(text(), "WOMAN")]',
-            '//a[contains(text(), "WOMAN")]',
-            '//*[text()="WOMAN"]'
-        ]
-        
-        woman_clicked = False
-        for selector in woman_selectors:
-            try:
-                woman_section = wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
-                woman_section.click()
-                sleep(3)
-                print("WOMAN clicked")
-                woman_clicked = True
-                break
-            except TimeoutException:
-                continue
-        
-        if not woman_clicked:
-            print("Could not find WOMAN section, trying direct URL...")
-            driver.get('https://www.zara.com/es/en/woman-l1180.html')
-            sleep(3)
-        
-        # Click NEW COLLECTION
-        print("Looking for NEW COLLECTION...")
-        collection_selectors = [
-            '//span[@class="layout-categories-category-name" and contains(text(), "NEW COLLECTION")]',
-            '//span[contains(@class,"layout-categories-category-name") and contains(text(), "NEW COLLECTION")]',
-            '//span[contains(text(), "NEW COLLECTION")]',
-            '//a[contains(text(), "NEW COLLECTION")]',
-            '//*[contains(text(), "NEW COLLECTION")]'
-        ]
-        
-        collection_clicked = False
-        for selector in collection_selectors:
-            try:
-                new_collection = wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
-                new_collection.click()
-                sleep(3)
-                print("NEW COLLECTION clicked")
-                collection_clicked = True
-                break
-            except TimeoutException:
-                continue
-        
-        if not collection_clicked:
-            print("Could not find NEW COLLECTION, skipping...")
-        
-        # Click category
-        print(f"Looking for {category_name}...")
-        category_section = wait.until(EC.element_to_be_clickable((By.XPATH, f'//span[@class="layout-categories-category-name" and text()="{category_name}"]')))
-        category_section.click()
-        sleep(3)
-        print(f"Navigated to {category_name}!")
-    except TimeoutException as e:
-        print(f"Navigation timeout error: {e}")
-        raise
-    except Exception as e:
-        print(f"Navigation error: {e}")
-        raise
+        accept_cookies = driver.find_element(By.XPATH, '//button[contains(text(), "Accept") or contains(text(), "Aceptar")]')
+        accept_cookies.click()
+        sleep(1)
+    except:
+        pass
+    
+    print(f"Navigated to {category_name}!")
+
+# COMMENTED OUT - Old menu navigation method
+# def navigate_to_category(category_name):
+#     print(f"Navigating to {category_name}...")
+#     
+#     for attempt in range(3):  # Retry up to 3 times
+#         try:
+#             driver.get('https://www.zara.com/es/en/')
+#             sleep(5)  # Increased wait time
+#             
+#             # Click menu icon
+#             print("Looking for menu icon...")
+#             menu_icon = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='theme-app']//header//button")))
+#             driver.execute_script("arguments[0].click();", menu_icon)  # Use JS click
+#             sleep(3)
+#             print("Menu opened")
+#             
+#             # Click WOMAN
+#             print("Looking for WOMAN section...")
+#             woman_selectors = [
+#                 '//span[@class="layout-categories-category-name" and text()="WOMAN"]',
+#                 '//span[contains(@class,"layout-categories-category-name") and text()="WOMAN"]',
+#                 '//span[contains(text(), "WOMAN")]'
+#             ]
+#             
+#             woman_clicked = False
+#             for selector in woman_selectors:
+#                 try:
+#                     woman_section = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, selector)))
+#                     driver.execute_script("arguments[0].click();", woman_section)  # Use JS click
+#                     sleep(3)
+#                     print("WOMAN clicked")
+#                     woman_clicked = True
+#                     break
+#                 except TimeoutException:
+#                     continue
+#             
+#             if not woman_clicked:
+#                 print("Could not find WOMAN section, trying direct URL...")
+#                 driver.get('https://www.zara.com/es/en/woman-l1180.html')
+#                 sleep(5)
+#             
+#             # Click NEW COLLECTION (optional step)
+#             print("Looking for NEW COLLECTION...")
+#             try:
+#                 new_collection = WebDriverWait(driver, 8).until(
+#                     EC.element_to_be_clickable((By.XPATH, '//span[@class="layout-categories-category-name" and contains(text(), "NEW COLLECTION")]'))
+#                 )
+#                 driver.execute_script("arguments[0].click();", new_collection)
+#                 sleep(3)
+#                 print("NEW COLLECTION clicked")
+#             except TimeoutException:
+#                 print("NEW COLLECTION not found, continuing...")
+#             
+#             # Click category
+#             print(f"Looking for {category_name}...")
+#             category_section = WebDriverWait(driver, 15).until(
+#                 EC.element_to_be_clickable((By.XPATH, f'//span[@class="layout-categories-category-name" and text()="{category_name}"]'))
+#             )
+#             driver.execute_script("arguments[0].click();", category_section)  # Use JS click
+#             sleep(5)
+#             print(f"Navigated to {category_name}!")
+#             return  # Success, exit retry loop
+#             
+#         except Exception as e:
+#             print(f"Attempt {attempt + 1} failed: {e}")
+#             if attempt == 2:  # Last attempt
+#                 raise
+#             sleep(3)
 
 # Function to scroll and collect product links
-def collect_product_links():
+def collect_product_links(driver):
     print("Scrolling to load all products...")
-    height = driver.execute_script("return document.body.scrollHeight")
-    scroll_count = 0
-    while True:
+    # Scroll 3 times quickly instead of waiting for no height change
+    for i in range(3):
         driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-        sleep(5)
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        scroll_count += 1
-        print(f"Scroll #{scroll_count}")
-        
-        if height == new_height:
-            break
-        height = new_height
+        sleep(2)
+        print(f"Scroll #{i+1}")
     
     print("Collecting product links...")
     product_links = []
@@ -170,10 +153,14 @@ def collect_product_links():
     
     for product in page_product_links:
         product_link = product.get_attribute('href')
-        if product_link and product_link.startswith('http'):
+        # Validate URL format immediately
+        if product_link and product_link.startswith('https://www.zara.com'):
             product_links.append(product_link)
+            print(f"Valid URL collected: {product_link}")
+        else:
+            print(f"Invalid URL skipped: {product_link}")
     
-    print(f"Found {len(product_links)} products")
+    print(f"Found {len(product_links)} valid products")
     return product_links
 
 # Extracting product name
@@ -185,7 +172,7 @@ def collect_product_links():
 #         product_name = "Not available"
 #     return product_name
 
-def get_product_name(timeout=8):
+def get_product_name(driver, timeout=5):
     try:
         el = WebDriverWait(driver, timeout).until(
             EC.visibility_of_element_located((By.XPATH, "//h1[contains(@class,'product-detail-info__header-name')]"))
@@ -195,20 +182,8 @@ def get_product_name(timeout=8):
         print(f"Product name extraction error: {e}")
         return "Not available"
 
-
-
-# Extracting product mrp
-# def get_mrp():
-#     try:
-#         mrp = driver.find_element(By.XPATH, '//span[@class="money-amount__main"]').text
-#     except Exception as e:
-#         print(f"Price extraction error: {e}")
-#         mrp = "Not available"
-#     return mrp
-
-def get_mrp(timeout=8):
+def get_mrp(driver, timeout=5):
     try:
-        # There can be multiple prices; take the first visible main amount
         el = WebDriverWait(driver, timeout).until(
             EC.visibility_of_element_located((By.XPATH, "//span[contains(@class,'money-amount__main')]"))
         )
@@ -228,19 +203,10 @@ def get_mrp(timeout=8):
 #         color = "Not available"
 #     return color
 
-def get_color_new(timeout=8):
-    """
-    Robust Zara color extraction using XPath.
-    Tries multiple page variants and avoids exact class matching.
-    """
+def get_color_new(driver, timeout=5):
     xpaths = [
-        # Most stable (QA attribute)
         "//p[@data-qa-qualifier='product-detail-info-color']",
-
-        # Selected color component (some templates)
         "//*[self::p or self::span][contains(@class,'product-detail-color-selector__selected-color-name')]",
-
-        # Generic fallback
         "//*[self::p or self::span][contains(@class,'product-color-extended-name')]",
     ]
 
@@ -262,20 +228,7 @@ def get_color_new(timeout=8):
 
     return "Not available"
 
-# Extracting reference number
-# def get_reference_number():
-#     try:
-#         reference = driver.find_element(By.XPATH, '//button[@class="product-color-extended-name__copy-action"]').text
-#     except Exception as e:
-#         print(f"Reference number extraction error: {e}")
-#         reference = "Not available"
-#     return reference 
-
-def get_reference_number(timeout=8):
-    """
-    Some pages show a 'copy action' button containing the reference text.
-    Use contains(@class,...) instead of exact class match.
-    """
+def get_reference_number(driver, timeout=5):
     xpaths = [
         "//button[contains(@class,'product-color-extended-name__copy-action')]",
         "//*[self::button or self::span or self::p][contains(@class,'product-color-extended-name__copy-action')]",
@@ -293,24 +246,7 @@ def get_reference_number(timeout=8):
 
     return "Not available"
 
-# # Extracting product color
-# def get_color():
-#     try:
-#         color = driver.find_element(By.XPATH, '//p[@class="product-color-extended-name product-detail-info__color"]').text
-#     except Exception as e:
-#         color = "Not available"
-#     return color
-
-# Extracting product description
-# def get_desc():
-#     try:
-#         desc = driver.find_element(By.XPATH, '//div[@class="expandable-text__inner-content"]/p').text
-#     except Exception as e:
-#         print(f"Description extraction error: {e}")
-#         desc = "Not available"
-#     return desc
-
-def get_desc(timeout=8):
+def get_desc(driver, timeout=5):
     try:
         el = WebDriverWait(driver, timeout).until(
             EC.visibility_of_element_located(
@@ -322,101 +258,251 @@ def get_desc(timeout=8):
         print(f"Description extraction error: {e}")
         return "Not available"
 
-# Extracting front view image URL
-# def get_front_view_image():
-#     try:
-#         front_image = driver.find_element(By.XPATH, '//img[@class="media-image__image media__wrapper--media" and starts-with(@alt, "Front view")]')
-#         front_image_url = front_image.get_attribute('src')
-#     except Exception as e:
-#         print(f"Front view image extraction error: {e}")
-#         front_image_url = "Not available"
-#     return front_image_url
+def _largest_from_srcset(srcset: str) -> str | None:
+    if not srcset:
+        return None
+    parts = [p.strip() for p in srcset.split(",") if p.strip()]
+    best_url, best_w = None, -1
+    for part in parts:
+        segs = part.split()
+        url = segs[0].strip()
+        w = -1
+        if len(segs) > 1:
+            m = re.match(r"(\d+)w", segs[1])
+            if m:
+                w = int(m.group(1))
+        if w > best_w:
+            best_w, best_url = w, url
+    return best_url
 
-# //*[@id="main"]/div/div[2]/div[1]/div[1]/button/div/div/picture/img
-
-# //*[@id="main"]/div/div[2]/ul/li[3]/button/div/div/picture/img
-
-# //*[@id="main"]/div/div[2]/ul/li[6]/button/div/div/picture/img
-# //*[@id="main"]/div/div[2]/ul/li[7]/button/div/div/picture/img
-# //*[@id="main"]/div/div[2]/ul/li[5]/button/div/div/picture/img
-
-# def get_front_view_image(timeout=8):
-#     """
-#     Zara image alts vary by language. Try multiple strategies.
-#     """
-#     xpaths = [
-#         # Your original (English)
-#         "//img[contains(@class,'media-image__image') and starts-with(@alt, 'Front view')]",
-#         # Spanish / more generic: any media image in gallery (first one)
-#         "(//img[contains(@class,'media-image__image')])[1]",
-#     ]
-#     for xp in xpaths:
-#         try:
-#             el = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.XPATH, xp)))
-#             src = el.get_attribute("src")
-#             if src:
-#                 return src
-#         except TimeoutException:
-#             continue
-#         except StaleElementReferenceException:
-#             continue
-
-#     return "Not available"
-
-def get_product_image(timeout=8):
+def get_product_image(driver, timeout=10):
     try:
+        # Clear any existing state and ensure fresh page load
+        driver.execute_script("window.scrollTo(0, 0);")
+        sleep(1)
+        
+        # Scroll to load extra images (same as isolated test)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
+        sleep(2)
+        
+        # Wait for extra images section to load
         WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.XPATH, "//img[contains(@class,'media-image__image media__wrapper--media')]"))
+            EC.presence_of_element_located((By.XPATH, "//ul[@class='product-detail-view__extra-images']//picture"))
         )
-        images = driver.find_elements(By.XPATH, "//img[contains(@class,'media-image__image media__wrapper--media')]")
         
-        for img in images:
-            src = img.get_attribute("src")
-            if src and "transparent-background.png" not in src:
-                return src
+        # Get all picture elements
+        pictures = driver.find_elements(By.XPATH, "//ul[@class='product-detail-view__extra-images']//picture[@class='media-image']")
+        print(f"Found {len(pictures)} picture elements to check")
         
+        # First pass: look for front view images
+        for i, picture in enumerate(pictures):
+            try:
+                img = picture.find_element(By.XPATH, ".//img")
+                alt = (img.get_attribute("alt") or "")
+                alt_norm = " ".join(alt.split()).lower()
+                print(f"Picture {i+1} img alt: '{alt}'")
+                
+                if "front view" in alt_norm:
+                    print(f"Found front view in picture {i+1}")
+                    # Try to get from srcset first
+                    sources = picture.find_elements(By.XPATH, ".//source[@srcset]")
+                    for s in sources:
+                        url = _largest_from_srcset((s.get_attribute("srcset") or "").strip())
+                        if url:
+                            print(f"Extracted URL from srcset: {url[:50]}...")
+                            return url
+                    
+                    # Fallback to img src
+                    src = img.get_attribute("src")
+                    if src and "transparent-background.png" not in src:
+                        print(f"Using img src: {src[:50]}...")
+                        return src
+                        
+            except Exception:
+                continue
+        
+        print("No front view found, using first valid image...")
+        # Second pass: use first valid image
+        for i, picture in enumerate(pictures):
+            try:
+                img = picture.find_element(By.XPATH, ".//img")
+                src = img.get_attribute("src")
+                if src and "transparent-background.png" not in src:
+                    print(f"Using first valid image from picture {i+1}: {src[:50]}...")
+                    return src
+            except Exception:
+                continue
+        
+        print("Product image extraction error: No valid images found")
         return "Not available"
+        
     except Exception as e:
         print(f"Product image extraction error: {e}")
         return "Not available"
 
+# def get_product_image(driver, timeout=5):
+#     try:
+#         # First try to find images in the extra images section
+#         WebDriverWait(driver, timeout).until(
+#             EC.presence_of_element_located((By.XPATH, "//ul[@class='product-detail-view__extra-images']//picture"))
+#         )
+        
+#         # Look for picture elements in extra images, then find img inside
+#         pictures = driver.find_elements(By.XPATH, "//ul[@class='product-detail-view__extra-images']//picture[@class='media-image']")
+#         print(f"Found {len(pictures)} picture elements to check")
+        
+#         for i, picture in enumerate(pictures):
+#             try:
+#                 # Find the img element inside this picture
+#                 img = picture.find_element(By.XPATH, ".//img")
+#                 alt = (img.get_attribute("alt") or "")
+#                 alt_norm = " ".join(alt.split()).lower()
+#                 print(f"Picture {i+1} img alt: '{alt[:50]}...'")
+                
+#                 if "front view" in alt_norm:
+#                     print(f"Found front view in picture {i+1}")
+#                     # Try to get from srcset first
+#                     sources = picture.find_elements(By.XPATH, ".//source[@srcset]")
+#                     for s in sources:
+#                         url = _largest_from_srcset((s.get_attribute("srcset") or "").strip())
+#                         if url:
+#                             print(f"Extracted URL from srcset: {url[:50]}...")
+#                             return url
+                    
+#                     # Fallback to img src
+#                     src = img.get_attribute("src")
+#                     if src and "transparent-background.png" not in src:
+#                         print(f"Using img src: {src[:50]}...")
+#                         return src
+                        
+#             except Exception as e:
+#                 print(f"Error processing picture {i+1}: {e}")
+#                 continue
+        
+#         print("No front view found, using first valid image...")
+#         # If no front view found, use first valid image from pictures
+#         for i, picture in enumerate(pictures):
+#             try:
+#                 img = picture.find_element(By.XPATH, ".//img")
+#                 src = img.get_attribute("src")
+#                 if src and "transparent-background.png" not in src:
+#                     print(f"Using first valid image from picture {i+1}: {src[:50]}...")
+#                     return src
+#             except Exception:
+#                 continue
+        
+#         print("Product image extraction error: No valid images found in extra images")
+#         return "Not available"
+        
+#     except Exception as e:
+#         print(f"Product image extraction error: {e}")
+#         return "Not available"
 
-
-# Writing to a CSV File
-print("Starting data extraction for all categories...")
-with open('women_all_categories_data.csv','w',newline='', encoding='utf-8') as f:
-    theWriter = writer(f)
-    heading = ['product_url', 'product_name', 'mrp', 'color', 'reference_number', 'description', 'product_image', 'product_category']
-    theWriter.writerow(heading)
+# Scrape single category function for parallel processing
+def scrape_category(category_name, category_url):
+    driver = create_driver()
+    driver.maximize_window()
     
-    for category in categories:
-        try:
-            navigate_to_category(category)
-            product_links = collect_product_links()
-            
-            print(f"Starting data extraction for {category}...")
-            for i, product in enumerate(product_links, 1):
-                try:
-                    print(f"Processing {category} {i}/{len(product_links)}")
-                    driver.get(product)
-                    sleep(2)
-                    product_name = get_product_name()
-                    mrp = get_mrp()
-                    color = get_color_new()
-                    reference_number = get_reference_number()
-                    desc = get_desc()
-                    product_image = get_product_image()
-                    record = [product, product_name, mrp, color, reference_number, desc, product_image, category]
-                    theWriter.writerow(record)
-                    print(f"✓ {product_name}")
-                except Exception as e:
-                    print(f"Error processing product {i}: {e}")
+    try:
+        navigate_to_category(category_name, category_url, driver)
+        product_links = collect_product_links(driver)
+        
+        category_data = []
+        processed_count = 0
+        success_count = 0
+        error_count = 0
+        print(f"Starting data extraction for {category_name}...")
+        
+        for i, product in enumerate(product_links, 1):
+            processed_count += 1
+            try:
+                print(f"Processing {category_name} {i}/{len(product_links)}: {product}")
+                driver.get(product)
+                sleep(1)  # Reduced sleep time
+                
+                product_name = get_product_name(driver)
+                mrp = get_mrp(driver)
+                color = get_color_new(driver)
+                reference_number = get_reference_number(driver)
+                desc = get_desc(driver)
+                product_image = get_product_image(driver)
+                
+                # Validate all extracted data before creating record
+                if not product or not product.startswith('https://www.zara.com'):
+                    print(f"✗ Invalid product URL: {product}")
+                    error_count += 1
                     continue
-            
-            print(f"Completed {category} - {len(product_links)} products")
-        except Exception as e:
-            print(f"Error processing {category}: {e}")
-            continue
+                    
+                # Ensure no field contains newlines or commas that could break CSV
+                product_name = product_name.replace('\n', ' ').replace('\r', ' ') if product_name else "Not available"
+                desc = desc.replace('\n', ' ').replace('\r', ' ') if desc else "Not available"
+                
+                record = [product, product_name, mrp, color, reference_number, desc, product_image, category_name]
+                
+                # Final validation - ensure all fields are strings
+                record = [str(field) if field is not None else "Not available" for field in record]
+                
+                category_data.append(record)
+                success_count += 1
+                print(f"✓ {product_name} - SUCCESS")
+                
+            except Exception as e:
+                print(f"✗ Error processing product {i}: {e}")
+                error_count += 1
+                continue
+        
+        print(f"Completed {category_name}:")
+        print(f"  - Products found: {len(product_links)}")
+        print(f"  - Products processed: {processed_count}")
+        print(f"  - Successful extractions: {success_count}")
+        print(f"  - Errors/skipped: {error_count}")
+        return category_data
+        
+    except Exception as e:
+        print(f"Error processing {category_name}: {e}")
+        return []
+    finally:
+        driver.quit()
 
-print("Done!")
-driver.quit()
+
+
+# Main execution with parallel processing
+if __name__ == "__main__":
+    print("Starting parallel data extraction...")
+    
+    # Use ThreadPoolExecutor for parallel processing (1-2 threads to avoid overwhelming the server)
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        # Submit all category scraping tasks
+        future_to_category = {
+            executor.submit(scrape_category, category, url): category 
+            for category, url in category_urls.items()
+        }
+        
+        # Collect results and write to CSV
+        total_found = 0
+        total_written = 0
+        
+        with open('women_all_categories_data.csv', 'w', newline='', encoding='utf-8') as f:
+            theWriter = writer(f)
+            heading = ['product_url', 'product_name', 'mrp', 'color', 'reference_number', 'description', 'product_image', 'product_category']
+            theWriter.writerow(heading)
+            
+            # Process completed tasks as they finish
+            for future in future_to_category:
+                category = future_to_category[future]
+                try:
+                    category_data = future.result()
+                    total_found += len(category_data)
+                    
+                    for record in category_data:
+                        theWriter.writerow(record)
+                        total_written += 1
+                    print(f"✓ Completed writing {category} data to CSV")
+                except Exception as e:
+                    print(f"✗ Error with {category}: {e}")
+        
+        print(f"\n=== FINAL SUMMARY ===")
+        print(f"Total products extracted: {total_found}")
+        print(f"Total products written to CSV: {total_written}")
+    
+    print("Done! All categories processed.")
