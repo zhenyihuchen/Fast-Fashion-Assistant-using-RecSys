@@ -18,9 +18,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from webdriver_manager.chrome import ChromeDriverManager
+import pandas as pd
 
 #urls = ["https://www.zara.com/es/en/knit-peplum-belted-top-p04192141.html", "https://www.zara.com/es/en/satin-halter-top-p02231581.html?v1=502175053"]
-urls = ["https://www.zara.com/es/en/short-satin-scarf-dress-p02116341.html"]
+# urls = ["https://www.zara.com/es/en/short-satin-scarf-dress-p02116341.html"]
+
+# Read women_all_categories_dataset.csv file
+woman_data = pd.read_csv("women_all_categories_data.csv")
+
+# Check how many rows has in the product_image column the value "Not available"
+na_image_rows = woman_data[woman_data["product_image"] == "Not available"]
+print(f"Number of rows with 'Not available' in product_image column: {len(na_image_rows)}")
+
+# Save in a list all the product URLs of the rows with "Not available" in the product_image column
+urls = na_image_rows["product_url"].tolist()
 
 def _largest_from_srcset(srcset: str) -> str | None:
     if not srcset:
@@ -130,10 +141,15 @@ def main():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
 
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=chrome_options,
-    )
+    try:
+        # Force fresh ChromeDriver download
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+    except Exception as e:
+        print(f"ChromeDriver setup failed: {e}")
+        print("Trying alternative setup...")
+        # Fallback: try without service specification
+        driver = webdriver.Chrome(options=chrome_options)
 
     try:
         for i, url in enumerate(urls, 1):
@@ -153,6 +169,9 @@ def main():
 
             image_url = get_front_or_rear_packshot_url(driver)
             print(f"\nFront/Rear packshot image URL: {image_url}\n")
+            
+            #Save the extracted image URL back to the dataframe
+            woman_data.loc[woman_data["product_url"] == url, "product_image"] = image_url
 
     finally:
         driver.quit()

@@ -160,8 +160,15 @@ def collect_product_links(driver):
         else:
             print(f"Invalid URL skipped: {product_link}")
     
-    print(f"Found {len(product_links)} valid products")
-    return product_links
+    # Remove duplicates while preserving order
+    unique_links = list(dict.fromkeys(product_links))
+    duplicates_removed = len(product_links) - len(unique_links)
+    
+    print(f"Found {len(product_links)} total products")
+    print(f"Removed {duplicates_removed} duplicate URLs")
+    print(f"Final unique products: {len(unique_links)}")
+    
+    return unique_links
 
 # Extracting product name
 # def get_product_name():
