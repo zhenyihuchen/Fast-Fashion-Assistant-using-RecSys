@@ -4,6 +4,7 @@
 
 # Importing the required libraries
 import re
+from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -23,6 +24,9 @@ from selenium.common.exceptions import (
 
 
 print("Starting web scraper...")
+
+DEFAULT_TIMEOUT = 3
+IMAGE_TIMEOUT = 6
 
 # Categories with direct URLs
 category_urls = {
@@ -69,7 +73,7 @@ def navigate_to_category(category_name, category_url, driver):
     
     print(f"Navigated to {category_name}!")
 
-# COMMENTED OUT - Old menu navigation method
+# COMMENTED OUT, Old menu navigation method of manually clickling through menu - not very efficient 
 # def navigate_to_category(category_name):
 #     print(f"Navigating to {category_name}...")
 #     
@@ -179,7 +183,7 @@ def collect_product_links(driver):
 #         product_name = "Not available"
 #     return product_name
 
-def get_product_name(driver, timeout=5):
+def get_product_name(driver, timeout=DEFAULT_TIMEOUT):
     try:
         el = WebDriverWait(driver, timeout).until(
             EC.visibility_of_element_located((By.XPATH, "//h1[contains(@class,'product-detail-info__header-name')]"))
@@ -189,7 +193,7 @@ def get_product_name(driver, timeout=5):
         print(f"Product name extraction error: {e}")
         return "Not available"
 
-def get_mrp(driver, timeout=5):
+def get_price(driver, timeout=DEFAULT_TIMEOUT):
     try:
         el = WebDriverWait(driver, timeout).until(
             EC.visibility_of_element_located((By.XPATH, "//span[contains(@class,'money-amount__main')]"))
@@ -210,7 +214,7 @@ def get_mrp(driver, timeout=5):
 #         color = "Not available"
 #     return color
 
-def get_color_new(driver, timeout=5):
+def get_color_new(driver, timeout=DEFAULT_TIMEOUT):
     xpaths = [
         "//p[@data-qa-qualifier='product-detail-info-color']",
         "//*[self::p or self::span][contains(@class,'product-detail-color-selector__selected-color-name')]",
@@ -235,7 +239,7 @@ def get_color_new(driver, timeout=5):
 
     return "Not available"
 
-def get_reference_number(driver, timeout=5):
+def get_reference_number(driver, timeout=DEFAULT_TIMEOUT):
     xpaths = [
         "//button[contains(@class,'product-color-extended-name__copy-action')]",
         "//*[self::button or self::span or self::p][contains(@class,'product-color-extended-name__copy-action')]",
@@ -253,7 +257,7 @@ def get_reference_number(driver, timeout=5):
 
     return "Not available"
 
-def get_desc(driver, timeout=5):
+def get_desc(driver, timeout=DEFAULT_TIMEOUT):
     try:
         el = WebDriverWait(driver, timeout).until(
             EC.visibility_of_element_located(
@@ -282,7 +286,7 @@ def _largest_from_srcset(srcset: str) -> str | None:
             best_w, best_url = w, url
     return best_url
 
-def get_product_image(driver, timeout=10):
+def get_product_image(driver, timeout=IMAGE_TIMEOUT):
     try:
         # Clear any existing state and ensure fresh page load
         driver.execute_script("window.scrollTo(0, 0);")
@@ -328,17 +332,7 @@ def get_product_image(driver, timeout=10):
             except Exception:
                 continue
         
-        print("No front view found, using first valid image...")
-        # Second pass: use first valid image
-        for i, picture in enumerate(pictures):
-            try:
-                img = picture.find_element(By.XPATH, ".//img")
-                src = img.get_attribute("src")
-                if src and "transparent-background.png" not in src:
-                    print(f"Using first valid image from picture {i+1}: {src[:50]}...")
-                    return src
-            except Exception:
-                continue
+        print("No front view found")
         
         print("Product image extraction error: No valid images found")
         return "Not available"
@@ -347,63 +341,6 @@ def get_product_image(driver, timeout=10):
         print(f"Product image extraction error: {e}")
         return "Not available"
 
-# def get_product_image(driver, timeout=5):
-#     try:
-#         # First try to find images in the extra images section
-#         WebDriverWait(driver, timeout).until(
-#             EC.presence_of_element_located((By.XPATH, "//ul[@class='product-detail-view__extra-images']//picture"))
-#         )
-        
-#         # Look for picture elements in extra images, then find img inside
-#         pictures = driver.find_elements(By.XPATH, "//ul[@class='product-detail-view__extra-images']//picture[@class='media-image']")
-#         print(f"Found {len(pictures)} picture elements to check")
-        
-#         for i, picture in enumerate(pictures):
-#             try:
-#                 # Find the img element inside this picture
-#                 img = picture.find_element(By.XPATH, ".//img")
-#                 alt = (img.get_attribute("alt") or "")
-#                 alt_norm = " ".join(alt.split()).lower()
-#                 print(f"Picture {i+1} img alt: '{alt[:50]}...'")
-                
-#                 if "front view" in alt_norm:
-#                     print(f"Found front view in picture {i+1}")
-#                     # Try to get from srcset first
-#                     sources = picture.find_elements(By.XPATH, ".//source[@srcset]")
-#                     for s in sources:
-#                         url = _largest_from_srcset((s.get_attribute("srcset") or "").strip())
-#                         if url:
-#                             print(f"Extracted URL from srcset: {url[:50]}...")
-#                             return url
-                    
-#                     # Fallback to img src
-#                     src = img.get_attribute("src")
-#                     if src and "transparent-background.png" not in src:
-#                         print(f"Using img src: {src[:50]}...")
-#                         return src
-                        
-#             except Exception as e:
-#                 print(f"Error processing picture {i+1}: {e}")
-#                 continue
-        
-#         print("No front view found, using first valid image...")
-#         # If no front view found, use first valid image from pictures
-#         for i, picture in enumerate(pictures):
-#             try:
-#                 img = picture.find_element(By.XPATH, ".//img")
-#                 src = img.get_attribute("src")
-#                 if src and "transparent-background.png" not in src:
-#                     print(f"Using first valid image from picture {i+1}: {src[:50]}...")
-#                     return src
-#             except Exception:
-#                 continue
-        
-#         print("Product image extraction error: No valid images found in extra images")
-#         return "Not available"
-        
-#     except Exception as e:
-#         print(f"Product image extraction error: {e}")
-#         return "Not available"
 
 # Scrape single category function for parallel processing
 def scrape_category(category_name, category_url):
@@ -428,7 +365,7 @@ def scrape_category(category_name, category_url):
                 sleep(1)  # Reduced sleep time
                 
                 product_name = get_product_name(driver)
-                mrp = get_mrp(driver)
+                price = get_price(driver)
                 color = get_color_new(driver)
                 reference_number = get_reference_number(driver)
                 desc = get_desc(driver)
@@ -444,7 +381,9 @@ def scrape_category(category_name, category_url):
                 product_name = product_name.replace('\n', ' ').replace('\r', ' ') if product_name else "Not available"
                 desc = desc.replace('\n', ' ').replace('\r', ' ') if desc else "Not available"
                 
-                record = [product, product_name, mrp, color, reference_number, desc, product_image, category_name]
+                row_id = success_count + 1
+                extracted_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+                record = [row_id, product, product_name, price, color, reference_number, desc, product_image, category_name, extracted_at]
                 
                 # Final validation - ensure all fields are strings
                 record = [str(field) if field is not None else "Not available" for field in record]
@@ -491,7 +430,7 @@ if __name__ == "__main__":
         
         with open('women_all_categories_data.csv', 'w', newline='', encoding='utf-8') as f:
             theWriter = writer(f)
-            heading = ['product_url', 'product_name', 'mrp', 'color', 'reference_number', 'description', 'product_image', 'product_category']
+            heading = ['row_id', 'product_url', 'product_name', 'price', 'color', 'reference_number', 'description', 'image_url', 'product_category', 'extracted_at']
             theWriter.writerow(heading)
             
             # Process completed tasks as they finish
