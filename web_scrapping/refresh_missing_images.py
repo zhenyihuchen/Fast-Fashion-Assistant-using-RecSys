@@ -1,6 +1,7 @@
 import csv
 import re
 from time import sleep
+from pathlib import Path
 
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
@@ -10,8 +11,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from web_scrapping.web_scrapping import create_driver
 
 
-INPUT_CSV = "women_all_categories_data_updated1.csv"
-OUTPUT_CSV = "women_all_categories_data_updated2.csv"
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR.parent / "data"
+
+INPUT_CSV = DATA_DIR / "web_scrapping_runs" / "women_all_categories_data_updated1.csv"
+OUTPUT_CSV = DATA_DIR / "web_scrapping_runs" / "women_all_categories_data_updated2.csv"
 IMAGE_TIMEOUT = 6
 
 

@@ -4,6 +4,7 @@
 
 # Importing the required libraries
 import re
+from pathlib import Path
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 from selenium import webdriver
@@ -22,6 +23,10 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR.parent / "data"
+SCRAPE_DIR = DATA_DIR / "web_scrapping_runs"
 
 print("Starting web scraper...")
 
@@ -427,7 +432,9 @@ if __name__ == "__main__":
         total_found = 0
         total_written = 0
         
-        with open('women_all_categories_data.csv', 'w', newline='', encoding='utf-8') as f:
+        SCRAPE_DIR.mkdir(parents=True, exist_ok=True)
+        output_csv = SCRAPE_DIR / "women_all_categories_data.csv"
+        with open(output_csv, 'w', newline='', encoding='utf-8') as f:
             theWriter = writer(f)
             heading = ['row_id', 'product_url', 'product_name', 'price', 'color', 'reference_number', 'description', 'image_url', 'product_category', 'extracted_at']
             theWriter.writerow(heading)

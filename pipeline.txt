@@ -27,5 +27,72 @@ cleaned product metadata is stored in Apache Parquet format to preserve data typ
 CSV: Row-based, Must read the entire file to access any column, Slow for large files, Expensive when repeatedly loading for filtering and ranking
 Parquet: Columnar format, You can load only the columns you need, Much faster for: filtering by category/price/color, repeated reads in recommender loops, Better for memory usage
 
+
+
+
+
+
 2. Visual feature extraction
-- cache image URLs locally because they can break or rate-limit, network failures, not reproducible fast, recomputing embeddings becomes slow and unpredictable 
+- cache image URLs locally because they can break or rate-limit, network failures, not reproducible fast, recomputing embeddings becomes slow and unpredictable
+- after caching the images locally in .jpg format, there are a total of 1071, becauase some of the exact same items appear under different categories,so when scrapping they were duplicated. 
+
+
+For the visual feature extraction part: 
+- will not use one model specifically designed for clothes, because the aim is not to clasify clothes categories. 
+
+A pre-trained Contrastive Language–Image Pretraining (CLIP) model is employed to extract image and text embeddings in a shared semantic space, enabling zero-shot matching between user queries and product images, as well as prompt-based estimation of occasion suitability.
+
+CLIP: 
+- CLIP may struggle with: very subtle fabric types (e.g., silk vs satin), very fine-grained tailoring details, brand-specific style nuances
+- But for: category, color, pattern, formality, party vs wedding vs business
+
+
+fashion-specific models (trained on DeepFashion, etc.): Slightly better at fine-grained fashion attributes, More detailed garment-specific labels
+Cons (important for you)
+❌ Harder to integrate
+❌ Often not aligned with natural language queries
+❌ Limited generalization to Zara photography
+❌ Less good at abstract concepts like “wedding-appropriate”
+❌ Harder to explain cross-modal matching
+
+# the multimodal vision models will be used serveral times: 
+Your user query usually contains two different kinds of information:
+Event / context intent
+→ “for a wedding”, “for a party”, “for work”
+Product-specific preferences
+→ “red”, “midi”, “skinny”, “oversized”, “black”, “cheap”, “long sleeves”
+Occasion probability only captures (1).
+Query–image relevance captures (1) + (2).
+
+
+If you only do one score:
+You can’t answer:
+Did the item rank high because it matched the style?
+Or because it matched the occasion?
+With two signals, you can analyze:
+(1) relevance-only baseline
+(2) occasion-aware improvement
+That’s a real experimental contribution.
+
+
+-- Siglip vs CLIP
+That could be a nice optional experiment section:
+CLIP vs SIGLIP for fashion occasion retrieval
+(to be considered)
+
+
+CLIP: https://github.com/openai/CLIP
+
+- embeddings were computed using CLIP; doubled checked with PCA 
+- build FAISS index for fast search - stores the embeddings in a structure that allows fast nearest-neighbor search. still keep product_ids.npy because FAISS returns indices (0..N-1), not your product IDs.
+
+FAISS: index over your embeddings so you can find the closest vectors quickly without comparing to every item. FAISS returns positions in the embeddings array (0..N‑1)
+FAISS gives index i
+product_ids.npy[i] gives the actual row_id (or product ID)
+
+In clip_image_embeddings.py:
+_product_id returns row_id.
+product_ids is appended in the same order that embeddings are created (batch_ids are extended right after encode_image).
+So FAISS index 0 corresponds to product_ids[0], which is the row_id.
+
+but even if your IDs are already aligned, FAISS is still valuable because it makes similarity search fast.
