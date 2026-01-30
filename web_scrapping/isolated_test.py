@@ -23,15 +23,17 @@ import pandas as pd
 #urls = ["https://www.zara.com/es/en/knit-peplum-belted-top-p04192141.html", "https://www.zara.com/es/en/satin-halter-top-p02231581.html?v1=502175053"]
 # urls = ["https://www.zara.com/es/en/short-satin-scarf-dress-p02116341.html"]
 
-# Read women_all_categories_dataset.csv file
-woman_data = pd.read_csv("women_all_categories_data.csv")
+urls = ["https://www.zara.com/es/en/wool-blend-bomber-jacket-zw-collection-p07522040.html"]
 
-# Check how many rows has in the product_image column the value "Not available"
-na_image_rows = woman_data[woman_data["product_image"] == "Not available"]
-print(f"Number of rows with 'Not available' in product_image column: {len(na_image_rows)}")
+# # Read women_all_categories_dataset.csv file
+# woman_data = pd.read_csv("women_all_categories_data.csv")
 
-# Save in a list all the product URLs of the rows with "Not available" in the product_image column
-urls = na_image_rows["product_url"].tolist()
+# # Check how many rows has in the product_image column the value "Not available"
+# na_image_rows = woman_data[woman_data["product_image"] == "Not available"]
+# print(f"Number of rows with 'Not available' in product_image column: {len(na_image_rows)}")
+
+# # Save in a list all the product URLs of the rows with "Not available" in the product_image column
+# urls = na_image_rows["product_url"].tolist()
 
 def _largest_from_srcset(srcset: str) -> str | None:
     if not srcset:
@@ -171,7 +173,7 @@ def main():
             print(f"\nFront/Rear packshot image URL: {image_url}\n")
             
             #Save the extracted image URL back to the dataframe
-            woman_data.loc[woman_data["product_url"] == url, "product_image"] = image_url
+            # woman_data.loc[woman_data["product_url"] == url, "product_image"] = image_url
 
     finally:
         driver.quit()

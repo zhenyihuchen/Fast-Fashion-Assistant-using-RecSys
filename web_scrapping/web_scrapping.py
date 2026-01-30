@@ -293,7 +293,7 @@ def get_product_image(driver, timeout=IMAGE_TIMEOUT):
         sleep(1)
         
         # Scroll to load extra images (same as isolated test)
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);") #scrolls halfway down the page to trigger lazy loading of the extra images section.
         sleep(2)
         
         # Wait for extra images section to load
@@ -381,9 +381,8 @@ def scrape_category(category_name, category_url):
                 product_name = product_name.replace('\n', ' ').replace('\r', ' ') if product_name else "Not available"
                 desc = desc.replace('\n', ' ').replace('\r', ' ') if desc else "Not available"
                 
-                row_id = success_count + 1
                 extracted_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-                record = [row_id, product, product_name, price, color, reference_number, desc, product_image, category_name, extracted_at]
+                record = [product, product_name, price, color, reference_number, desc, product_image, category_name, extracted_at]
                 
                 # Final validation - ensure all fields are strings
                 record = [str(field) if field is not None else "Not available" for field in record]
@@ -441,8 +440,8 @@ if __name__ == "__main__":
                     total_found += len(category_data)
                     
                     for record in category_data:
-                        theWriter.writerow(record)
                         total_written += 1
+                        theWriter.writerow([total_written] + record)
                     print(f"✓ Completed writing {category} data to CSV")
                 except Exception as e:
                     print(f"✗ Error with {category}: {e}")

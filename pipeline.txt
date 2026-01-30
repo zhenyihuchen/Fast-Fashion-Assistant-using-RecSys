@@ -1,0 +1,31 @@
+1. Web scrapping - REVIEW 
+TO-DO: run again for deduplication and updated columns to be included
+- Image URL test completed successfully.
+- Challenges faced: the main challenge was to correctly extract the image URLs that had a white background and that were the Front view of the item, for extraction purposes. 
+- Some products dont have an image that starts with Front view
+- Other have the front view named as rear view (possibly an error on the website)
+- Others are not detected because the scroll function didnt work properlys
+- 140/1181 = 0.1185 = 11.85% images were missing and had to be refreshed
+- refresh strategy: some front view images were not included in the extra images section as usual, rather in the secondary content, and other front view images needed more than 1 scroll (the function was updated in the refresh_missing_images.py section)
+- after running the refresh strategy, there were still x/1182 images urls not found. after inspection, it was found that either there was not a Front view image or that it was named in the description as Rear view (potnetially a website error). since we want the front view because when extracting the image embeddings we only need the item per se, thos emissing urls were excluded. 
+- if double rear view, the first was taken because assumed as mislabeled
+- shoes are named with differnt descriptions, no Front View -> only keeping the ones that have images starting with Front view to not waste time 
+- after the first refresh the not available urls dropped from 140 to 72/1181= 0.0609 = 6.1%, almost by half, so the missing strategy worked 
+- realised that some products have the front view image at the beggining in the main content and not in the secondary or extra images section 
+- other missing ones were not named consistently starting with Front view, so we decided to skip (ex: "COWBOY SPLIT SUEDE BOOTS - Brown by Zara - Image 2")
+- after the second refresh 65/1181 = 0.055 = 5.5% still not avaiable but decide to skip those. 
+(Products for which front-view images could not be reliably retrieved were excluded from the image-based modeling components. This reflects realistic data quality constraints and ensures that all multimodal representations are derived from consistently obtained inputs.)
+
+The output is a CSV instead of other storage choice such as a relational DB because:
+- catalog is small/medium, only covering 14 categories from WOMAN new collection
+- single user? (for now i am the only user)
+- not rescrapping or updating often 
+- relationalDB is more production-like system
+
+cleaned product metadata is stored in Apache Parquet format to preserve data types, improve I/O efficiency, and support repeated filtering and ranking operations during recommendation.
+
+CSV: Row-based, Must read the entire file to access any column, Slow for large files, Expensive when repeatedly loading for filtering and ranking
+Parquet: Columnar format, You can load only the columns you need, Much faster for: filtering by category/price/color, repeated reads in recommender loops, Better for memory usage
+
+2. Visual feature extraction
+- cache image URLs locally because they can break or rate-limit, network failures, not reproducible fast, recomputing embeddings becomes slow and unpredictable 
