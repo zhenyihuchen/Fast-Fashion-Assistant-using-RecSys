@@ -96,3 +96,159 @@ product_ids is appended in the same order that embeddings are created (batch_ids
 So FAISS index 0 corresponds to product_ids[0], which is the row_id.
 
 but even if your IDs are already aligned, FAISS is still valuable because it makes similarity search fast.
+
+
+
+
+
+
+
+
+
+
+3. Occassion prompt library
+
+If you wanted “occasion suitability probabilities” the traditional way, you’d need a labeled dataset to train a classifier.
+Instead, prompts let you create an occasion scoring function without training by using CLIP’s learned knowledge.
+
+Because CLIP learned a shared embedding space where: images of “wedding guest dresses” and the text “wedding guest dress” end up close together.
+CLIP was trained on huge datasets of image–text pairs so that the correct caption matches the image better than random captions.
+==> zero-shot classification / prompt-based scoring
+
+embedding("wedding guest dress") 
+      ↕
+embedding(image_of_formal_dress)
+
+If the image looks like what CLIP has learned corresponds to wedding attire, the vectors will be close.
+If the image is:
+ripped jeans → far away
+hoodie → far away
+formal dress → close
+elegant blazer → somewhat close
+
+So the system doesn’t “decide” what clothing fits a wedding —
+it measures how visually similar the item is to the learned concept of “wedding attire”.
+
+CLIP does not “understand weddings” like a human.
+It understands: visual patterns associated with text used on the internet
+That’s enough for: ranking, recommendation, suitability estimation
+And it’s perfectly acceptable for a thesis.
+
+!!!! Occasion embeddings represent visual prototypes, and products are scored by how visually close they are to those prototypes.
+
+system can still handle occasions that are not in the library explicitely: 
+How to handle unseen/more specific occasions (recommended)
+Use a simple mapping strategy:
+If user occasion is not in library:
+- map it to the closest library occasion (“graduation” → “formal/corporate” or “party” depending on wording)
+- or dynamically create prompts from the user’s occasion text (more flexible)
+
+How to handle unseen/more specific occasions (recommended)
+Use a simple mapping strategy:
+If user occasion is not in library:
+map it to the closest library occasion (“graduation” → “formal/corporate” or “party” depending on wording)
+or dynamically create prompts from the user’s occasion text (more flexible)
+
+    If the occasion is unseen (e.g., “graduation”) and you decide to handle it dynamically, then:
+        you create 1 prompt (or a small set of prompts derived from it),
+        embed it with CLIP,
+        and compare it against the candidate image embeddings (just like your library occasions).
+
+        !!! or 2-3 automatic prompts 
+
+
+- Known occasion (in library): use your fixed 2–5 prompts
+- Unknown occasion (outside library): use a small auto-generated prompt set (2–3)
+- No occasion: occasion weight = 0, relevance only
+- Implicit occasion
+This gives you: consistency, robustness, a clean methodological story
+
+
+WORKFLOW
+Retrieve by query relevance → score occasion on retrieved candidates → rank → explain.
+
+Online (per user query) is essentially:
+1. Parse the query (occasion/category/constraints if detectable)
+2. Retrieve candidates by relevance (vector search + filters)
+3. Compute occasion suitability on the candidate set (prompt similarity)
+4. Final rank + explanations + return results
+
+!!! TO-DO: diagram to show the flow of this online part 
+
+
+
+
+PROMPT LIBRARY 
+Robust library: 
+    - Keep prompts short and consistent (avoid long sentences).
+    - Version the library (v1, v2…) so your experiments are reproducible.
+(use CLIP in english)
+
+- Criteria for defining the prompts
+- X prompts per occasion
+    3–5 prompts per occasion is a sweet spot that balances:
+        robustness (less sensitivity to wording),
+        coverage (different styles within the same occasion),
+        and efficiency (no unnecessary noise or computation).
+        many prompts = inneficient (ex: 10 occasions × 10 prompts = 100 prompt comparisons per item)
+    Each occasion is represented by a compact prompt ensemble that captures stylistic variability while remaining computationally efficient.
+
+        Beyond ~5 prompts: prompts become redundant, some introduce noise or unintended bias, improvements plateau, explanations get harder
+        More prompts ≠ more information.
+            Each occasion is represented by a small ensemble of three to five prompts. This choice reflects a trade-off between robustness and efficiency: multiple prompts reduce sensitivity to individual wording choices and capture stylistic variation within an occasion, while keeping the ensemble compact avoids redundant signals and unnecessary computational overhead.
+
+- X Q of occasions 
+    Fewer than 6 → too broad (everything becomes “formal vs casual”)
+    More than ~10 → becomes hard to define cleanly, overlaps explode, evaluation gets messy
+    (6-10)
+
+Occasions list: 
+(for NEW COLLECTION ZARA AUTUMN AND winter 2025-2025)
+1. wedding_guest: Outfits typically worn when attending a wedding as a guest, characterized by elevated formality, elegant silhouettes, and refined materials without reaching black-tie level.
+2. party_night_out: Looks intended for social nightlife contexts such as parties or clubbing, often featuring bold styling, statement pieces, and fashion-forward or expressive aesthetics.
+3. work_office: Professional attire appropriate for office environments, emphasizing clean lines, structured garments, and a balance between formality and everyday practicality.
+4. formal_event (gala, cocktail, formal dinner): Highly polished outfits designed for formal evening occasions, including galas, cocktail events, or formal dinners, typically involving sophisticated silhouettes and premium visual cues.
+5. casual_everyday: Comfort-oriented, relaxed clothing suitable for daily activities, prioritizing wearability and ease over structure or formality.
+6. date_night: Stylish yet approachable outfits intended for romantic or semi-formal social encounters, combining elegance with personal expression without excessive formality.
+(no se) 7. winter_outerwear: Cold-weather outer garments such as coats and jackets selected primarily for warmth and layering, while still contributing to the overall aesthetic of an outfit.
+(no se) 8. smart_casual: Polished but relaxed attire that blends casual comfort with structured or refined elements, suitable for informal professional or social settings requiring a put-together appearance.
+
+        These two are more for summer collection and since the scrapped data is winter like so not too appropriate:
+            vacation_summer (holiday, beach, resort)
+            festival_concert (concert, festival, going out casual-cool)
+
+Why this set works: Covers the most common real shopping contexts, Keeps overlap manageable, Includes both “dressy” and “casual” clusters, Matches typical Zara browsing patterns
+If you want a 9th/10th: winter_outerwear (for coats/jackets context), athleisure_gym (if you include sporty categories)
+
+
+Criteria: 
+1. Cover stylistic variation within the occasion
+2. Keep prompts short, descriptive, and visually grounded
+3. Balance formality across prompts. For each occasion: include at least one more formal phrasing, include at least one less formal / relaxed phrasing
+4. Avoid brand-, culture-, or rule-specific assumptions
+5. Keep wording consistent across occasions
+6. Limit the number of prompts per occasion
+7. Use English consistently (unless multilingual is intentional)
+
+PCA plot suggested that prompts were very far away from the image embeddings. 
+This PCA plot is not strong evidence that the approach “isn’t working.” Two important things can be true at the same time:
+- Your retrieval/scoring with CLIP can work perfectly well in the original 512-D space, and
+- A 2-D PCA visualization can look “broken” because PCA often separates modalities (text vs image) along the first principal component.
+
+A. PCA often separates modality (text vs image), not meaning
+When you run PCA on mixed embeddings, the biggest variance direction is often:
+“text vectors vs image vectors”
+So PCA₁ becomes a “domain axis”. That pushes all text points to one side and images to the other, even if cosine similarity in the full space is still meaningful.
+
+
+C. Missing normalization (very common) --> it is normalized!!! 
+For cosine similarity / dot-product retrieval you should L2-normalize both:
+image embeddings
+text embeddings
+If you normalize images but not text (or vice versa), projections and similarity behave weirdly, and PCA can exaggerate the gap.
+
+D. PCA plot scale is arbitrary and misleading
+Even if everything is correct, PCA axes can make it look like “they’re far apart,” but what matters is relative closeness.
+A better sanity check is:
+“Does the prompt ‘wedding guest outfit’ retrieve wedding-like dresses near the top?”
+Not whether points overlap in a 2-D projection.
