@@ -312,11 +312,16 @@ def parse_query_llm(query: str) -> dict[str, Any]:
     return result
 
 
-# if __name__ == "__main__":
-#     test_queries = [
-#         "I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
-#         "I am looking for a night short dress red but that costs red that costs less than 50 euros",
-#     ]
-#     for q in test_queries:
-#         print("\nQuery:", q)
-#         print(json.dumps(parse_query_llm(q), indent=2))
+if __name__ == "__main__":
+    test_queries = [
+        # "I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
+        "I am looking for a night short dress red but that costs red that costs less than 50 euros",
+    ]
+    for q in test_queries:
+        print("\nQuery:", q)
+        print(json.dumps(parse_query_llm(q), indent=2))
+        #Save JSON response to a file for inspection
+        output_path = BASE_DIR / "online" / "test_query_outputs"
+        output_path.mkdir(parents=True, exist_ok=True)
+        file_name = re.sub(r"\W+", "_", q.strip().lower())[:50] + ".json"
+        (output_path / file_name).write_text(json.dumps(parse_query_llm(q), indent=2), encoding="utf-8")

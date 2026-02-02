@@ -17,9 +17,10 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_query:
-        args.query = "I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be straight"
+        args.query = "I am looking for a night short red dress but that costs less than 50 euros"
+            #"I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be straight"
             #"I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
-            #"I am looking for a night short dress red but that costs red that costs less than 50 euros"
+            
     if not args.query:
         raise SystemExit("Provide --query or use --test-query")
 

@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 import re
 
+import open_clip
+import torch # !!! import this before numpy to avoid MKL issues
 import numpy as np
 import pandas as pd
+import faiss
+# import os
 
-
+# os.environ['KMP_DUPLICATE_LIB_OK']='True'
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 EMBED_DIR = DATA_DIR / "image_embeddings"
@@ -56,7 +61,7 @@ def _filter_rows(df: pd.DataFrame, parsed: dict) -> pd.DataFrame:
     if colors:
         color_norm = filtered["color"].astype(str).map(_normalize_color)
         color_set = {_normalize_color(c) for c in colors}
-        mask = color_norm.apply(lambda c: any(k in c for k in color_set))
+        mask = color_norm.apply(lambda c: any(k in c for k in color_set)) # match by substring
         filtered = filtered[mask]
 
     if price_min is not None or price_max is not None:
@@ -70,11 +75,6 @@ def _filter_rows(df: pd.DataFrame, parsed: dict) -> pd.DataFrame:
 
 
 def _encode_query(text: str) -> np.ndarray:
-    try:
-        import open_clip
-        import torch
-    except Exception:
-        raise SystemExit("open_clip not installed; run `pip install open-clip-torch`")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model, _, _ = open_clip.create_model_and_transforms(MODEL_NAME, pretrained=PRETRAINED)
@@ -95,26 +95,15 @@ def _search_vectors(
     topk: int,
     use_faiss: bool,
 ) -> tuple[np.ndarray, np.ndarray]:
-    if use_faiss:
-        try:
-            import faiss  # type: ignore
-        except Exception:
-            use_faiss = False
-    if use_faiss:
-        dim = embeddings.shape[1]
-        index = faiss.IndexFlatIP(dim)
-        faiss.normalize_L2(embeddings)
-        index.add(embeddings)
-        scores, indices = index.search(q_vec.reshape(1, -1), topk)
-        return scores[0], indices[0]
+    if not use_faiss:
+        raise ValueError("FAISS search disabled; enable use_faiss to search vectors")
 
-    # Brute-force fallback
-    emb = embeddings.copy()
-    emb /= np.linalg.norm(emb, axis=1, keepdims=True)
-    q = q_vec / np.linalg.norm(q_vec)
-    scores = emb @ q
-    idx = np.argsort(scores)[-topk:][::-1]
-    return scores[idx], idx
+    dim = embeddings.shape[1]
+    index = faiss.IndexFlatIP(dim)
+    faiss.normalize_L2(embeddings)
+    index.add(embeddings)
+    scores, indices = index.search(q_vec.reshape(1, -1), topk)
+    return scores[0], indices[0]
 
 
 def retrieve_candidates(
@@ -163,3 +152,16 @@ def retrieve_candidates(
     allowed_ids = set(filtered["row_id"].astype(str))
     return [(pid, score) for pid, score in pairs if pid in allowed_ids]
 
+
+# if __name__ == "__main__":
+#     query_text = (
+#         "I am looking for a night short dress red but that costs red that costs less than 50 euros"
+#     )
+#     parsed_path = BASE_DIR / "online" / "test_query_outputs" / "example1.json"
+#     with parsed_path.open("r", encoding="utf-8") as handle:
+#         parsed_query = json.load(handle)
+#     results = retrieve_candidates(query_text, parsed_query, topk=10, filter_first=True)
+#     print(f"Query: {query_text}")
+#     print(f"Parsed JSON: {parsed_path}")
+#     for rank, (product_id, score) in enumerate(results, start=1):
+#         print(f"{rank:02d}. {product_id} -> {score:.4f}")
