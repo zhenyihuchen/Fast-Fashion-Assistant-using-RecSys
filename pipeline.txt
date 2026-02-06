@@ -279,12 +279,19 @@ preguntar a santi que approach dejar
 
 
 b. Candidate list retrieval 
-
-
+Done using FAISS 
+TO-DO: need to include the description and the name that also includes relevant information about the cut and fit, that may not be straightforward in the image embedding. 
 
 c. Occasion suitability scores 
 
+Load the prompt embeddings for the target occasion (p = embeeding["name of occasion"]
+
+compute occassion score per candidade: for each candidate item embedding, compute the cosine similarity to each of the prompts from that occasion, and aggregate them using the mean 
+OccasionScore(i)=meanp∈P​cosine(ei​,p)
 
 
 d. Final Ranking 
+
+
+FinalScore(i)=α⋅Relevance(i)+β⋅OccasionScore(i)+γ⋅ConstraintBonus(i)
 
