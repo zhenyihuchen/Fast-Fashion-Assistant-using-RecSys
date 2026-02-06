@@ -6,8 +6,8 @@ from typing import Iterable
 def rank_candidates(
     candidates: Iterable[tuple[str, float]],
     occasion_scores: dict[str, float],
-    alpha: float = 0.7,
-    beta: float = 0.3,
+    alpha: float = 0.6,
+    beta: float = 0.4,
 ) -> list[tuple[str, float, float, float]]:
     ranked: list[tuple[str, float, float, float]] = []
     for row_id, relevance in candidates:
