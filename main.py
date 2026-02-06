@@ -26,7 +26,8 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_query:
-        args.query = "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black"
+        args.query =  "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black"
+            # "I want something to wear for an Ibicenca party this summer"
             # "I want a pair of black jeans for a chill and casual day in the park, I like the cut to be straight"
             # "I am looking for a night short red dress but that costs less than 50 euros"
             #"I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be straight"

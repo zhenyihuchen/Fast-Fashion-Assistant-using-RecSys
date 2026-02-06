@@ -282,6 +282,9 @@ b. Candidate list retrieval
 Done using FAISS 
 TO-DO: need to include the description and the name that also includes relevant information about the cut and fit, that may not be straightforward in the image embedding. 
 
+not able to captuyre for example the fit, so maybe include the product name and description that explicitely talk about that 
+
+
 c. Occasion suitability scores 
 
 Load the prompt embeddings for the target occasion (p = embeeding["name of occasion"]
@@ -289,9 +292,21 @@ Load the prompt embeddings for the target occasion (p = embeeding["name of occas
 compute occassion score per candidade: for each candidate item embedding, compute the cosine similarity to each of the prompts from that occasion, and aggregate them using the mean 
 OccasionScore(i)=meanp∈P​cosine(ei​,p)
 
+applied softmax idk if necessary 
+
+maybe should revisit the occasion suitability scores
+if specific occasion like aprty, would try to work but not explicitely coded for that occasion, are based on CLIP trianing data 
 
 d. Final Ranking 
 
 
 FinalScore(i)=α⋅Relevance(i)+β⋅OccasionScore(i)+γ⋅ConstraintBonus(i)
+
+
+e. Explination generation 
+
+usign Groq so it is able to adapt to differnt like types of prompt 
+maybe need to include more detailed explanations 
+
+
 
