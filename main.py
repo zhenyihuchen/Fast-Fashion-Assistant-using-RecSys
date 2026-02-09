@@ -19,7 +19,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Online retrieval pipeline")
     parser.add_argument("--query")
     parser.add_argument("--test-query", action="store_true")
-    parser.add_argument("--topk", type=int, default=200)
+    parser.add_argument("--topk", type=int, default=10)
     parser.add_argument("--filter-first", action="store_true")
     parser.add_argument("--out", default="online_results.csv")
     parser.add_argument("--no-faiss", action="store_true")
