@@ -297,6 +297,9 @@ applied softmax idk if necessary
 maybe should revisit the occasion suitability scores
 if specific occasion like aprty, would try to work but not explicitely coded for that occasion, are based on CLIP trianing data 
 
+better to also embed the title and descriptions. 
+
+
 d. Final Ranking 
 
 
@@ -307,6 +310,19 @@ e. Explination generation
 
 usign Groq so it is able to adapt to differnt like types of prompt 
 maybe need to include more detailed explanations 
+
+
+The first approach was template-based but it is not very flexible. 
+compare with template based recommenders, that can be more explanatory. 
+
+(chat) LangChain is used as an orchestration framework to manage prompt construction and interaction with a large language model for explanation generation, while recommendation and ranking remain fully deterministic.
+compare the explanations from both 
+
+using langchain because it is able to link the qery and the results and provide a GROUNDED explanation 
+
+
+
+
 
 
 

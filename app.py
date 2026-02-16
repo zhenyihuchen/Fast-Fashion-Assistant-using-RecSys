@@ -19,7 +19,7 @@ from online.candidate_retrieval import (
     PARQUET_PATH,
     retrieve_candidates,
 )
-from online.explanation_generation import generate_explanations
+from online.explanation_generation_langchain import generate_explanations
 from online.final_ranking import rank_candidates
 from online.occasion_suitability_scores import compute_occasion_scores
 from online.query_processing_llm import parse_query_llm
