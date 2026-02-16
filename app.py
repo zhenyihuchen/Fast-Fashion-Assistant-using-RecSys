@@ -11,7 +11,7 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 from groq import Groq
-from streamlit_extras.stylable_container import stylable_container
+from streamlit_chat import message
 
 from online.candidate_retrieval import (
     EMBEDDINGS_PATH,
@@ -173,40 +173,7 @@ def _occasion_missing(parsed: dict[str, Any]) -> bool:
 
 st.set_page_config(page_title="Zara's virtual shopping assistant", layout="wide")
 st.title("Zara's virtual shopping assistant")
-st.markdown(
-    """
-    <style>
-    div[data-testid="stChatMessage"][data-message-author="user"],
-    div[data-testid="stChatMessage"][data-testid*="user"],
-    div[data-testid="stChatMessage"][data-testid="stChatMessageUser"],
-    div[data-testid="stChatMessage"].st-chat-message-user,
-    div[data-testid="stChatMessage"]:has(svg[aria-label="user"]) {
-        justify-content: flex-end;
-        flex-direction: row-reverse;
-    }
-    div[data-testid="stChatMessage"][data-message-author="user"] > div,
-    div[data-testid="stChatMessage"][data-testid*="user"] > div,
-    div[data-testid="stChatMessage"][data-testid="stChatMessageUser"] > div,
-    div[data-testid="stChatMessage"].st-chat-message-user > div,
-    div[data-testid="stChatMessage"]:has(svg[aria-label="user"]) > div {
-        margin-left: auto;
-    }
-    div[data-testid="stChatMessage"][data-message-author="user"] .stMarkdown,
-    div[data-testid="stChatMessage"][data-testid*="user"] .stMarkdown,
-    div[data-testid="stChatMessage"][data-testid="stChatMessageUser"] .stMarkdown,
-    div[data-testid="stChatMessage"].st-chat-message-user .stMarkdown,
-    div[data-testid="stChatMessage"]:has(svg[aria-label="user"]) .stMarkdown,
-    div[data-testid="stChatMessage"][data-message-author="user"] p,
-    div[data-testid="stChatMessage"][data-testid*="user"] p,
-    div[data-testid="stChatMessage"][data-testid="stChatMessageUser"] p,
-    div[data-testid="stChatMessage"].st-chat-message-user p,
-    div[data-testid="stChatMessage"]:has(svg[aria-label="user"]) p {
-        text-align: right;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+st.caption("This chat supports several interactions within the same session.")
 
 if "sessions" not in st.session_state:
     st.session_state.sessions = []
@@ -254,37 +221,41 @@ with st.sidebar:
         )
         st.rerun()
 
-for msg in st.session_state.messages:
+    if st.button("Clear conversation"):
+        st.session_state.messages = [{"role": "assistant", "content": _assistant_intro()}]
+        st.session_state.awaiting_occasion = False
+        st.session_state.pending_query = ""
+        st.session_state.sessions[st.session_state.current_session] = {
+            "messages": list(st.session_state.messages),
+            "awaiting_occasion": st.session_state.awaiting_occasion,
+            "pending_query": st.session_state.pending_query,
+        }
+        st.rerun()
+
+for idx, msg in enumerate(st.session_state.messages):
     if msg["role"] == "user":
-        with stylable_container(
-            key=f"user-msg-{hash(msg['content'])}",
-            css_styles="""
-            div[data-testid="stChatMessage"] {
-                justify-content: flex-end;
-                flex-direction: row-reverse;
-            }
-            div[data-testid="stChatMessageContent"] {
-                text-align: right;
-                margin-left: auto;
-            }
-            div[data-testid="stChatMessageContent"] p,
-            div[data-testid="stChatMessageContent"] [data-testid="stMarkdownContainer"],
-            div[data-testid="stChatMessageContent"] [data-testid="stMarkdownContainer"] p {
-                text-align: right;
-            }
-            """,
-        ):
-            with st.chat_message(msg["role"]):
-                st.write(msg["content"])
+        message(msg["content"], is_user=True, key=f"user-{idx}")
     else:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+        message(msg["content"], is_user=False, key=f"assistant-{idx}")
+        recs = msg.get("recs")
+        if recs:
+            for rec_idx, row in enumerate(recs):
+                st.markdown(f"**{row.get('product_name', '')}**")
+                image_url = row.get("image_url", "")
+                if image_url:
+                    st.image(image_url, width=260, use_container_width=False)
+                final_score = row.get("final_score")
+                if final_score is not None:
+                    st.write(f"Final score: {final_score:.4f}")
+                st.write(row.get("explanation", ""))
+                if row.get("product_url"):
+                    st.write(row["product_url"])
+                st.write("---")
 
 user_input = st.chat_input("Tell me what you want to buy...")
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.write(user_input)
+    message(user_input, is_user=True, key=f"user-input-{len(st.session_state.messages)}")
 
     combined_query = user_input
     if st.session_state.awaiting_occasion and st.session_state.pending_query:
@@ -297,8 +268,7 @@ if user_input:
         st.session_state.pending_query = combined_query
         assistant_text = _ask_for_occasion()
         st.session_state.messages.append({"role": "assistant", "content": assistant_text})
-        with st.chat_message("assistant"):
-            st.write(assistant_text)
+        message(assistant_text, is_user=False, key=f"assistant-occasion-{len(st.session_state.messages)}")
     else:
         st.session_state.awaiting_occasion = False
         st.session_state.pending_query = ""
@@ -306,27 +276,19 @@ if user_input:
         if not result.rows:
             assistant_text = "I couldn't find matches for that request. Want to adjust the style, color, or budget?"
             st.session_state.messages.append({"role": "assistant", "content": assistant_text})
-            with st.chat_message("assistant"):
-                st.write(assistant_text)
+            message(assistant_text, is_user=False, key=f"assistant-nomatch-{len(st.session_state.messages)}")
         else:
             assistant_text = _build_response_message(result.rows, result.parsed)
             st.session_state.messages.append({"role": "assistant", "content": assistant_text})
-            with st.chat_message("assistant"):
-                st.write(assistant_text)
+            message(assistant_text, is_user=False, key=f"assistant-recs-{len(st.session_state.messages)}")
 
-            st.subheader("Top Picks")
-            for row in result.rows[:5]:
-                st.markdown(f"**{row.get('product_name', '')}**")
-                image_url = row.get("image_url", "")
-                if image_url:
-                    st.image(image_url, width=260)
-                final_score = row.get("final_score")
-                if final_score is not None:
-                    st.write(f"Final score: {final_score:.4f}")
-                st.write(row.get("explanation", ""))
-                if row.get("product_url"):
-                    st.write(row["product_url"])
-                st.write("---")
+            st.session_state.messages.append(
+                {
+                    "role": "assistant",
+                    "content": "Here are your top picks:",
+                    "recs": result.rows[:5],
+                }
+            )
 
     st.session_state.sessions[st.session_state.current_session] = {
         "messages": list(st.session_state.messages),

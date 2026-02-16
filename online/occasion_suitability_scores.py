@@ -7,7 +7,7 @@ import numpy as np
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-OCCASION_EMBEDDINGS_PATH = BASE_DIR / "occasion_library" / "occasion_prompt_embeddings.npz"
+OCCASION_EMBEDDINGS_PATH = BASE_DIR / "occasion_library" / "occasion_clavix_embeddings.npz"
 
 
 def _get_occasion_target(parsed: dict) -> str | None:

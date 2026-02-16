@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -27,12 +28,14 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_query:
-        args.query =  "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black"
+        args.query = "I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be wide-leg"
+            # " "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black""
             # "I want something to wear for an Ibicenca party this summer"
             # "I want a pair of black jeans for a chill and casual day in the park, I like the cut to be straight"
             # "I am looking for a night short red dress but that costs less than 50 euros"
             #"I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be straight"
             #"I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
+            # "I want a pair of dark blue color straight jeans for a chill and casual day in the park, high-rise" (para mejorar)
             
     if not args.query:
         raise SystemExit("Provide --query or use --test-query")
@@ -104,6 +107,9 @@ def main() -> None:
     if out_path == "online_results.csv":
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         out_path = f"online_results_{stamp}.csv"
+    results_dir = Path("results_test")
+    results_dir.mkdir(parents=True, exist_ok=True)
+    out_path = results_dir / out_path
     out_df.to_csv(out_path, index=False)
     print(f"Wrote {out_path}")
 

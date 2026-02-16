@@ -10,9 +10,9 @@ import torch
 
 
 BASE_DIR = Path(__file__).resolve().parent
-PROMPTS_PATH = BASE_DIR / "occasion_prompts.json"
-OUT_PATH = BASE_DIR / "occasion_prompt_embeddings.npz"
-META_PATH = BASE_DIR / "occasion_prompt_embeddings_meta.json"
+PROMPTS_PATH = BASE_DIR / "occasion_prompts_clavix.json"
+OUT_PATH = BASE_DIR / "occasion_clavix_embeddings.npz"
+META_PATH = BASE_DIR / "occasion_clavix_embeddings_meta.json"
 
 MODEL_NAME = "ViT-B-32"
 PRETRAINED = "openai"

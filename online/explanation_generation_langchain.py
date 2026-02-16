@@ -107,7 +107,8 @@ def _build_prompt(evidence: dict) -> tuple[str, str]:
         "Use only the provided evidence; do not invent attributes. "
         "Write 2-3 sentences. If a field is missing or empty, omit it. "
         "If description is provided, incorporate a short phrase from it (verbatim or lightly paraphrased). "
-        "Do not mention that you are an AI, and do not add extra claims."
+        "Do not mention that you are an AI, and do not add extra claims. "
+        "Do not mention numeric scores or technical details."
     )
     user = {
         "evidence": evidence,
@@ -119,6 +120,7 @@ def _build_prompt(evidence: dict) -> tuple[str, str]:
             "If description is present, mention a concrete attribute from it.",
             "Explain why the item fits the occasion and the user query keywords.",
             "Use specific metadata like color, category, and price when available.",
+            "Do not mention scores or numeric values from the evidence.",
         ],
     }
     return system, json.dumps(user)

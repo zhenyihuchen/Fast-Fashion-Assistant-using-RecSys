@@ -321,6 +321,10 @@ compare the explanations from both
 using langchain because it is able to link the qery and the results and provide a GROUNDED explanation 
 
 
+But for your current pipeline, direct Groq calls are simpler and lighter. (WARNING)
+
+
+
 
 
 
