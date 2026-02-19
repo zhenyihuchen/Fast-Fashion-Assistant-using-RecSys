@@ -1,0 +1,336 @@
+1. Web scrapping - REVIEW 
+TO-DO: run again for deduplication and updated columns to be included
+- Image URL test completed successfully.
+- Challenges faced: the main challenge was to correctly extract the image URLs that had a white background and that were the Front view of the item, for extraction purposes. 
+- Some products dont have an image that starts with Front view
+- Other have the front view named as rear view (possibly an error on the website)
+- Others are not detected because the scroll function didnt work properlys
+- 140/1181 = 0.1185 = 11.85% images were missing and had to be refreshed
+- refresh strategy: some front view images were not included in the extra images section as usual, rather in the secondary content, and other front view images needed more than 1 scroll (the function was updated in the refresh_missing_images.py section)
+- after running the refresh strategy, there were still x/1182 images urls not found. after inspection, it was found that either there was not a Front view image or that it was named in the description as Rear view (potnetially a website error). since we want the front view because when extracting the image embeddings we only need the item per se, thos emissing urls were excluded. 
+- if double rear view, the first was taken because assumed as mislabeled
+- shoes are named with differnt descriptions, no Front View -> only keeping the ones that have images starting with Front view to not waste time 
+- after the first refresh the not available urls dropped from 140 to 72/1181= 0.0609 = 6.1%, almost by half, so the missing strategy worked 
+- realised that some products have the front view image at the beggining in the main content and not in the secondary or extra images section 
+- other missing ones were not named consistently starting with Front view, so we decided to skip (ex: "COWBOY SPLIT SUEDE BOOTS - Brown by Zara - Image 2")
+- after the second refresh 65/1181 = 0.055 = 5.5% still not avaiable but decide to skip those. 
+(Products for which front-view images could not be reliably retrieved were excluded from the image-based modeling components. This reflects realistic data quality constraints and ensures that all multimodal representations are derived from consistently obtained inputs.)
+
+The output is a CSV instead of other storage choice such as a relational DB because:
+- catalog is small/medium, only covering 14 categories from WOMAN new collection
+- single user? (for now i am the only user)
+- not rescrapping or updating often 
+- relationalDB is more production-like system
+
+cleaned product metadata is stored in Apache Parquet format to preserve data types, improve I/O efficiency, and support repeated filtering and ranking operations during recommendation.
+
+CSV: Row-based, Must read the entire file to access any column, Slow for large files, Expensive when repeatedly loading for filtering and ranking
+Parquet: Columnar format, You can load only the columns you need, Much faster for: filtering by category/price/color, repeated reads in recommender loops, Better for memory usage
+
+
+
+
+
+
+2. Visual feature extraction
+- cache image URLs locally because they can break or rate-limit, network failures, not reproducible fast, recomputing embeddings becomes slow and unpredictable
+- after caching the images locally in .jpg format, there are a total of 1071, becauase some of the exact same items appear under different categories,so when scrapping they were duplicated. 
+
+
+For the visual feature extraction part: 
+- will not use one model specifically designed for clothes, because the aim is not to clasify clothes categories. 
+
+A pre-trained Contrastive Language–Image Pretraining (CLIP) model is employed to extract image and text embeddings in a shared semantic space, enabling zero-shot matching between user queries and product images, as well as prompt-based estimation of occasion suitability.
+
+CLIP: 
+- CLIP may struggle with: very subtle fabric types (e.g., silk vs satin), very fine-grained tailoring details, brand-specific style nuances
+- But for: category, color, pattern, formality, party vs wedding vs business
+
+
+fashion-specific models (trained on DeepFashion, etc.): Slightly better at fine-grained fashion attributes, More detailed garment-specific labels
+Cons (important for you)
+❌ Harder to integrate
+❌ Often not aligned with natural language queries
+❌ Limited generalization to Zara photography
+❌ Less good at abstract concepts like “wedding-appropriate”
+❌ Harder to explain cross-modal matching
+
+# the multimodal vision models will be used serveral times: 
+Your user query usually contains two different kinds of information:
+Event / context intent
+→ “for a wedding”, “for a party”, “for work”
+Product-specific preferences
+→ “red”, “midi”, “skinny”, “oversized”, “black”, “cheap”, “long sleeves”
+Occasion probability only captures (1).
+Query–image relevance captures (1) + (2).
+
+
+If you only do one score:
+You can’t answer:
+Did the item rank high because it matched the style?
+Or because it matched the occasion?
+With two signals, you can analyze:
+(1) relevance-only baseline
+(2) occasion-aware improvement
+That’s a real experimental contribution.
+
+
+-- Siglip vs CLIP
+That could be a nice optional experiment section:
+CLIP vs SIGLIP for fashion occasion retrieval
+(to be considered)
+
+
+CLIP: https://github.com/openai/CLIP
+
+- embeddings were computed using CLIP; doubled checked with PCA 
+- build FAISS index for fast search - stores the embeddings in a structure that allows fast nearest-neighbor search. still keep product_ids.npy because FAISS returns indices (0..N-1), not your product IDs.
+
+FAISS: index over your embeddings so you can find the closest vectors quickly without comparing to every item. FAISS returns positions in the embeddings array (0..N‑1)
+FAISS gives index i
+product_ids.npy[i] gives the actual row_id (or product ID)
+
+In clip_image_embeddings.py:
+_product_id returns row_id.
+product_ids is appended in the same order that embeddings are created (batch_ids are extended right after encode_image).
+So FAISS index 0 corresponds to product_ids[0], which is the row_id.
+
+but even if your IDs are already aligned, FAISS is still valuable because it makes similarity search fast.
+
+
+
+
+
+
+
+
+
+
+3. Occassion prompt library
+
+If you wanted “occasion suitability probabilities” the traditional way, you’d need a labeled dataset to train a classifier.
+Instead, prompts let you create an occasion scoring function without training by using CLIP’s learned knowledge.
+
+Because CLIP learned a shared embedding space where: images of “wedding guest dresses” and the text “wedding guest dress” end up close together.
+CLIP was trained on huge datasets of image–text pairs so that the correct caption matches the image better than random captions.
+==> zero-shot classification / prompt-based scoring
+
+embedding("wedding guest dress") 
+      ↕
+embedding(image_of_formal_dress)
+
+If the image looks like what CLIP has learned corresponds to wedding attire, the vectors will be close.
+If the image is:
+ripped jeans → far away
+hoodie → far away
+formal dress → close
+elegant blazer → somewhat close
+
+So the system doesn’t “decide” what clothing fits a wedding —
+it measures how visually similar the item is to the learned concept of “wedding attire”.
+
+CLIP does not “understand weddings” like a human.
+It understands: visual patterns associated with text used on the internet
+That’s enough for: ranking, recommendation, suitability estimation
+And it’s perfectly acceptable for a thesis.
+
+!!!! Occasion embeddings represent visual prototypes, and products are scored by how visually close they are to those prototypes.
+
+system can still handle occasions that are not in the library explicitely: 
+How to handle unseen/more specific occasions (recommended)
+Use a simple mapping strategy:
+If user occasion is not in library:
+- map it to the closest library occasion (“graduation” → “formal/corporate” or “party” depending on wording)
+- or dynamically create prompts from the user’s occasion text (more flexible)
+
+How to handle unseen/more specific occasions (recommended)
+Use a simple mapping strategy:
+If user occasion is not in library:
+map it to the closest library occasion (“graduation” → “formal/corporate” or “party” depending on wording)
+or dynamically create prompts from the user’s occasion text (more flexible)
+
+    If the occasion is unseen (e.g., “graduation”) and you decide to handle it dynamically, then:
+        you create 1 prompt (or a small set of prompts derived from it),
+        embed it with CLIP,
+        and compare it against the candidate image embeddings (just like your library occasions).
+
+        !!! or 2-3 automatic prompts 
+
+
+- Known occasion (in library): use your fixed 2–5 prompts
+- Unknown occasion (outside library): use a small auto-generated prompt set (2–3)
+- No occasion: occasion weight = 0, relevance only
+- Implicit occasion
+This gives you: consistency, robustness, a clean methodological story
+
+
+WORKFLOW
+Retrieve by query relevance → score occasion on retrieved candidates → rank → explain.
+
+Online (per user query) is essentially:
+1. Parse the query (occasion/category/constraints if detectable)
+2. Retrieve candidates by relevance (vector search + filters)
+3. Compute occasion suitability on the candidate set (prompt similarity)
+4. Final rank + explanations + return results
+
+!!! TO-DO: diagram to show the flow of this online part 
+
+
+
+
+PROMPT LIBRARY 
+Robust library: 
+    - Keep prompts short and consistent (avoid long sentences).
+    - Version the library (v1, v2…) so your experiments are reproducible.
+(use CLIP in english)
+
+- Criteria for defining the prompts
+- X prompts per occasion
+    3–5 prompts per occasion is a sweet spot that balances:
+        robustness (less sensitivity to wording),
+        coverage (different styles within the same occasion),
+        and efficiency (no unnecessary noise or computation).
+        many prompts = inneficient (ex: 10 occasions × 10 prompts = 100 prompt comparisons per item)
+    Each occasion is represented by a compact prompt ensemble that captures stylistic variability while remaining computationally efficient.
+
+        Beyond ~5 prompts: prompts become redundant, some introduce noise or unintended bias, improvements plateau, explanations get harder
+        More prompts ≠ more information.
+            Each occasion is represented by a small ensemble of three to five prompts. This choice reflects a trade-off between robustness and efficiency: multiple prompts reduce sensitivity to individual wording choices and capture stylistic variation within an occasion, while keeping the ensemble compact avoids redundant signals and unnecessary computational overhead.
+
+- X Q of occasions 
+    Fewer than 6 → too broad (everything becomes “formal vs casual”)
+    More than ~10 → becomes hard to define cleanly, overlaps explode, evaluation gets messy
+    (6-10)
+
+Occasions list: 
+(for NEW COLLECTION ZARA AUTUMN AND winter 2025-2025)
+1. wedding_guest: Outfits typically worn when attending a wedding as a guest, characterized by elevated formality, elegant silhouettes, and refined materials without reaching black-tie level.
+2. party_night_out: Looks intended for social nightlife contexts such as parties or clubbing, often featuring bold styling, statement pieces, and fashion-forward or expressive aesthetics.
+3. work_office: Professional attire appropriate for office environments, emphasizing clean lines, structured garments, and a balance between formality and everyday practicality.
+4. formal_event (gala, cocktail, formal dinner): Highly polished outfits designed for formal evening occasions, including galas, cocktail events, or formal dinners, typically involving sophisticated silhouettes and premium visual cues.
+5. casual_everyday: Comfort-oriented, relaxed clothing suitable for daily activities, prioritizing wearability and ease over structure or formality.
+6. date_night: Stylish yet approachable outfits intended for romantic or semi-formal social encounters, combining elegance with personal expression without excessive formality.
+(no se) 7. winter_outerwear: Cold-weather outer garments such as coats and jackets selected primarily for warmth and layering, while still contributing to the overall aesthetic of an outfit.
+(no se) 8. smart_casual: Polished but relaxed attire that blends casual comfort with structured or refined elements, suitable for informal professional or social settings requiring a put-together appearance.
+
+        These two are more for summer collection and since the scrapped data is winter like so not too appropriate:
+            vacation_summer (holiday, beach, resort)
+            festival_concert (concert, festival, going out casual-cool)
+
+Why this set works: Covers the most common real shopping contexts, Keeps overlap manageable, Includes both “dressy” and “casual” clusters, Matches typical Zara browsing patterns
+If you want a 9th/10th: winter_outerwear (for coats/jackets context), athleisure_gym (if you include sporty categories)
+
+
+Criteria: 
+1. Cover stylistic variation within the occasion
+2. Keep prompts short, descriptive, and visually grounded
+3. Balance formality across prompts. For each occasion: include at least one more formal phrasing, include at least one less formal / relaxed phrasing
+4. Avoid brand-, culture-, or rule-specific assumptions
+5. Keep wording consistent across occasions
+6. Limit the number of prompts per occasion
+7. Use English consistently (unless multilingual is intentional)
+
+PCA plot suggested that prompts were very far away from the image embeddings. 
+This PCA plot is not strong evidence that the approach “isn’t working.” Two important things can be true at the same time:
+- Your retrieval/scoring with CLIP can work perfectly well in the original 512-D space, and
+- A 2-D PCA visualization can look “broken” because PCA often separates modalities (text vs image) along the first principal component.
+
+A. PCA often separates modality (text vs image), not meaning
+When you run PCA on mixed embeddings, the biggest variance direction is often:
+“text vectors vs image vectors”
+So PCA₁ becomes a “domain axis”. That pushes all text points to one side and images to the other, even if cosine similarity in the full space is still meaningful.
+
+
+C. Missing normalization (very common) --> it is normalized!!! 
+For cosine similarity / dot-product retrieval you should L2-normalize both:
+image embeddings
+text embeddings
+If you normalize images but not text (or vice versa), projections and similarity behave weirdly, and PCA can exaggerate the gap.
+
+D. PCA plot scale is arbitrary and misleading
+Even if everything is correct, PCA axes can make it look like “they’re far apart,” but what matters is relative closeness.
+A better sanity check is:
+“Does the prompt ‘wedding guest outfit’ retrieve wedding-like dresses near the top?”
+Not whether points overlap in a 2-D projection.
+
+
+After doing checks printing the recs for avg of all prompts for the same occasion, we see that most of the suggested items makes sense, and with further specification onthe attribute or category requested we can fine grain the recommendations more. 
+
+
+
+
+
+
+
+
+4. Online part 
+
+
+a. Query parsing and embeddings
+It is hard to identify the occasion because there can be ambiguities, somehow include the heuristics. 
+TO-DO: make this more automated? LLM integration?
+TO-DO: do the whole parsing with an LLM?
+
+Since the first approach using manual Regex was not very scalable, not flexible and ofetn not understanding the sentences and needing very strict rules to infer the occasion and different characteristics, we decide to try with Groq API key. 
+It works better, so amazing. 
+
+
+preguntar a santi que approach dejar 
+
+
+b. Candidate list retrieval 
+Done using FAISS 
+TO-DO: need to include the description and the name that also includes relevant information about the cut and fit, that may not be straightforward in the image embedding. 
+
+not able to captuyre for example the fit, so maybe include the product name and description that explicitely talk about that 
+
+
+c. Occasion suitability scores 
+
+Load the prompt embeddings for the target occasion (p = embeeding["name of occasion"]
+
+compute occassion score per candidade: for each candidate item embedding, compute the cosine similarity to each of the prompts from that occasion, and aggregate them using the mean 
+OccasionScore(i)=meanp∈P​cosine(ei​,p)
+
+applied softmax idk if necessary 
+
+maybe should revisit the occasion suitability scores
+if specific occasion like aprty, would try to work but not explicitely coded for that occasion, are based on CLIP trianing data 
+
+better to also embed the title and descriptions. 
+
+
+d. Final Ranking 
+
+
+FinalScore(i)=α⋅Relevance(i)+β⋅OccasionScore(i)+γ⋅ConstraintBonus(i)
+
+
+e. Explination generation 
+
+usign Groq so it is able to adapt to differnt like types of prompt 
+maybe need to include more detailed explanations 
+
+
+The first approach was template-based but it is not very flexible. 
+compare with template based recommenders, that can be more explanatory. 
+
+(chat) LangChain is used as an orchestration framework to manage prompt construction and interaction with a large language model for explanation generation, while recommendation and ranking remain fully deterministic.
+compare the explanations from both 
+
+using langchain because it is able to link the qery and the results and provide a GROUNDED explanation 
+
+
+But for your current pipeline, direct Groq calls are simpler and lighter. (WARNING)
+
+
+
+
+
+Graph based + LLM reasoning 
+
+
+
+
+
+
