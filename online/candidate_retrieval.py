@@ -327,27 +327,27 @@ def retrieve_candidates(
     return results
 
 
-# ---------------------------------------------------------------------------
-# Quick test
-# ---------------------------------------------------------------------------
+# # ---------------------------------------------------------------------------
+# # Quick test
+# # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    query_text = (
-        "I am looking for a night short red dress but that costs less than 50 euros"
-    )
-    parsed_path = BASE_DIR / "online" / "test_query_outputs" / "example1.json"
-    with parsed_path.open("r", encoding="utf-8") as handle:
-        parsed_query = json.load(handle)
+# if __name__ == "__main__":
+#     query_text = (
+#         "I am looking for a night short red dress but that costs less than 50 euros"
+#     )
+#     parsed_path = BASE_DIR / "online" / "test_query_outputs" / "example1.json"
+#     with parsed_path.open("r", encoding="utf-8") as handle:
+#         parsed_query = json.load(handle)
 
-    print(f"Query : {query_text}")
-    print(f"Parsed: {parsed_path}\n")
+#     print(f"Query : {query_text}")
+#     print(f"Parsed: {parsed_path}\n")
 
-    results_by_model = retrieve_candidates(
-        query_text, parsed_query, topk=10, filter_first=True
-    )
+#     results_by_model = retrieve_candidates(
+#         query_text, parsed_query, topk=10, filter_first=True
+#     )
 
-    for model_name, candidates in results_by_model.items():
-        print(f"── {model_name.upper()} ── {len(candidates)} candidates")
-        for rank, (product_id, score) in enumerate(candidates, start=1):
-            print(f"  {rank:02d}. {product_id}  score={score:.4f}")
-        print()
+#     for model_name, candidates in results_by_model.items():
+#         print(f"── {model_name.upper()} ── {len(candidates)} candidates")
+#         for rank, (product_id, score) in enumerate(candidates, start=1):
+#             print(f"  {rank:02d}. {product_id}  score={score:.4f}")
+#         print()

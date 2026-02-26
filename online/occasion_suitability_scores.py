@@ -7,7 +7,11 @@ import numpy as np
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-OCCASION_EMBEDDINGS_PATH = BASE_DIR / "occasion_library" / "occasion_clavix_embeddings.npz"
+PROMPT_EMBEDDINGS_DIR = BASE_DIR / "offline" / "data" / "prompt_embeddings"
+MODEL_OCCASION_EMBEDDINGS_PATHS: dict[str, Path] = {
+    "clip": PROMPT_EMBEDDINGS_DIR / "clip" / "occasion_embeddings.npz",
+    "fashion_clip": PROMPT_EMBEDDINGS_DIR / "fashion_clip" / "occasion_embeddings.npz",
+}
 
 
 def _get_occasion_target(parsed: dict) -> str | None:
@@ -38,16 +42,27 @@ def compute_occasion_scores(
     parsed: dict,
     product_ids: np.ndarray,
     embeddings: np.ndarray,
-    occasion_embeddings_path: Path = OCCASION_EMBEDDINGS_PATH,
+    model_name: str = "clip",
+    occasion_embeddings_path: Path | None = None,
 ) -> dict[str, float]:
     target = _get_occasion_target(parsed)
     if not target:
+        return {}
+
+    if occasion_embeddings_path is None:
+        occasion_embeddings_path = MODEL_OCCASION_EMBEDDINGS_PATHS.get(
+            model_name,
+            MODEL_OCCASION_EMBEDDINGS_PATHS["clip"],
+        )
+    if not occasion_embeddings_path.exists():
         return {}
 
     occasion_npz = np.load(occasion_embeddings_path)
     if target not in occasion_npz:
         return {}
     prompt_embeddings = occasion_npz[target].astype("float32", copy=False)
+    if not np.isfinite(prompt_embeddings).all():
+        return {}
     prompt_embeddings = _normalize_rows(prompt_embeddings)
 
     id_to_index = {str(pid): idx for idx, pid in enumerate(product_ids)}

@@ -11,7 +11,6 @@ load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 import numpy as np
 import open_clip
 import torch
-from fashion_clip.fashion_clip import FashionCLIP
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -95,13 +94,50 @@ def _run_clip(prompt_map: dict[str, list[str]], device: str) -> None:
 
 
 def _run_fashion_clip(prompt_map: dict[str, list[str]]) -> None:
-    print("\n[FashionCLIP] Loading model …")
-    fclip = FashionCLIP("fashion-clip")
+    from transformers import CLIPModel, CLIPTokenizer
+
+    print("\n[FashionCLIP] Loading transformers model …")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model_id = "patrickjohncyh/fashion-clip"
+    try:
+        model = CLIPModel.from_pretrained(
+            model_id,
+            low_cpu_mem_usage=False,
+            use_safetensors=False,
+        )
+    except OSError:
+        model = CLIPModel.from_pretrained(
+            model_id,
+            low_cpu_mem_usage=False,
+        )
+    tokenizer = CLIPTokenizer.from_pretrained(model_id)
+    model = model.to(device).eval()
 
     out_data: dict[str, np.ndarray] = {}
     for occasion, prompts in prompt_map.items():
-        emb = fclip.encode_text(prompts, batch_size=BATCH_SIZE)
-        emb = emb / np.linalg.norm(emb, ord=2, axis=-1, keepdims=True)
+        chunks: list[np.ndarray] = []
+        for i in range(0, len(prompts), BATCH_SIZE):
+            batch = prompts[i : i + BATCH_SIZE]
+            tokens = tokenizer(
+                batch,
+                return_tensors="pt",
+                max_length=77,
+                padding="max_length",
+                truncation=True,
+            )
+            tokens = {k: v.to(device) for k, v in tokens.items()}
+            with torch.no_grad():
+                feats = model.get_text_features(**tokens)
+            if not isinstance(feats, torch.Tensor):
+                feats = feats.pooler_output
+            chunks.append(feats.detach().cpu().numpy().astype("float32"))
+        emb = np.concatenate(chunks, axis=0) if chunks else np.empty((0, 0), dtype=np.float32)
+        if not np.isfinite(emb).all():
+            raise RuntimeError(f"Non-finite FashionCLIP prompt embeddings for occasion '{occasion}'")
+        norms = np.linalg.norm(emb, ord=2, axis=-1, keepdims=True)
+        if np.any((~np.isfinite(norms)) | (norms <= 1e-12)):
+            raise RuntimeError(f"Invalid/zero FashionCLIP prompt embedding norms for occasion '{occasion}'")
+        emb = emb / norms
         out_data[occasion] = emb
         print(f"  {occasion}: {emb.shape}")
 

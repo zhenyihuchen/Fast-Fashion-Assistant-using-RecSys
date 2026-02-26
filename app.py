@@ -14,14 +14,16 @@ from groq import Groq
 from streamlit_chat import message
 
 from online.candidate_retrieval import (
-    EMBEDDINGS_PATH,
-    IDS_PATH,
+    MODEL_PATHS,
     PARQUET_PATH,
     retrieve_candidates,
 )
-from online.explanation_generation_langchain import generate_explanations
+from online.explanation_generation_groq import generate_explanations
 from online.final_ranking import rank_candidates
-from online.occasion_suitability_scores import compute_occasion_scores
+from online.occasion_suitability_scores import (
+    MODEL_OCCASION_EMBEDDINGS_PATHS,
+    compute_occasion_scores,
+)
 from online.query_processing_llm import parse_query_llm
 
 
@@ -36,7 +38,7 @@ TIMEOUT_SECONDS = 60
 
 @dataclass
 class RecoResult:
-    rows: list[dict[str, Any]]
+    rows_by_model: dict[str, list[dict[str, Any]]]
     parsed: dict[str, Any]
 
 
@@ -101,74 +103,205 @@ def _build_response_message(rows: list[dict[str, Any]], parsed: dict[str, Any]) 
 
 
 @st.cache_resource
-def _load_assets() -> tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+def _load_catalog() -> pd.DataFrame:
     df = pd.read_parquet(PARQUET_PATH)
     df["row_id"] = df["row_id"].astype(str)
     df = df.set_index("row_id")
-    product_ids = np.load(IDS_PATH, allow_pickle=True).astype(str)
-    embeddings = np.load(EMBEDDINGS_PATH).astype("float32", copy=False)
-    return df, product_ids, embeddings
+    return df
 
 
 def _run_pipeline(query: str, topk: int = 30) -> RecoResult:
     parsed = parse_query_llm(query)
-    candidates = retrieve_candidates(
+    candidates_by_model = retrieve_candidates(
         query,
         parsed=parsed,
         topk=topk,
         filter_first=True,
         use_faiss=True,
+        embedding_model="both",
     )
-    if not candidates:
-        return RecoResult(rows=[], parsed=parsed)
+    if not any(candidates_by_model.values()):
+        return RecoResult(rows_by_model={}, parsed=parsed)
 
-    df, product_ids, embeddings = _load_assets()
-    occasion_scores = compute_occasion_scores(
-        candidates,
-        parsed=parsed,
-        product_ids=product_ids,
-        embeddings=embeddings,
-    )
-    ranked = rank_candidates(candidates, occasion_scores)
+    df = _load_catalog()
+    rows_by_model: dict[str, list[dict[str, Any]]] = {}
 
-    rows: list[dict[str, Any]] = []
-    for row_id, relevance, occ_score, final_score in ranked:
-        if row_id not in df.index:
+    for model_name, candidates in candidates_by_model.items():
+        if not candidates:
             continue
-        row = df.loc[row_id]
-        rows.append(
-            {
-                "row_id": row_id,
-                "relevance_score": relevance,
-                "occasion_score": occ_score,
-                "final_score": final_score,
-                "product_name": row.get("product_name", ""),
-                "product_description": row.get("product_description", ""),
-                "product_url": row.get("product_url", ""),
-                "price": row.get("price", ""),
-                "color": row.get("color", ""),
-                "product_category": row.get("product_category", ""),
-                "image_url": row.get("image_url", ""),
-            }
+
+        paths = MODEL_PATHS[model_name]
+        product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
+        embeddings = np.load(paths["image_embeddings"]).astype("float32", copy=False)
+
+        occasion_scores = compute_occasion_scores(
+            candidates,
+            parsed=parsed,
+            product_ids=product_ids,
+            embeddings=embeddings,
+            model_name=model_name,
+            occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
         )
+        ranked = rank_candidates(candidates, occasion_scores)
 
-    explanations = generate_explanations(
-        rows,
-        candidates=candidates,
+        rows: list[dict[str, Any]] = []
+        for row_id, relevance, occ_score, final_score in ranked:
+            if row_id not in df.index:
+                continue
+            row = df.loc[row_id]
+            rows.append(
+                {
+                    "model_name": model_name,
+                    "row_id": row_id,
+                    "relevance_score": relevance,
+                    "occasion_score": occ_score,
+                    "final_score": final_score,
+                    "product_name": row.get("product_name", ""),
+                    "product_description": row.get("product_description", ""),
+                    "product_url": row.get("product_url", ""),
+                    "price": row.get("price", ""),
+                    "color": row.get("color", ""),
+                    "product_category": row.get("product_category", ""),
+                    "image_url": row.get("image_url", ""),
+                }
+            )
+
+        explanations = generate_explanations(
+            rows,
+            candidates=candidates,
+            parsed=parsed,
+            product_ids=product_ids,
+            embeddings=embeddings,
+            occasion_scores=occasion_scores,
+            model_name=model_name,
+            occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
+        )
+        for row in rows:
+            row["explanation"] = explanations.get(str(row["row_id"]), "")
+
+        rows_by_model[model_name] = rows
+
+    return RecoResult(rows_by_model=rows_by_model, parsed=parsed)
+
+
+def _run_pipeline_with_progress(
+    query: str, topk: int = 30
+) -> tuple[RecoResult, list[str]]:
+    progress = st.progress(0)
+    status = st.empty()
+    steps_log: list[str] = []
+
+    def update(step: int, total: int, text: str) -> None:
+        pct = int((step / total) * 100)
+        progress.progress(pct)
+        status.write(text)
+        steps_log.append(text)
+
+    total_steps = 6
+    update(1, total_steps, "1/6 Parsing query with LLM...")
+    parsed = parse_query_llm(query)
+
+    update(2, total_steps, "2/6 Retrieving candidates (CLIP + FashionCLIP)...")
+    candidates_by_model = retrieve_candidates(
+        query,
         parsed=parsed,
-        product_ids=product_ids,
-        embeddings=embeddings,
-        occasion_scores=occasion_scores,
+        topk=topk,
+        filter_first=True,
+        use_faiss=True,
+        embedding_model="both",
     )
-    for row in rows:
-        row["explanation"] = explanations.get(str(row["row_id"]), "")
 
-    return RecoResult(rows=rows, parsed=parsed)
+    if not any(candidates_by_model.values()):
+        update(6, total_steps, "6/6 Done (no candidates found).")
+        progress.empty()
+        status.empty()
+        return RecoResult(rows_by_model={}, parsed=parsed), steps_log
+
+    update(3, total_steps, "3/6 Loading product catalog...")
+    df = _load_catalog()
+
+    rows_by_model: dict[str, list[dict[str, Any]]] = {}
+    available_models = [m for m, c in candidates_by_model.items() if c]
+    for idx, model_name in enumerate(available_models, start=1):
+        update(4, total_steps, f"4/6 Scoring and ranking {model_name} ({idx}/{len(available_models)})...")
+        candidates = candidates_by_model[model_name]
+        paths = MODEL_PATHS[model_name]
+        product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
+        embeddings = np.load(paths["image_embeddings"]).astype("float32", copy=False)
+
+        occasion_scores = compute_occasion_scores(
+            candidates,
+            parsed=parsed,
+            product_ids=product_ids,
+            embeddings=embeddings,
+            model_name=model_name,
+            occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
+        )
+        ranked = rank_candidates(candidates, occasion_scores)
+
+        rows: list[dict[str, Any]] = []
+        for row_id, relevance, occ_score, final_score in ranked:
+            if row_id not in df.index:
+                continue
+            row = df.loc[row_id]
+            rows.append(
+                {
+                    "model_name": model_name,
+                    "row_id": row_id,
+                    "relevance_score": relevance,
+                    "occasion_score": occ_score,
+                    "final_score": final_score,
+                    "product_name": row.get("product_name", ""),
+                    "product_description": row.get("product_description", ""),
+                    "product_url": row.get("product_url", ""),
+                    "price": row.get("price", ""),
+                    "color": row.get("color", ""),
+                    "product_category": row.get("product_category", ""),
+                    "image_url": row.get("image_url", ""),
+                }
+            )
+
+        update(5, total_steps, f"5/6 Generating explanations for {model_name}...")
+        explanations = generate_explanations(
+            rows,
+            candidates=candidates,
+            parsed=parsed,
+            product_ids=product_ids,
+            embeddings=embeddings,
+            occasion_scores=occasion_scores,
+            model_name=model_name,
+            occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
+        )
+        for row in rows:
+            row["explanation"] = explanations.get(str(row["row_id"]), "")
+        rows_by_model[model_name] = rows
+
+    update(6, total_steps, "6/6 Done. Rendering recommendations...")
+    progress.empty()
+    status.empty()
+    return RecoResult(rows_by_model=rows_by_model, parsed=parsed), steps_log
 
 
 def _occasion_missing(parsed: dict[str, Any]) -> bool:
     occasion = parsed.get("occasion") or {}
     return occasion.get("mode") != "on" or not occasion.get("target")
+
+
+def _render_recs_by_model(recs_by_model: dict[str, list[dict[str, Any]]]) -> None:
+    for model_name, recs in recs_by_model.items():
+        st.markdown(f"### {model_name.upper()} recommendations")
+        for row in recs:
+            st.markdown(f"**{row.get('product_name', '')}**")
+            image_url = row.get("image_url", "")
+            if image_url:
+                st.image(image_url, width=260, use_container_width=False)
+            final_score = row.get("final_score")
+            if final_score is not None:
+                st.write(f"Final score: {final_score:.4f}")
+            st.write(row.get("explanation", ""))
+            if row.get("product_url"):
+                st.write(row["product_url"])
+            st.write("---")
 
 
 st.set_page_config(page_title="Zara's virtual shopping assistant", layout="wide")
@@ -237,20 +370,9 @@ for idx, msg in enumerate(st.session_state.messages):
         message(msg["content"], is_user=True, key=f"user-{idx}")
     else:
         message(msg["content"], is_user=False, key=f"assistant-{idx}")
-        recs = msg.get("recs")
-        if recs:
-            for rec_idx, row in enumerate(recs):
-                st.markdown(f"**{row.get('product_name', '')}**")
-                image_url = row.get("image_url", "")
-                if image_url:
-                    st.image(image_url, width=260, use_container_width=False)
-                final_score = row.get("final_score")
-                if final_score is not None:
-                    st.write(f"Final score: {final_score:.4f}")
-                st.write(row.get("explanation", ""))
-                if row.get("product_url"):
-                    st.write(row["product_url"])
-                st.write("---")
+        recs_by_model = msg.get("recs_by_model")
+        if recs_by_model:
+            _render_recs_by_model(recs_by_model)
 
 user_input = st.chat_input("Tell me what you want to buy...")
 if user_input:
@@ -261,7 +383,7 @@ if user_input:
     if st.session_state.awaiting_occasion and st.session_state.pending_query:
         combined_query = f"{st.session_state.pending_query}. Occasion: {user_input}"
 
-    result = _run_pipeline(combined_query)
+    result, _progress_log = _run_pipeline_with_progress(combined_query)
 
     if _occasion_missing(result.parsed):
         st.session_state.awaiting_occasion = True
@@ -273,22 +395,29 @@ if user_input:
         st.session_state.awaiting_occasion = False
         st.session_state.pending_query = ""
 
-        if not result.rows:
+        all_rows = [r for rows in result.rows_by_model.values() for r in rows]
+        if not all_rows:
             assistant_text = "I couldn't find matches for that request. Want to adjust the style, color, or budget?"
             st.session_state.messages.append({"role": "assistant", "content": assistant_text})
             message(assistant_text, is_user=False, key=f"assistant-nomatch-{len(st.session_state.messages)}")
         else:
-            assistant_text = _build_response_message(result.rows, result.parsed)
+            assistant_text = _build_response_message(all_rows, result.parsed)
             st.session_state.messages.append({"role": "assistant", "content": assistant_text})
             message(assistant_text, is_user=False, key=f"assistant-recs-{len(st.session_state.messages)}")
 
+            recs_by_model = {
+                model_name: rows[:5]
+                for model_name, rows in result.rows_by_model.items()
+                if rows
+            }
             st.session_state.messages.append(
                 {
                     "role": "assistant",
-                    "content": "Here are your top picks:",
-                    "recs": result.rows[:5],
+                    "content": "Here are your top picks by model:",
+                    "recs_by_model": recs_by_model,
                 }
             )
+            _render_recs_by_model(recs_by_model)
 
     st.session_state.sessions[st.session_state.current_session] = {
         "messages": list(st.session_state.messages),

@@ -7,13 +7,27 @@ from typing import Iterable
 
 import numpy as np
 from dotenv import load_dotenv
+from groq import Groq
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+# MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+TIMEOUT_SECONDS = 60
+
+PROMPT_EMBEDDINGS_DIR = BASE_DIR / "offline" / "data" / "prompt_embeddings"
+MODEL_PROMPT_EMBEDDINGS_PATHS: dict[str, Path] = {
+    "clip": PROMPT_EMBEDDINGS_DIR / "clip" / "occasion_embeddings.npz",
+    "fashion_clip": PROMPT_EMBEDDINGS_DIR / "fashion_clip" / "occasion_embeddings.npz",
+}
+SHARED_PROMPTS_META_PATH = PROMPT_EMBEDDINGS_DIR / "occasion_prompt_embeddings_meta.json"
+MODEL_PROMPTS_META_PATHS: dict[str, Path] = {
+    "clip": PROMPT_EMBEDDINGS_DIR / "clip" / "occasion_embeddings_meta.json",
+    "fashion_clip": PROMPT_EMBEDDINGS_DIR / "fashion_clip" / "occasion_embeddings_meta.json",
+}
 
 
 def _get_occasion_target(parsed: dict) -> str | None:
@@ -60,13 +74,25 @@ def compute_top_prompt_matches(
     parsed: dict,
     product_ids: np.ndarray,
     embeddings: np.ndarray,
-    occasion_embeddings_path: Path = BASE_DIR / "occasion_library" / "occasion_prompt_embeddings.npz",
-    prompts_meta_path: Path = BASE_DIR
-    / "occasion_library"
-    / "occasion_prompt_embeddings_meta.json",
+    model_name: str = "clip",
+    occasion_embeddings_path: Path | None = None,
+    prompts_meta_path: Path | None = None,
 ) -> dict[str, dict[str, float | str]]:
     target = _get_occasion_target(parsed)
     if not target:
+        return {}
+
+    if occasion_embeddings_path is None:
+        occasion_embeddings_path = MODEL_PROMPT_EMBEDDINGS_PATHS.get(
+            model_name,
+            MODEL_PROMPT_EMBEDDINGS_PATHS["clip"],
+        )
+    if prompts_meta_path is None:
+        prompts_meta_path = MODEL_PROMPTS_META_PATHS.get(
+            model_name,
+            SHARED_PROMPTS_META_PATH,
+        )
+    if not occasion_embeddings_path.exists() or not prompts_meta_path.exists():
         return {}
 
     occasion_npz = np.load(occasion_embeddings_path)
@@ -79,6 +105,11 @@ def compute_top_prompt_matches(
     prompt_texts = meta.get("prompts", {}).get(target)
     if not prompt_texts:
         return {}
+    n_prompts = min(prompt_embeddings.shape[0], len(prompt_texts))
+    if n_prompts <= 0:
+        return {}
+    prompt_embeddings = prompt_embeddings[:n_prompts]
+    prompt_texts = prompt_texts[:n_prompts]
 
     id_to_index = {str(pid): idx for idx, pid in enumerate(product_ids)}
     cand_ids = [str(row_id) for row_id, _ in candidates if str(row_id) in id_to_index]
@@ -129,24 +160,17 @@ def _build_prompt(evidence: dict) -> tuple[str, str]:
 def _call_groq_langchain(system: str, evidence_payload: str) -> str:
     if not GROQ_API_KEY:
         raise SystemExit("GROQ_API_KEY is not set")
-    try:
-        from langchain_core.output_parsers import StrOutputParser
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_groq import ChatGroq
-    except Exception as exc:
-        raise SystemExit(
-            "LangChain Groq not installed; run `pip install langchain-groq langchain-core`"
-        ) from exc
-
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system),
-            ("human", "{evidence}"),
-        ]
+    client = Groq(api_key=GROQ_API_KEY)
+    chat = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": evidence_payload},
+        ],
+        temperature=0.2,
+        timeout=TIMEOUT_SECONDS,
     )
-    llm = ChatGroq(model=MODEL, temperature=0.2)
-    chain = prompt | llm | StrOutputParser()
-    return chain.invoke({"evidence": evidence_payload})
+    return chat.choices[0].message.content.strip()
 
 
 def generate_explanations(
@@ -156,6 +180,9 @@ def generate_explanations(
     product_ids: np.ndarray,
     embeddings: np.ndarray,
     occasion_scores: dict[str, float],
+    model_name: str = "clip",
+    occasion_embeddings_path: Path | None = None,
+    prompts_meta_path: Path | None = None,
 ) -> dict[str, str]:
     target = _get_occasion_target(parsed)
     query_keywords = _extract_query_keywords(parsed)
@@ -164,6 +191,9 @@ def generate_explanations(
         parsed=parsed,
         product_ids=product_ids,
         embeddings=embeddings,
+        model_name=model_name,
+        occasion_embeddings_path=occasion_embeddings_path,
+        prompts_meta_path=prompts_meta_path,
     )
 
     explanations: dict[str, str] = {}

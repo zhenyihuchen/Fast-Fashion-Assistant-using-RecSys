@@ -12,12 +12,16 @@ from groq import Groq
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-OCCASION_PROMPTS = BASE_DIR / "occasion_library" / "occasion_prompts.json"
+OCCASION_PROMPTS_CANDIDATES = [
+    BASE_DIR / "offline" / "occasion_library" / "occasion_prompts_clavix.json",
+]
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+#MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
 
 TIMEOUT_SECONDS = 60
 
@@ -230,7 +234,10 @@ class OccasionDecision:
 
 
 def _load_occasions() -> list[str]:
-    data = json.loads(OCCASION_PROMPTS.read_text(encoding="utf-8"))
+    prompts_path = next((p for p in OCCASION_PROMPTS_CANDIDATES if p.exists()), None)
+    if prompts_path is None:
+        return []
+    data = json.loads(prompts_path.read_text(encoding="utf-8"))
     if isinstance(data, dict) and isinstance(data.get("occasions"), dict):
         return sorted(list(data["occasions"].keys()))
     return []

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 from datetime import datetime, timezone
-import os
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -12,7 +11,6 @@ import numpy as np
 import pandas as pd
 import torch
 import open_clip
-from fashion_clip.fashion_clip import FashionCLIP
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -32,10 +30,42 @@ BATCH_SIZE = 64
 
 def _safe_l2_normalize(arr: np.ndarray, eps: float = 1e-12) -> np.ndarray:
     arr = arr.astype("float32", copy=False)
+    if not np.isfinite(arr).all():
+        bad = int((~np.isfinite(arr)).sum())
+        raise ValueError(f"Embeddings contain non-finite values before normalization: {bad}")
     norms = np.linalg.norm(arr, ord=2, axis=-1, keepdims=True)
-    norms = np.where(np.isfinite(norms) & (norms > eps), norms, 1.0)
-    out = arr / norms
-    return np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0)
+    bad_norms = (~np.isfinite(norms)) | (norms <= eps)
+    if bad_norms.any():
+        bad = int(bad_norms.sum())
+        raise ValueError(f"Embeddings have {bad} invalid/zero norms before normalization")
+    return arr / norms
+
+
+def _load_fashion_clip_components(device: str):
+    from transformers import CLIPModel, CLIPTokenizer
+
+    model_id = "patrickjohncyh/fashion-clip"
+    try:
+        model = CLIPModel.from_pretrained(
+            model_id,
+            low_cpu_mem_usage=False,
+            use_safetensors=False,
+        )
+    except OSError:
+        model = CLIPModel.from_pretrained(
+            model_id,
+            low_cpu_mem_usage=False,
+        )
+    tokenizer = CLIPTokenizer.from_pretrained(model_id)
+    return model.to(device).eval(), tokenizer
+
+
+def _as_feature_tensor(features):
+    if isinstance(features, torch.Tensor):
+        return features
+    if hasattr(features, "pooler_output"):
+        return features.pooler_output
+    raise TypeError(f"Unsupported features output type: {type(features)}")
 
 
 def _product_id(row: pd.Series) -> str:
@@ -116,11 +146,28 @@ def _run_fashion_clip(
     texts: list[str],
     valid_ids: list[str],
     status_rows: list[dict],
+    device: str,
 ) -> None:
-    print("\n[FashionCLIP] Loading model …")
-    fclip = FashionCLIP("fashion-clip")
-
-    text_embeddings = fclip.encode_text(texts, batch_size=BATCH_SIZE)
+    print("\n[FashionCLIP] Loading transformers model …")
+    model, tokenizer = _load_fashion_clip_components(device)
+    chunks: list[np.ndarray] = []
+    for start in range(0, len(texts), BATCH_SIZE):
+        batch = texts[start : start + BATCH_SIZE]
+        tokens = tokenizer(
+            batch,
+            return_tensors="pt",
+            max_length=77,
+            padding="max_length",
+            truncation=True,
+        )
+        tokens = {k: v.to(device) for k, v in tokens.items()}
+        with torch.no_grad():
+            feats = model.get_text_features(**tokens)
+            feats = _as_feature_tensor(feats)
+        chunks.append(feats.detach().cpu().numpy().astype("float32"))
+    text_embeddings = (
+        np.concatenate(chunks, axis=0) if chunks else np.empty((0, 0), dtype=np.float32)
+    )
     text_embeddings = _safe_l2_normalize(text_embeddings)
 
     model_info = [
@@ -157,7 +204,12 @@ def main() -> None:
     print(f"Built {len(texts)} text descriptions ({len(status_rows) - len(texts)} skipped)")
 
     _run_clip(texts, valid_ids, status_rows, device="cuda" if torch.cuda.is_available() else "cpu")
-    _run_fashion_clip(texts, valid_ids, status_rows)
+    _run_fashion_clip(
+        texts,
+        valid_ids,
+        status_rows,
+        device="cuda" if torch.cuda.is_available() else "cpu",
+    )
 
     print("\nDone.")
 

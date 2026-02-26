@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 from datetime import datetime, timezone
-import os
 from pathlib import Path
 import re
 
@@ -14,7 +13,6 @@ import pandas as pd
 from PIL import Image
 import torch
 import open_clip
-from fashion_clip.fashion_clip import FashionCLIP
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -35,10 +33,42 @@ BATCH_SIZE = 32
 
 def _safe_l2_normalize(arr: np.ndarray, eps: float = 1e-12) -> np.ndarray:
     arr = arr.astype("float32", copy=False)
+    if not np.isfinite(arr).all():
+        bad = int((~np.isfinite(arr)).sum())
+        raise ValueError(f"Embeddings contain non-finite values before normalization: {bad}")
     norms = np.linalg.norm(arr, ord=2, axis=-1, keepdims=True)
-    norms = np.where(np.isfinite(norms) & (norms > eps), norms, 1.0)
-    out = arr / norms
-    return np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0)
+    bad_norms = (~np.isfinite(norms)) | (norms <= eps)
+    if bad_norms.any():
+        bad = int(bad_norms.sum())
+        raise ValueError(f"Embeddings have {bad} invalid/zero norms before normalization")
+    return arr / norms
+
+
+def _load_fashion_clip_components(device: str):
+    from transformers import CLIPModel, CLIPProcessor
+
+    model_id = "patrickjohncyh/fashion-clip"
+    try:
+        model = CLIPModel.from_pretrained(
+            model_id,
+            low_cpu_mem_usage=False,
+            use_safetensors=False,
+        )
+    except OSError:
+        model = CLIPModel.from_pretrained(
+            model_id,
+            low_cpu_mem_usage=False,
+        )
+    processor = CLIPProcessor.from_pretrained(model_id, use_fast=False)
+    return model.to(device).eval(), processor
+
+
+def _as_feature_tensor(features):
+    if isinstance(features, torch.Tensor):
+        return features
+    if hasattr(features, "pooler_output"):
+        return features.pooler_output
+    raise TypeError(f"Unsupported features output type: {type(features)}")
 
 
 def _safe_filename(value: str) -> str:
@@ -120,11 +150,22 @@ def _run_fashion_clip(
     pil_images: list[Image.Image],
     valid_ids: list[str],
     status_rows: list[dict],
+    device: str,
 ) -> None:
-    print("\n[FashionCLIP] Loading model …")
-    fclip = FashionCLIP("fashion-clip")
-
-    image_embeddings = fclip.encode_images(pil_images, batch_size=BATCH_SIZE)
+    print("\n[FashionCLIP] Loading transformers model …")
+    model, processor = _load_fashion_clip_components(device)
+    chunks: list[np.ndarray] = []
+    for start in range(0, len(pil_images), BATCH_SIZE):
+        batch = pil_images[start : start + BATCH_SIZE]
+        inputs = processor(images=batch, return_tensors="pt")
+        pixel_values = inputs["pixel_values"].to(device)
+        with torch.no_grad():
+            feats = model.get_image_features(pixel_values=pixel_values)
+            feats = _as_feature_tensor(feats)
+        chunks.append(feats.detach().cpu().numpy().astype("float32"))
+    image_embeddings = (
+        np.concatenate(chunks, axis=0) if chunks else np.empty((0, 0), dtype=np.float32)
+    )
     image_embeddings = _safe_l2_normalize(image_embeddings)
 
     model_info = [
@@ -193,7 +234,7 @@ def main() -> None:
 
     # only the status rows for valid images are shared; skipped rows are included in both CSVs
     _run_clip(pil_images, valid_ids, status_rows, device)
-    _run_fashion_clip(pil_images, valid_ids, status_rows)
+    _run_fashion_clip(pil_images, valid_ids, status_rows, device)
 
     print("\nDone.")
 
