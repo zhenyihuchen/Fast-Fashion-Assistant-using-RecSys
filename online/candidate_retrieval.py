@@ -11,9 +11,15 @@ import re
 
 import open_clip
 import torch  # import before numpy to avoid MKL issues
+# torch.set_num_threads(1)
+# torch.set_num_interop_threads(1)
 import numpy as np
 import pandas as pd
 import faiss
+import fashion_clip.fashion_clip as fashion_clip_module
+from fashion_clip.fashion_clip import FashionCLIP
+
+
 
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
@@ -47,7 +53,8 @@ MODEL_PATHS: dict[str, dict[str, Path]] = {
 
 # Module-level lazy caches — models are loaded once and reused across queries.
 _clip_cache: tuple | None = None   # (model, tokenizer, device)
-_fclip_cache: tuple | None = None  # (CLIPModel, CLIPTokenizer, device)
+_fclip_cache: FashionCLIP | None = None
+_fclip_loader_patched = False
 
 
 # ---------------------------------------------------------------------------
@@ -67,25 +74,44 @@ def _get_clip_model() -> tuple:
     return _clip_cache
 
 
-def _get_fclip() -> tuple:
-    """Load patrickjohncyh/fashion-clip directly via transformers.
+def _patch_fashion_clip_loader() -> None:
+    """Force FashionCLIP to use slow processor and safer HF loading options."""
+    global _fclip_loader_patched
+    if _fclip_loader_patched:
+        return
 
-    low_cpu_mem_usage=False  — skips meta-tensor / memory-mapped loading,
-                               which triggers SIGBUS on macOS ARM64 (16 KB vs
-                               4 KB page alignment mismatch).
-    CLIPTokenizer (slow, pure-Python) — no Rust extension, no semaphores.
-    """
-    global _fclip_cache
-    if _fclip_cache is None:
-        from transformers import CLIPModel, CLIPTokenizer
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        model = CLIPModel.from_pretrained(
-            "patrickjohncyh/fashion-clip", low_cpu_mem_usage=False
-        )
-        tokenizer = CLIPTokenizer.from_pretrained("patrickjohncyh/fashion-clip")
-        model = model.to(device).eval()
-        _fclip_cache = (model, tokenizer, device)
-    return _fclip_cache
+    from transformers import CLIPModel, CLIPProcessor
+
+    original_load_model = fashion_clip_module.FashionCLIP._load_model
+
+    def _load_model_slow(self, name, device=None, auth_token=None):
+        if name in fashion_clip_module._MODELS or fashion_clip_module._is_hugging_face_repo(name, auth_token):
+            repo_name = fashion_clip_module._MODELS[name] if name in fashion_clip_module._MODELS else name
+            try:
+                model = CLIPModel.from_pretrained(
+                    repo_name,
+                    token=auth_token,
+                    low_cpu_mem_usage=False,
+                    use_safetensors=False,
+                )
+            except OSError:
+                model = CLIPModel.from_pretrained(
+                    repo_name,
+                    token=auth_token,
+                    low_cpu_mem_usage=False,
+                )
+            processor = CLIPProcessor.from_pretrained(
+                repo_name,
+                token=auth_token,
+                use_fast=False,
+            )
+            model_hash = fashion_clip_module._model_processor_hash(repo_name, model, processor)
+            return model, processor, model_hash
+
+        return original_load_model(self, name, device=device, auth_token=auth_token)
+
+    fashion_clip_module.FashionCLIP._load_model = _load_model_slow
+    _fclip_loader_patched = True
 
 
 # ---------------------------------------------------------------------------
@@ -102,15 +128,11 @@ def _encode_query_clip(text: str) -> np.ndarray:
 
 
 def _encode_query_fashion_clip(text: str) -> np.ndarray:
-    model, tokenizer, device = _get_fclip()
-    inputs = tokenizer(
-        [text], return_tensors="pt",
-        max_length=77, padding="max_length", truncation=True,
-    )
-    inputs = {k: v.to(device) for k, v in inputs.items()}
-    with torch.no_grad():
-        features = model.get_text_features(**inputs)
-    emb = features.cpu().numpy()
+    global _fclip_cache
+    if _fclip_cache is None:
+        _patch_fashion_clip_loader()
+        _fclip_cache = FashionCLIP("fashion-clip")
+    emb = _fclip_cache.encode_text([text], batch_size=1)
     emb = emb / np.linalg.norm(emb, ord=2, axis=-1, keepdims=True)
     return emb[0].astype("float32")
 
@@ -286,13 +308,13 @@ def retrieve_candidates(
     """Return candidates for each embedding model separately.
 
     Returns ``{"clip": [...], "fashion_clip": [...]}`` (or a single-key dict
-    when *embedding_model* is not ``"both"``).  Results are kept separate so
-    every downstream step (occasion scoring, ranking, explanations) runs
-    independently per model.
+    when *embedding_model* is not ``"both"``).
     """
     df = pd.read_parquet(PARQUET_PATH)
     df["row_id"] = df["row_id"].astype(str)
 
+    if embedding_model not in {"clip", "fashion_clip", "both"}:
+        raise ValueError("embedding_model must be one of: 'clip', 'fashion_clip', 'both'")
     models_to_run = ["clip", "fashion_clip"] if embedding_model == "both" else [embedding_model]
 
     results: dict[str, list[tuple[str, float]]] = {}

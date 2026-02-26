@@ -33,6 +33,14 @@ CLIP_PRETRAINED = "openai"
 BATCH_SIZE = 32
 
 
+def _safe_l2_normalize(arr: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    arr = arr.astype("float32", copy=False)
+    norms = np.linalg.norm(arr, ord=2, axis=-1, keepdims=True)
+    norms = np.where(np.isfinite(norms) & (norms > eps), norms, 1.0)
+    out = arr / norms
+    return np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0)
+
+
 def _safe_filename(value: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "_", value.strip())
     return cleaned.strip("_") or "unknown"
@@ -117,9 +125,7 @@ def _run_fashion_clip(
     fclip = FashionCLIP("fashion-clip")
 
     image_embeddings = fclip.encode_images(pil_images, batch_size=BATCH_SIZE)
-    image_embeddings = image_embeddings / np.linalg.norm(
-        image_embeddings, ord=2, axis=-1, keepdims=True
-    )
+    image_embeddings = _safe_l2_normalize(image_embeddings)
 
     model_info = [
         "model=fashion-clip\n",

@@ -30,6 +30,14 @@ CLIP_PRETRAINED = "openai"
 BATCH_SIZE = 64
 
 
+def _safe_l2_normalize(arr: np.ndarray, eps: float = 1e-12) -> np.ndarray:
+    arr = arr.astype("float32", copy=False)
+    norms = np.linalg.norm(arr, ord=2, axis=-1, keepdims=True)
+    norms = np.where(np.isfinite(norms) & (norms > eps), norms, 1.0)
+    out = arr / norms
+    return np.nan_to_num(out, nan=0.0, posinf=0.0, neginf=0.0)
+
+
 def _product_id(row: pd.Series) -> str:
     if "row_id" in row and pd.notna(row["row_id"]) and str(row["row_id"]).strip():
         return str(row["row_id"]).strip()
@@ -113,9 +121,7 @@ def _run_fashion_clip(
     fclip = FashionCLIP("fashion-clip")
 
     text_embeddings = fclip.encode_text(texts, batch_size=BATCH_SIZE)
-    text_embeddings = text_embeddings / np.linalg.norm(
-        text_embeddings, ord=2, axis=-1, keepdims=True
-    )
+    text_embeddings = _safe_l2_normalize(text_embeddings)
 
     model_info = [
         "model=fashion-clip\n",
