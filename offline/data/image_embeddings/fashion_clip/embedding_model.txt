@@ -1,2 +1,0 @@
-model=fashion-clip
-generated_at=2026-02-26T14:39:49+00:00
