@@ -330,6 +330,13 @@ But for your current pipeline, direct Groq calls are simpler and lighter. (WARNI
 Graph based + LLM reasoning 
 
 
+DESPUES DE ENTREGAR EL METHODLOGY 
+
+- explicar mejor por que es un RAG 
+- por que no uso un CNN 
+- explicar mejor FAISS??
+- explicar mejor LLM as a judge 
+
 
 
 

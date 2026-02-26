@@ -2,29 +2,34 @@ from __future__ import annotations
 
 import csv
 from datetime import datetime, timezone
+import os
 from pathlib import Path
 import re
+
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 import numpy as np
 import pandas as pd
 from PIL import Image
 import torch
 import open_clip
+from fashion_clip.fashion_clip import FashionCLIP
 
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR.parent / "data"
 EMBED_DIR = DATA_DIR / "image_embeddings"
 
+CLIP_DIR = EMBED_DIR / "clip"
+FCLIP_DIR = EMBED_DIR / "fashion_clip"
+
 INPUT_PARQUET = DATA_DIR / "women_data.parquet"
 IMAGE_DIR = DATA_DIR / "images"
-EMBEDDINGS_OUT = EMBED_DIR / "image_embeddings.npy"
-IDS_OUT = EMBED_DIR / "product_ids.npy"
-MODEL_INFO_OUT = EMBED_DIR / "embedding_model.txt"
-STATUS_OUT = EMBED_DIR / "embedding_status.csv"
 
-MODEL_NAME = "ViT-B-32"
-PRETRAINED = "openai"
+# open_clip / CLIP settings
+CLIP_MODEL_NAME = "ViT-B-32"
+CLIP_PRETRAINED = "openai"
 BATCH_SIZE = 32
 
 
@@ -39,36 +44,103 @@ def _product_id(row: pd.Series) -> str:
     return "unknown"
 
 
+def _save_outputs(
+    out_dir: Path,
+    embeddings_array: np.ndarray,
+    product_ids: list[str],
+    status_rows: list[dict],
+    model_info_lines: list[str],
+) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    np.save(out_dir / "image_embeddings.npy", embeddings_array)
+    np.save(out_dir / "product_ids.npy", np.array(product_ids, dtype=object))
+
+    with open(out_dir / "embedding_model.txt", "w", encoding="utf-8") as f:
+        f.writelines(model_info_lines)
+
+    with open(out_dir / "embedding_status.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["product_id", "reference_number", "image_path", "status", "error"],
+        )
+        writer.writeheader()
+        writer.writerows(status_rows)
+
+    print(f"  embeddings : {out_dir / 'image_embeddings.npy'}  shape={embeddings_array.shape}")
+    print(f"  product_ids: {out_dir / 'product_ids.npy'}  count={len(product_ids)}")
+
+
+def _run_clip(
+    pil_images: list[Image.Image],
+    valid_ids: list[str],
+    status_rows: list[dict],
+    device: str,
+) -> None:
+    print("\n[CLIP] Loading model …")
+    model, _, preprocess = open_clip.create_model_and_transforms(
+        CLIP_MODEL_NAME, pretrained=CLIP_PRETRAINED
+    )
+    model = model.to(device)
+    model.eval()
+
+    embeddings: list[np.ndarray] = []
+
+    for start in range(0, len(pil_images), BATCH_SIZE):
+        batch_pil = pil_images[start : start + BATCH_SIZE]
+        batch_tensor = torch.stack([preprocess(img) for img in batch_pil]).to(device)
+        with torch.no_grad():
+            feats = model.encode_image(batch_tensor)
+            feats = feats / feats.norm(dim=-1, keepdim=True)
+            embeddings.append(feats.cpu().numpy())
+
+    embeddings_array = (
+        np.concatenate(embeddings, axis=0) if embeddings else np.empty((0, 0), dtype=np.float32)
+    )
+
+    model_info = [
+        f"model={CLIP_MODEL_NAME}\n",
+        f"pretrained={CLIP_PRETRAINED}\n",
+        f"device={device}\n",
+        f"generated_at={datetime.now(timezone.utc).isoformat(timespec='seconds')}\n",
+    ]
+
+    print("[CLIP] Saving outputs …")
+    _save_outputs(CLIP_DIR, embeddings_array, valid_ids, status_rows, model_info)
+
+
+def _run_fashion_clip(
+    pil_images: list[Image.Image],
+    valid_ids: list[str],
+    status_rows: list[dict],
+) -> None:
+    print("\n[FashionCLIP] Loading model …")
+    fclip = FashionCLIP("fashion-clip")
+
+    image_embeddings = fclip.encode_images(pil_images, batch_size=BATCH_SIZE)
+    image_embeddings = image_embeddings / np.linalg.norm(
+        image_embeddings, ord=2, axis=-1, keepdims=True
+    )
+
+    model_info = [
+        "model=fashion-clip\n",
+        f"generated_at={datetime.now(timezone.utc).isoformat(timespec='seconds')}\n",
+    ]
+
+    print("[FashionCLIP] Saving outputs …")
+    _save_outputs(FCLIP_DIR, image_embeddings, valid_ids, status_rows, model_info)
+
+
 def main() -> None:
     df = pd.read_parquet(INPUT_PARQUET)
     if "reference_number" not in df.columns or "row_id" not in df.columns:
         raise SystemExit("Missing reference_number or row_id column")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model, _, preprocess = open_clip.create_model_and_transforms(
-        MODEL_NAME, pretrained=PRETRAINED
-    )
-    model = model.to(device)
-    model.eval()
 
-    embeddings = []
-    product_ids = []
-
-    status_rows = []
-    batch_images = []
-    batch_ids = []
-
-    def flush_batch() -> None: #  inner helper to run inference on a batch
-        if not batch_images:
-            return
-        with torch.no_grad(): #  inference without gradients
-            batch = torch.stack(batch_images).to(device) # pack images into a tensor
-            feats = model.encode_image(batch) # compute image embeddings
-            feats = feats / feats.norm(dim=-1, keepdim=True) # normalize embeddings
-            embeddings.append(feats.cpu().numpy())
-            product_ids.extend(batch_ids) # align ids with embeddings
-        batch_images.clear()
-        batch_ids.clear()
+    # --- single image-loading pass ---
+    pil_images: list[Image.Image] = []
+    valid_ids: list[str] = []
+    status_rows: list[dict] = []
 
     for _, row in df.iterrows():
         ref = str(row["reference_number"]).strip()
@@ -89,9 +161,8 @@ def main() -> None:
             continue
 
         try:
-            image = Image.open(image_path).convert("RGB")
-            batch_images.append(preprocess(image))
-            batch_ids.append(pid)
+            pil_images.append(Image.open(image_path).convert("RGB"))
+            valid_ids.append(pid)
             status_rows.append(
                 {
                     "product_id": pid,
@@ -111,38 +182,14 @@ def main() -> None:
                     "error": str(e),
                 }
             )
-            continue
 
-        if len(batch_images) >= BATCH_SIZE:
-            flush_batch()
+    print(f"Loaded {len(pil_images)} images ({len(status_rows) - len(pil_images)} skipped)")
 
-    flush_batch()
+    # only the status rows for valid images are shared; skipped rows are included in both CSVs
+    _run_clip(pil_images, valid_ids, status_rows, device)
+    _run_fashion_clip(pil_images, valid_ids, status_rows)
 
-    if embeddings:
-        embeddings_array = np.concatenate(embeddings, axis=0)
-    else:
-        embeddings_array = np.empty((0, 0), dtype=np.float32)
-
-    np.save(EMBEDDINGS_OUT, embeddings_array)
-    np.save(IDS_OUT, np.array(product_ids, dtype=object))
-
-    with open(MODEL_INFO_OUT, "w", encoding="utf-8") as f:
-        f.write(f"model={MODEL_NAME}\n")
-        f.write(f"pretrained={PRETRAINED}\n")
-        f.write(f"device={device}\n")
-        f.write(f"generated_at={datetime.now(timezone.utc).isoformat(timespec='seconds')}\n")
-
-    with open(STATUS_OUT, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=["product_id", "reference_number", "image_path", "status", "error"],
-        )
-        writer.writeheader()
-        writer.writerows(status_rows)
-
-    print(f"Saved {EMBEDDINGS_OUT} with shape {embeddings_array.shape}")
-    print(f"Saved {IDS_OUT} with {len(product_ids)} ids")
-    print(f"Saved {MODEL_INFO_OUT} and {STATUS_OUT}")
+    print("\nDone.")
 
 
 if __name__ == "__main__":
