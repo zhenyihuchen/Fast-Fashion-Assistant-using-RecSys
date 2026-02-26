@@ -304,6 +304,21 @@ def _render_recs_by_model(recs_by_model: dict[str, list[dict[str, Any]]]) -> Non
             st.write("---")
 
 
+def _parsed_constraints_summary(parsed: dict[str, Any]) -> str:
+    constraints = parsed.get("constraints") or {}
+    occasion = parsed.get("occasion") or {}
+    categories = constraints.get("categories", []) or []
+    colors = constraints.get("colors", []) or []
+    fit = constraints.get("fit", []) or []
+    price_min = constraints.get("price_min")
+    price_max = constraints.get("price_max")
+    return (
+        f"Parsed constraints -> categories={categories}, colors={colors}, "
+        f"fit={fit}, price_min={price_min}, price_max={price_max}, "
+        f"occasion={occasion.get('target')}, occasion_mode={occasion.get('mode')}"
+    )
+
+
 st.set_page_config(page_title="Zara's virtual shopping assistant", layout="wide")
 st.title("Zara's virtual shopping assistant")
 st.caption("This chat supports several interactions within the same session.")
@@ -384,6 +399,8 @@ if user_input:
         combined_query = f"{st.session_state.pending_query}. Occasion: {user_input}"
 
     result, _progress_log = _run_pipeline_with_progress(combined_query)
+    with st.expander("Parsed query constraints", expanded=False):
+        st.json(result.parsed)
 
     if _occasion_missing(result.parsed):
         st.session_state.awaiting_occasion = True
@@ -397,7 +414,10 @@ if user_input:
 
         all_rows = [r for rows in result.rows_by_model.values() for r in rows]
         if not all_rows:
-            assistant_text = "I couldn't find matches for that request. Want to adjust the style, color, or budget?"
+            assistant_text = (
+                "I couldn't find matches for that request. Want to adjust the style, color, or budget?\n\n"
+                + _parsed_constraints_summary(result.parsed)
+            )
             st.session_state.messages.append({"role": "assistant", "content": assistant_text})
             message(assistant_text, is_user=False, key=f"assistant-nomatch-{len(st.session_state.messages)}")
         else:

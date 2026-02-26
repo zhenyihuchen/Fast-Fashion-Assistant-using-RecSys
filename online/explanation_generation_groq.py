@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterable
 
@@ -16,6 +17,10 @@ load_dotenv(dotenv_path=ENV_PATH)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+# Explanations are short (2-3 sentences) with structured evidence, so a fast
+# small model is sufficient and avoids rate-limit errors from parallel calls.
+# Override with GROQ_EXPLANATION_MODEL in .env if needed.
+EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "llama-3.1-8b-instant")
 TIMEOUT_SECONDS = 60
 
 PROMPT_EMBEDDINGS_DIR = BASE_DIR / "offline" / "data" / "prompt_embeddings"
@@ -162,7 +167,7 @@ def _call_groq_langchain(system: str, evidence_payload: str) -> str:
         raise SystemExit("GROQ_API_KEY is not set")
     client = Groq(api_key=GROQ_API_KEY)
     chat = client.chat.completions.create(
-        model=MODEL,
+        model=EXPLANATION_MODEL,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": evidence_payload},
@@ -171,6 +176,33 @@ def _call_groq_langchain(system: str, evidence_payload: str) -> str:
         timeout=TIMEOUT_SECONDS,
     )
     return chat.choices[0].message.content.strip()
+
+
+def _generate_one_explanation(
+    row: dict,
+    target: str | None,
+    query_keywords: list[str],
+    top_prompt_matches: dict[str, dict[str, float | str]],
+    occasion_scores: dict[str, float],
+) -> tuple[str, str]:
+    row_id = str(row.get("row_id", ""))
+    if not row_id:
+        return "", ""
+    prompt_info = top_prompt_matches.get(row_id, {})
+    evidence = {
+        "product_title": row.get("product_name", ""),
+        "description": row.get("product_description", ""),
+        "color": row.get("color", ""),
+        "category": row.get("product_category", ""),
+        "price": row.get("price", ""),
+        "occasion_target": target,
+        "occasion_score": occasion_scores.get(row_id),
+        "top_occasion_prompt": prompt_info.get("prompt"),
+        "top_occasion_prompt_score": prompt_info.get("score"),
+        "query_keywords": query_keywords,
+    }
+    system, payload = _build_prompt(evidence)
+    return row_id, _call_groq_langchain(system, payload)
 
 
 def generate_explanations(
@@ -197,23 +229,30 @@ def generate_explanations(
     )
 
     explanations: dict[str, str] = {}
-    for row in rows:
-        row_id = str(row.get("row_id", ""))
-        if not row_id:
-            continue
-        prompt_info = top_prompt_matches.get(row_id, {})
-        evidence = {
-            "product_title": row.get("product_name", ""),
-            "description": row.get("product_description", ""),
-            "color": row.get("color", ""),
-            "category": row.get("product_category", ""),
-            "price": row.get("price", ""),
-            "occasion_target": target,
-            "occasion_score": occasion_scores.get(row_id),
-            "top_occasion_prompt": prompt_info.get("prompt"),
-            "top_occasion_prompt_score": prompt_info.get("score"),
-            "query_keywords": query_keywords,
+    work_rows = [row for row in rows if str(row.get("row_id", ""))]
+    if not work_rows:
+        return explanations
+
+    max_workers = min(4, len(work_rows))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {
+            executor.submit(
+                _generate_one_explanation,
+                row,
+                target,
+                query_keywords,
+                top_prompt_matches,
+                occasion_scores,
+            ): str(row.get("row_id", ""))
+            for row in work_rows
         }
-        system, payload = _build_prompt(evidence)
-        explanations[row_id] = _call_groq_langchain(system, payload)
+        for future in as_completed(futures):
+            row_id = futures[future]
+            try:
+                out_row_id, text = future.result()
+                if out_row_id:
+                    explanations[out_row_id] = text
+            except Exception as exc:
+                print(f"[explanation] failed for row_id={row_id}: {exc}")
+                explanations[row_id] = ""
     return explanations

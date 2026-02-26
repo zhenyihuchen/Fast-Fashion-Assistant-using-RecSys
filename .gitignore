@@ -4,6 +4,7 @@ env/
 ENV/
 .venv/
 .env/
+myenv/
 pyvenv.cfg
 activate
 activate.bat
@@ -48,5 +49,19 @@ wheels/
 .DS_Store
 Thumbs.db
 
-#For now, ignore cached images
-data/images/
+# Secrets
+.env
+
+# Large ML data files
+# offline/data/images/
+# offline/data/**/*.npy
+# offline/data/**/*.parquet
+# offline/data/**/*.index
+
+# Test results
+# results_test/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/

@@ -152,6 +152,12 @@ def _normalize_color(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().lower())
 
 
+def _color_tokens(value: str) -> set[str]:
+    tokens = re.findall(r"[a-z]+", _normalize_color(value))
+    generic_modifiers = {"dark", "light", "mid", "bright", "pale", "deep"}
+    return {t for t in tokens if len(t) > 2 and t not in generic_modifiers}
+
+
 def _category_to_dataset(cat: str) -> str:
     return cat.strip().upper()
 
@@ -174,7 +180,17 @@ def _filter_rows(df: pd.DataFrame, parsed: dict) -> pd.DataFrame:
     if colors:
         color_norm = filtered["color"].astype(str).map(_normalize_color)
         color_set  = {_normalize_color(c) for c in colors}
-        mask = color_norm.apply(lambda c: any(k in c for k in color_set))
+        requested_tokens: set[str] = set()
+        for c in colors:
+            requested_tokens.update(_color_tokens(c))
+
+        def _matches_color(c: str) -> bool:
+            if any(k in c or c in k for k in color_set):
+                return True
+            row_tokens = _color_tokens(c)
+            return bool(requested_tokens.intersection(row_tokens))
+
+        mask = color_norm.apply(_matches_color)
         filtered = filtered[mask]
 
     if price_min is not None or price_max is not None:
