@@ -47,6 +47,8 @@ def main() -> None:
             #"I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
             # "I want a pair of dark blue color straight jeans for a chill and casual day in the park, high-rise" (para mejorar)
             
+            # "I want something to wear for halloween, I have no idea what type of clothes, what do you suggest me?"
+            
     if not args.query:
         raise SystemExit("Provide --query or use --test-query")
 

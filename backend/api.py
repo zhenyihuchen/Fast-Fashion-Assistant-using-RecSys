@@ -25,9 +25,11 @@ from dotenv import load_dotenv
 
 load_dotenv(ROOT / ".env")
 
+import io
+
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from groq import Groq
@@ -374,6 +376,20 @@ async def search(req: SearchRequest):
             "Connection": "keep-alive",
         },
     )
+
+
+@app.post("/api/transcribe")
+async def transcribe(audio: UploadFile = File(...)):
+    if not GROQ_API_KEY:
+        raise HTTPException(status_code=503, detail="GROQ_API_KEY not configured")
+    content = await audio.read()
+    filename = audio.filename or "recording.webm"
+    client = Groq(api_key=GROQ_API_KEY)
+    result = client.audio.transcriptions.create(
+        file=(filename, io.BytesIO(content), audio.content_type or "audio/webm"),
+        model="whisper-large-v3-turbo",
+    )
+    return {"text": result.text}
 
 
 @app.get("/health")

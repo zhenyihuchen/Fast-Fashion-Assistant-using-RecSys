@@ -14,7 +14,8 @@ When you run `/clavix-improve`, I:
 2. **Select optimal depth** - Auto-choose standard vs comprehensive based on quality score
 3. **Apply improvement patterns** - Transform using proven optimization techniques
 4. **Generate optimized version** - Create enhanced prompt with quality feedback
-5. **Save for implementation** - Store in `.clavix/outputs/prompts/` for `/clavix-implement`
+5. **Re-score the refined prompt** - Run the same 6-dimension assessment on the optimized prompt
+6. **Save for implementation** - Store in `.clavix/outputs/prompts/` for `/clavix-implement`
 
 **Smart Depth Selection:**
 - **Quality ≥ 75%**: Comprehensive depth (add polish and enhancements)
@@ -31,6 +32,7 @@ This is a prompt improvement workflow. Your job is to ANALYZE and IMPROVE the pr
 - Analyze the user's prompt for quality
 - Apply improvement patterns
 - Generate an optimized version
+- Re-score the optimized version and show the delta
 - Save to `.clavix/outputs/prompts/`
 
 **What this mode does NOT do:**
@@ -52,6 +54,7 @@ This is a prompt improvement workflow. Your job is to ANALYZE and IMPROVE the pr
 - Apply improvement patterns
 - Generate improved versions
 - Provide quality assessments
+- Compare original and refined prompt quality
 - Save the optimized prompt
 - **STOP** after improvement
 
@@ -72,7 +75,7 @@ This is a prompt improvement workflow. Your job is to ANALYZE and IMPROVE the pr
 | Type | What It Looks Like |
 |------|--------------------|
 | 1. Implementation Code | Writing function/class definitions, creating components, generating API endpoints |
-| 2. Skipping Quality Assessment | Not scoring all 6 dimensions, jumping to improved prompt without analysis |
+| 2. Skipping Quality Assessment | Not scoring all 6 dimensions for both original and refined prompts |
 | 3. Wrong Depth Selection | Not explaining why standard/comprehensive was chosen |
 | 4. Incomplete Pattern Application | Not showing which patterns were applied |
 | 5. Missing Depth Features | In comprehensive mode: missing alternatives, edge cases, or validation |
@@ -113,7 +116,7 @@ Clavix provides a unified **improve** mode that intelligently selects the approp
 - Intent Detection: Automatically identifies what you're trying to achieve
 - Quality Assessment: 6-dimension analysis (Clarity, Efficiency, Structure, Completeness, Actionability, Specificity)
 - Smart Optimization: Applies core patterns based on your intent
-- Single improved prompt with quality feedback
+- Single improved prompt with before/after quality feedback
 
 **Comprehensive Depth Adds:**
 - Alternative Approaches: 2-3 different ways to phrase the request
@@ -142,7 +145,7 @@ Clavix provides a unified **improve** mode that intelligently selects the approp
    - **learning**: Conceptual understanding, tutorials, explanations
    - **summarization**: Extracting requirements from conversations
 
-3. **Quality Assessment** - Evaluate across 6 dimensions:
+3. **Original Prompt Quality Assessment** - Evaluate the user's prompt across 6 dimensions:
 
    - **Clarity**: Is the objective clear and unambiguous?
    - **Efficiency**: Is the prompt concise without losing critical information?
@@ -155,7 +158,7 @@ Clavix provides a unified **improve** mode that intelligently selects the approp
 
 4. **Smart Depth Selection**:
 
-   Based on the quality assessment:
+   Based on the original prompt quality assessment:
 
    **If Overall Quality >= 75%**:
    - Auto-select **comprehensive** depth
@@ -175,12 +178,22 @@ Clavix provides a unified **improve** mode that intelligently selects the approp
    - Auto-select **standard** depth
    - Explain: "Quality is low (XX%) - using standard depth for basic fixes"
 
-5. **Generate Output** based on selected depth:
+5. **Generate Improved Prompt** based on selected depth.
+
+6. **Refined Prompt Quality Assessment**:
+   - Evaluate the improved prompt using the same 6 dimensions.
+   - Score each dimension 0-100%, calculate weighted overall score.
+   - Compare refined scores against original scores.
+   - Show a short delta summary, including overall quality change.
+
+7. **Generate Output** based on selected depth:
 
    **Standard Depth Output:**
    - Intent Analysis (type, confidence)
-   - Quality Assessment (6 dimensions)
+   - Original Prompt Quality Assessment (6 dimensions)
    - Optimized Prompt (applying core patterns)
+   - Refined Prompt Quality Assessment (6 dimensions)
+   - Score Delta Summary
    - Improvements Applied (labeled with quality dimensions)
    - Patterns Applied
 
@@ -191,13 +204,13 @@ Clavix provides a unified **improve** mode that intelligently selects the approp
    - What Could Go Wrong (risk assessment)
    - Patterns Applied (all patterns including comprehensive-only)
 
-6. **Quality-labeled feedback**:
+8. **Quality-labeled feedback**:
    - Label all improvements with quality dimension tags
    - Example: "[Efficiency] Removed 15 unnecessary phrases"
    - Example: "[Structure] Reorganized into logical sections"
    - Example: "[Completeness] Added missing technical constraints"
 
-7. Present everything in a well-organized format.
+9. Present everything in a well-organized format.
 
 ---
 
@@ -215,7 +228,7 @@ Quality Score: 42% - Using standard depth for basic optimization
 Type: code-generation
 Confidence: 85%
 
-### Quality Assessment:
+### Original Prompt Quality Assessment:
 
 Clarity: 40%
 Efficiency: 35%
@@ -250,6 +263,27 @@ Success Criteria:
 - Users can log in successfully
 - Invalid credentials show appropriate errors
 - Page is accessible via keyboard navigation
+
+### Refined Prompt Quality Assessment:
+
+Clarity: 88%
+Efficiency: 82%
+Structure: 90%
+Completeness: 84%
+Actionability: 89%
+Specificity: 78%
+
+Overall Quality: 86% (good)
+
+### Score Delta Summary:
+
+- Clarity: +48%
+- Efficiency: +47%
+- Structure: +5%
+- Completeness: +64%
+- Actionability: +59%
+- Specificity: +53%
+- Overall: +44%
 
 ### Improvements Applied:
 
@@ -286,7 +320,7 @@ Characteristics:
   - Open-ended: Yes
   - Needs structure: Yes
 
-### Quality Assessment:
+### Original Prompt Quality Assessment:
 
 Clarity: 75%
 Efficiency: 85%
@@ -298,6 +332,12 @@ Overall Quality: 78% (good)
 
 ### Optimized Prompt:
 [... full optimized prompt ...]
+
+### Refined Prompt Quality Assessment:
+[... all 6 dimensions rescored for the optimized prompt ...]
+
+### Score Delta Summary:
+[... before/after changes by dimension and overall ...]
 
 ### Improvements Applied:
 [... improvements with labels ...]
@@ -352,8 +392,10 @@ Before proceeding to save, verify you have output ALL of the following:
 
 **Standard Depth:**
 - [ ] **Intent Analysis** with type and confidence
-- [ ] **Quality Assessment** with all 6 dimensions
+- [ ] **Original Prompt Quality Assessment** with all 6 dimensions
 - [ ] **Optimized Prompt** in code block
+- [ ] **Refined Prompt Quality Assessment** with all 6 dimensions
+- [ ] **Score Delta Summary**
 - [ ] **Improvements Applied** with dimension labels
 
 **Comprehensive Depth (add to above):**
@@ -419,13 +461,32 @@ originalPrompt: <user's original prompt text>
 
 <Insert the optimized prompt content from your analysis above>
 
-## Quality Scores
+## Original Prompt Quality Scores
 - **Clarity**: <percentage>%
 - **Efficiency**: <percentage>%
 - **Structure**: <percentage>%
 - **Completeness**: <percentage>%
 - **Actionability**: <percentage>%
+- **Specificity**: <percentage>%
 - **Overall**: <percentage>% (<rating>)
+
+## Refined Prompt Quality Scores
+- **Clarity**: <percentage>%
+- **Efficiency**: <percentage>%
+- **Structure**: <percentage>%
+- **Completeness**: <percentage>%
+- **Actionability**: <percentage>%
+- **Specificity**: <percentage>%
+- **Overall**: <percentage>% (<rating>)
+
+## Quality Delta
+- **Clarity**: <+/-percentage>%
+- **Efficiency**: <+/-percentage>%
+- **Structure**: <+/-percentage>%
+- **Completeness**: <+/-percentage>%
+- **Actionability**: <+/-percentage>%
+- **Specificity**: <+/-percentage>%
+- **Overall**: <+/-percentage>%
 
 ## Original Prompt
 ```

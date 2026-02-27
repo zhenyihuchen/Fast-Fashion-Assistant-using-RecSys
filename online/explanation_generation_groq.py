@@ -254,5 +254,5 @@ def generate_explanations(
                     explanations[out_row_id] = text
             except Exception as exc:
                 print(f"[explanation] failed for row_id={row_id}: {exc}")
-                explanations[row_id] = ""
+                explanations[row_id] = "Explanation unavailable."
     return explanations

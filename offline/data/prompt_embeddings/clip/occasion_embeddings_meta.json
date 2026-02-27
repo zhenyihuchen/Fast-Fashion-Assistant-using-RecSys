@@ -2,63 +2,91 @@
   "model": "ViT-B-32",
   "pretrained": "openai",
   "device": "cpu",
-  "generated_at": "2026-02-26T14:53:09+00:00",
+  "generated_at": "2026-02-27T19:23:53+00:00",
   "prompts": {
     "wedding_guest": [
-      "Semi-formal guestwear with midi silhouettes and refined tailoring",
-      "Crepe, chiffon, or satin-blend fabrics suited to ceremonies",
-      "Muted pastels and jewel tones for celebratory guest attire",
-      "Polished lines with modest coverage and restrained detailing",
-      "Formal social context: ceremony-appropriate, non-bridal clothing"
+      "Ceremony guest silhouettes with midi lengths and polished tailored lines",
+      "Crepe, chiffon, and satin blends suited to celebratory daytime dressing",
+      "Semi-formal dress code with refined restraint and non-bridal presentation",
+      "Balanced coverage, softened drape, and discreet ornament for wedding attendance",
+      "Social role: invited attendee dressing respectfully for a formal union"
     ],
     "party_night_out": [
-      "Bodycon or short-hem silhouettes designed for nightlife settings",
-      "Sequins, metallic knits, leather, or stretch jersey textures",
-      "High-contrast colors: black base with neon or metallic accents",
-      "Cutouts, glossy finishes, and statement proportions for parties",
-      "Social context: late-night club or party atmosphere attire"
+      "Body-skimming or abbreviated silhouettes built for energetic nightlife settings",
+      "Sequins, coated jersey, leather, and metallic knits with visual impact",
+      "After-dark dressiness with bold exposure and club-oriented confidence",
+      "Cutouts, shine, and high-contrast styling that read loud under evening lights",
+      "Social context: crowded late-night venues, dancing, and expressive party energy"
     ],
     "work_office": [
-      "Tailored blazer-and-trouser or sheath silhouettes for office settings",
-      "Wool suiting, poplin, or gabardine with low sheen",
-      "Conservative palette: navy, charcoal, black, muted earth tones",
-      "Clean lines, minimal ornamentation, and practical coverage",
-      "Professional daytime workplace dress code context"
+      "Structured office silhouettes built from blazers, straight trousers, and sheath shapes",
+      "Gabardine, wool suiting, poplin, and compact knits with restrained finish",
+      "Business-appropriate formality calibrated for professional daytime environments",
+      "Clean closures, practical coverage, and low-ornament construction for workplace norms",
+      "Social context: desk-to-meeting dressing with competence and restraint"
     ],
     "formal_event": [
-      "Floor-length gown or tuxedo-level evening silhouette for formal events",
-      "Silk, velvet, satin, or fine wool fabrics suited to gala settings",
-      "Deep jewel tones or monochrome palettes for formal occasions",
-      "Refined structure and controlled embellishment in gala attire",
-      "Black-tie social setting with ceremonial formality"
+      "Full-length evening silhouettes and tuxedo-inspired shapes for gala environments",
+      "Silk, velvet, satin, and fine wool with elevated evening surface quality",
+      "High ceremonial formality aligned with black-tie or gala expectations",
+      "Architectural drape, controlled embellishment, and precise finishing for formal attendance",
+      "Social context: red-carpet, banquet, or staged evening occasion dressing"
     ],
     "casual_everyday": [
-      "Relaxed casual outfit with easy silhouettes for daily wear",
-      "Cotton, jersey, denim, and lightweight knit textures",
-      "Washed neutrals and light earth tones for casual palettes",
-      "Minimal structure with utilitarian details for effortless style",
-      "Low-formality context: routine activities and casual outings"
+      "Relaxed daily silhouettes built from denim, tees, knits, and simple dresses",
+      "Cotton jersey, washed denim, soft fleece, and lightweight knit textures",
+      "Low-formality dressing centered on comfort, repetition, and routine wearability",
+      "Easy layering, minimal shaping, and practical utility details for daily movement",
+      "Social context: errands, commuting, coffee runs, and informal everyday life"
     ],
     "date_night": [
-      "Softly fitted silhouettes like slip dresses or sleek tailored trousers",
-      "Satin, fine knits, lace accents, or smooth crepe textures",
-      "Deep warm hues and muted romantic tones for evening dates",
-      "Subtle shaping with delicate detailing and composed lines",
-      "Social context: intimate evening outing with moderate formality"
+      "Softly defined silhouettes that feel composed, close-fitting, and evening-oriented",
+      "Satin, smooth crepe, fine rib knits, and delicate lace accents",
+      "Moderate evening formality with intimacy rather than public spectacle",
+      "Subtle contouring, refined finishes, and controlled reveal for personal polish",
+      "Social context: one-to-one evening plans, dinners, or intimate outings"
     ],
     "winter_outerwear": [
-      "Long coats, puffers, or parkas with layering-ready silhouettes",
-      "Wool, down quilting, or technical shell outerwear fabrics",
-      "Dark neutrals and muted forest tones for winter palettes",
-      "High collars, insulated panels, and weather-protective structure",
-      "Cold-weather context focused on warmth and coverage"
+      "Layer-friendly outer silhouettes including long coats, puffers, and insulated parkas",
+      "Heavy wool, quilted fill, technical shell, and dense twill cold-weather materials",
+      "Utility-led formality centered on climate protection rather than event protocol",
+      "High collars, storm plackets, padding, and extended coverage for thermal defense",
+      "Social context: cold-weather transit, outdoor exposure, and winter protection needs"
     ],
     "smart_casual": [
-      "Blazer-and-knit or chinos-and-shirt smart-casual silhouettes",
-      "Cotton twill, soft knits, chambray, or suede textures",
-      "Muted earthy palettes with moderate contrast for relaxed polish",
-      "Light tailoring with tidy proportions and composed lines",
-      "Low-to-mid formality for casual professional social settings"
+      "Mixed-formality silhouettes pairing relaxed separates with lightly tailored pieces",
+      "Twill, merino knits, chambray, suede, and brushed cotton for refined ease",
+      "Mid-level dress code between office polish and off-duty informality",
+      "Neat proportions, softened structure, and deliberate styling without rigid suiting",
+      "Social context: dinners, casual meetings, and polished but relaxed gatherings"
+    ],
+    "navidad_dinner": [
+      "Festive dinner silhouettes with softened tailoring, knit dresses, and polished separates",
+      "Velvet touches, brushed wools, satin blouses, and warm textured seasonal fabrics",
+      "Seasonal family-dinner formality that feels elevated without gala strictness",
+      "Layered warmth, tasteful sheen, and composed finishing suited to indoor holiday meals",
+      "Social context: Christmas dining, family hosting, and celebratory evening gathering"
+    ],
+    "nochevieja_nye": [
+      "Celebratory midnight silhouettes with sharper lines, shorter hems, or dramatic tailoring",
+      "Sequined surfaces, metallic textiles, satin shine, and party-weight evening materials",
+      "Festive high-energy dressiness geared toward countdown events and year-end parties",
+      "Sparkle, sharper contrast, and statement finishing designed for nightlife visibility",
+      "Social context: New Year's Eve countdown, champagne toasts, and midnight celebration"
+    ],
+    "halloween": [
+      "Darkly styled silhouettes with sharpened shapes and theatrical but wearable proportions",
+      "Leather, mesh, velvet, lace, and coated fabrics with moody surface depth",
+      "Event-specific evening dressing with stylized drama rather than formal protocol",
+      "Corsetry cues, layered black pieces, and eerie detailing with fashion-first restraint",
+      "Social context: Halloween parties requiring atmospheric, costume-adjacent fashion dressing"
+    ],
+    "oktoberfest": [
+      "Traditional festival silhouettes with fitted bodices, full skirts, or rustic tailored separates",
+      "Cotton poplin, sturdy twill, felted wool, and textured folk-inspired trims",
+      "Festive daytime dress code rooted in regional celebration rather than evening glamour",
+      "Apron layering, checked accents, and structured waist definition for beer-hall styling",
+      "Social context: Oktoberfest tents, folk celebration, and heritage-inspired social dressing"
     ]
   }
 }
