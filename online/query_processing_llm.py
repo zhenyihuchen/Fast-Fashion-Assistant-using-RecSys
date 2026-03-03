@@ -43,9 +43,6 @@ CATEGORY_KEYWORDS = [
 ]
 
 COLOR_KEYWORDS = [
-    "089",
-    "758",
-    "831",
     "anthracite grey",
     "apple green",
     "aubergine",
@@ -253,16 +250,25 @@ def _build_prompt(query: str) -> list[dict[str, str]]:
     schema = {
         "normalized": "string",
         "constraints": {
-            "categories": "list of strings (from allowed categories)",
-            "colors": "list of strings (from allowed colors)",
+            "categories": "list of category strings from allowed_categories; empty [] if no category explicitly mentioned by the user",
+            "colors": (
+                "list of color strings; prefer the closest match from allowed_colors "
+                "(e.g. 'navy' → 'navy blue', 'forest green' → 'dark green', 'wine red' → 'wine'); "
+                "if the user's term has no close match, use the user's exact descriptive term in lowercase; "
+                "empty [] if no color explicitly mentioned by the user"
+            ),
             "price_min": "number or null",
             "price_max": "number or null",
-            "fit": "list of strings (from allowed fit keywords)",
+            "fit": (
+                "list of fit descriptors; prefer the closest match from allowed_fit "
+                "(e.g. 'relaxed' → 'loose', 'baggy' → 'oversized', 'flowy' → 'wide leg', 'fitted' → 'slim'); "
+                "if the user's term has no close match, use the user's exact descriptive term in lowercase; "
+                "empty [] if no fit explicitly mentioned by the user"
+            ),
         },
         "occasion": {
             "mode": "\"on\" or \"off\"",
             "target": "string from allowed occasions or null",
-            "score": "number 0-1 or null",
         },
         "confidence": {
             "overall": "number 0-1",
@@ -277,9 +283,13 @@ def _build_prompt(query: str) -> list[dict[str, str]]:
         "allowed_occasions": occasions,
         "output_schema": schema,
         "notes": [
-            "Use allowed values exactly; lowercase strings.",
+            "Only extract categories, colors, and fit that are EXPLICITLY mentioned by the user — leave lists empty if not mentioned.",
+            "For categories: only use values from allowed_categories; do not guess or infer.",
+            "For colors: map to the closest allowed_colors entry when possible; otherwise keep the user's descriptive term.",
+            "For fit: map to the closest allowed_fit entry when possible; otherwise keep the user's descriptive term.",
             "If no price is found, use nulls.",
-            "If no occasion is clear, set mode=off, target=null, score to your best guess.",
+            "If no occasion is clear, set mode=off, target=null.",
+            "All string values must be lowercase.",
         ],
     }
     return [
@@ -319,16 +329,16 @@ def parse_query_llm(query: str) -> dict[str, Any]:
     return result
 
 
-if __name__ == "__main__":
-    test_queries = [
-        # "I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
-        "I am looking for a night short dress red but that costs red that costs less than 50 euros",
-    ]
-    for q in test_queries:
-        print("\nQuery:", q)
-        print(json.dumps(parse_query_llm(q), indent=2))
-        #Save JSON response to a file for inspection
-        output_path = BASE_DIR / "online" / "test_query_outputs"
-        output_path.mkdir(parents=True, exist_ok=True)
-        file_name = re.sub(r"\W+", "_", q.strip().lower())[:50] + ".json"
-        (output_path / file_name).write_text(json.dumps(parse_query_llm(q), indent=2), encoding="utf-8")
+# if __name__ == "__main__":
+#     test_queries = [
+#         # "I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
+#         "I am looking for a night short dress red but that costs red that costs less than 50 euros",
+#     ]
+#     for q in test_queries:
+#         print("\nQuery:", q)
+#         print(json.dumps(parse_query_llm(q), indent=2))
+#         #Save JSON response to a file for inspection
+#         output_path = BASE_DIR / "online" / "test_query_outputs"
+#         output_path.mkdir(parents=True, exist_ok=True)
+#         file_name = re.sub(r"\W+", "_", q.strip().lower())[:50] + ".json"
+#         (output_path / file_name).write_text(json.dumps(parse_query_llm(q), indent=2), encoding="utf-8")

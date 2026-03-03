@@ -339,5 +339,9 @@ DESPUES DE ENTREGAR EL METHODLOGY
 
 
 
-
+EVALUATION of LLMaaJ
+- parsed query
+- per item recommended by each model 
+- per model set
+- comparison of both models 
 

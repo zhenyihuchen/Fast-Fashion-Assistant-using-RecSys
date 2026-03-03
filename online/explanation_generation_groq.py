@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Iterable
 
@@ -16,11 +15,14 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+# MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 # Explanations are short (2-3 sentences) with structured evidence, so a fast
 # small model is sufficient and avoids rate-limit errors from parallel calls.
 # Override with GROQ_EXPLANATION_MODEL in .env if needed.
 EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "llama-3.1-8b-instant")
+# EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "groq/compound-mini")
+
+
 TIMEOUT_SECONDS = 60
 
 PROMPT_EMBEDDINGS_DIR = BASE_DIR / "offline" / "data" / "prompt_embeddings"
@@ -233,26 +235,16 @@ def generate_explanations(
     if not work_rows:
         return explanations
 
-    max_workers = min(4, len(work_rows))
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {
-            executor.submit(
-                _generate_one_explanation,
-                row,
-                target,
-                query_keywords,
-                top_prompt_matches,
-                occasion_scores,
-            ): str(row.get("row_id", ""))
-            for row in work_rows
-        }
-        for future in as_completed(futures):
-            row_id = futures[future]
-            try:
-                out_row_id, text = future.result()
-                if out_row_id:
-                    explanations[out_row_id] = text
-            except Exception as exc:
-                print(f"[explanation] failed for row_id={row_id}: {exc}")
-                explanations[row_id] = "Explanation unavailable."
+    # Sequential to avoid hitting Groq free-tier TPM limits (6 000 TPM on llama-3.1-8b-instant)
+    for row in work_rows:
+        row_id = str(row.get("row_id", ""))
+        try:
+            out_row_id, text = _generate_one_explanation(
+                row, target, query_keywords, top_prompt_matches, occasion_scores
+            )
+            if out_row_id:
+                explanations[out_row_id] = text
+        except Exception as exc:
+            print(f"[explanation] failed for row_id={row_id}: {exc}")
+            explanations[row_id] = "Explanation unavailable."
     return explanations
