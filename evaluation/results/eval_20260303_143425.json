@@ -1,0 +1,433 @@
+{
+  "run_timestamp": "20260303_143425",
+  "queries_file": "/Users/fani/Fast-Fashion-Assistant-using-RecSys/evaluation/test_queries.json",
+  "total_queries": 1,
+  "aggregate": {
+    "clip": {
+      "item_relevance": {
+        "mean": 4.6,
+        "std": 0.8944,
+        "n": 5
+      },
+      "occasion_appropriateness": {
+        "mean": 3.6,
+        "std": 0.8944,
+        "n": 5
+      },
+      "explanation_groundedness": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "explanation_quality": {
+        "mean": 3.4,
+        "std": 0.8944,
+        "n": 5
+      },
+      "constraint_adherence": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "set_answer_relevance": {
+        "mean": 3,
+        "std": null,
+        "n": 1
+      }
+    },
+    "fashion_clip": {
+      "item_relevance": {
+        "mean": 4,
+        "std": 1.4142,
+        "n": 5
+      },
+      "occasion_appropriateness": {
+        "mean": 4,
+        "std": 0.0,
+        "n": 5
+      },
+      "explanation_groundedness": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "explanation_quality": {
+        "mean": 3.2,
+        "std": 0.4472,
+        "n": 5
+      },
+      "constraint_adherence": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "set_answer_relevance": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      }
+    },
+    "parser": {
+      "parser_completeness": {
+        "mean": 2,
+        "std": null,
+        "n": 1
+      },
+      "parser_no_hallucination": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      },
+      "parser_occasion_detection": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      }
+    },
+    "cross_model": {
+      "clip_wins": 1,
+      "fashionclip_wins": 0,
+      "ties": 0,
+      "total": 1
+    }
+  },
+  "per_query": [
+    {
+      "id": "q01",
+      "query": "I need something to wear to a wedding as a guest, I want to look elegant but not overdressed, I prefer something in earthy tones or maybe burgundy",
+      "type": [
+        "occasion",
+        "color"
+      ],
+      "parsed": {
+        "normalized": "i need something to wear to a wedding as a guest, i want to look elegant but not overdressed, i prefer something in earthy tones or maybe burgundy",
+        "constraints": {
+          "categories": [],
+          "colors": [
+            "burgundy",
+            "earth"
+          ],
+          "price_min": null,
+          "price_max": null,
+          "fit": []
+        },
+        "occasion": {
+          "mode": "on",
+          "target": "wedding_guest"
+        },
+        "confidence": {
+          "overall": 0.8,
+          "occasion": 0.9
+        }
+      },
+      "rows_by_model": {
+        "clip": [
+          {
+            "product_name": "FITTED BLAZER WITH SHOULDER PADS",
+            "product_category": "JACKETS",
+            "color": "BURGUNDY",
+            "price": "55.95 EUR",
+            "explanation": "This burgundy fitted blazer with shoulder pads is suitable for a wedding guest due to its polished tailored lines, which align with the recommended silhouettes for the occasion. The earthy tone of the blazer also matches the user's query keywords.",
+            "image_url": "https://static.zara.net/assets/public/af11/ec82/0135491bba68/adf19f03115b/02054609681-e1/02054609681-e1.jpg?ts=1764848336839&w=4800",
+            "product_url": "https://www.zara.com/es/en/fitted-blazer-with-shoulder-pads-p02054609.html",
+            "final_score": 0.17227836400270463,
+            "relevance_score": 0.2621564269065857,
+            "occasion_score": 0.03746126964688301
+          },
+          {
+            "product_name": "HIGH-WAIST STRAIGHT-LEG TROUSERS",
+            "product_category": "TROUSERS",
+            "color": "BURGUNDY",
+            "price": "29.95 EUR",
+            "explanation": "This burgundy HIGH-WAIST STRAIGHT-LEG TROUSERS fits the user's query keywords, including \"burgundy\" and \"earth.\" The trousers are suitable for celebratory daytime dressing, as suggested by the top occasion prompt. The burgundy color is a fitting choice for a wedding guest.",
+            "image_url": "https://static.zara.net/assets/public/685f/6b79/e70445db8112/f87f527232d4/02051609681-e1/02051609681-e1.jpg?ts=1764848287597&w=4800",
+            "product_url": "https://www.zara.com/es/en/high-waist-straight-leg-trousers-p02051609.html",
+            "final_score": 0.16776312887668607,
+            "relevance_score": 0.254639208316803,
+            "occasion_score": 0.03744900971651077
+          },
+          {
+            "product_name": "WATER-RESISTANT WINDPROOF RECCO® TECHNOLOGY SKI COLLECTION JUMPSUIT",
+            "product_category": "TROUSERS",
+            "color": "BURGUNDY",
+            "price": "99.95 EUR",
+            "explanation": "This burgundy water-resistant windproof jumpsuit from the Recco technology ski collection is suitable for a wedding guest due to its polished tailored lines. The burgundy color also matches the user's query keywords.",
+            "image_url": "https://static.zara.net/assets/public/50be/f392/5b42405397c3/39a5e037cdf4/08073032681-e1/08073032681-e1.jpg?ts=1764675730250&w=4800",
+            "product_url": "https://www.zara.com/es/en/recco--technology-water-resistant-windproof-ski-jumpsuit-p08073032.html",
+            "final_score": 0.16762955188751222,
+            "relevance_score": 0.25414034724235535,
+            "occasion_score": 0.0378633588552475
+          },
+          {
+            "product_name": "SATIN BALLOON SHIRT",
+            "product_category": "SHIRTS",
+            "color": "BURGUNDY",
+            "price": "25.95 EUR",
+            "explanation": "The SATIN BALLOON SHIRT in BURGUNDY is suitable for a wedding guest. This shirt fits the occasion as it is a celebratory daytime dress, and its satin blend aligns with the suggested fabric for such events. The burgundy color also matches the user's query keywords.",
+            "image_url": "https://static.zara.net/assets/public/7ab9/a7ab/95224cf9bf34/dc0808a9d8a3/02109581681-e1/02109581681-e1.jpg?ts=1766047289150&w=4800",
+            "product_url": "https://www.zara.com/es/en/balloon-satin-shirt-p02109581.html",
+            "final_score": 0.16473878771066666,
+            "relevance_score": 0.2495945394039154,
+            "occasion_score": 0.03745516017079353
+          },
+          {
+            "product_name": "FAUX LEATHER MIDI SKIRT WITH BELT",
+            "product_category": "SKIRTS",
+            "color": "BURGUNDY",
+            "price": "29.95 EUR",
+            "explanation": "This burgundy faux leather midi skirt with a belt is suitable for a wedding guest. The skirt's earthy tone matches the user's query keywords, and its midi length is versatile for celebratory daytime dressing.",
+            "image_url": "https://static.zara.net/assets/public/795c/5232/4a7b46338e25/5d7b8add5238/04387245681-e1/04387245681-e1.jpg?ts=1757601204242&w=4800",
+            "product_url": "https://www.zara.com/es/en/faux-leather-midi-skirt-with-belt-p04387245.html",
+            "final_score": 0.1634793162345886,
+            "relevance_score": 0.2471373975276947,
+            "occasion_score": 0.037992194294929504
+          }
+        ],
+        "fashion_clip": [
+          {
+            "product_name": "SATIN HALTER TOP",
+            "product_category": "TOPS",
+            "color": "BURGUNDY",
+            "price": "19.95 EUR",
+            "explanation": "This satin halter top in burgundy is suitable for a wedding guest. The satin material aligns with the description of celebratory daytime dressing. It fits the user's query keywords, including \"burgundy\" and \"earth\" tones.",
+            "image_url": "https://static.zara.net/assets/public/0b4f/5121/5cd34552860c/f4d4fac291dd/02231581681-e1/02231581681-e1.jpg?ts=1766047318402&w=4800",
+            "product_url": "https://www.zara.com/es/en/satin-halter-top-p02231581.html",
+            "final_score": 0.1592101588845253,
+            "relevance_score": 0.23924589157104492,
+            "occasion_score": 0.039156559854745865
+          },
+          {
+            "product_name": "HIGH-WAIST STRAIGHT-LEG TROUSERS",
+            "product_category": "TROUSERS",
+            "color": "BURGUNDY",
+            "price": "29.95 EUR",
+            "explanation": "This burgundy HIGH-WAIST STRAIGHT-LEG TROUSERS fits the wedding guest occasion with its elegant color and style. The burgundy hue matches the user's query keywords, making it a suitable choice.",
+            "image_url": "https://static.zara.net/assets/public/685f/6b79/e70445db8112/f87f527232d4/02051609681-e1/02051609681-e1.jpg?ts=1764848287597&w=4800",
+            "product_url": "https://www.zara.com/es/en/high-waist-straight-leg-trousers-p02051609.html",
+            "final_score": 0.15259605497121811,
+            "relevance_score": 0.22883808612823486,
+            "occasion_score": 0.03823300823569298
+          },
+          {
+            "product_name": "FITTED BLAZER WITH SHOULDER PADS",
+            "product_category": "JACKETS",
+            "color": "BURGUNDY",
+            "price": "55.95 EUR",
+            "explanation": "This burgundy fitted blazer with shoulder pads is suitable for a wedding guest. The item's category as a jacket aligns with the occasion's dress code, which suggests crepe, chiffon, and satin blends for celebratory daytime dressing. The blazer's burgundy color also matches the user's query keywords.",
+            "image_url": "https://static.zara.net/assets/public/af11/ec82/0135491bba68/adf19f03115b/02054609681-e1/02054609681-e1.jpg?ts=1764848336839&w=4800",
+            "product_url": "https://www.zara.com/es/en/fitted-blazer-with-shoulder-pads-p02054609.html",
+            "final_score": 0.15258043706417085,
+            "relevance_score": 0.2293740063905716,
+            "occasion_score": 0.0373900830745697
+          },
+          {
+            "product_name": "EMBOSSED SLINGBACK SHOES",
+            "product_category": "SHOES",
+            "color": "BURGUNDY RED",
+            "price": "35.95 EUR",
+            "explanation": "The EMBOSSED SLINGBACK SHOES in BURGUNDY RED are suitable for a wedding guest. This style fits the occasion as it aligns with polished tailored lines, and its earthy tone matches the user's query keywords.",
+            "image_url": "https://static.zara.net/assets/public/dacd/d038/54684adcb323/b3aa692a5eb2/11223710022-e3/11223710022-e3.jpg?ts=1763547337939&w=4800",
+            "product_url": "https://www.zara.com/es/en/embossed-slingback-shoes-p11223710.html",
+            "final_score": 0.14684473872184753,
+            "relevance_score": 0.22008880972862244,
+            "occasion_score": 0.03697863221168518
+          },
+          {
+            "product_name": "MAXI BUCKET BAG WITH SIDE ZIP",
+            "product_category": "BAGS",
+            "color": "BURGUNDY RED",
+            "price": "29.95 EUR",
+            "explanation": "This burgundy red maxi bucket bag with a side zip is suitable for a wedding guest. It fits the occasion as it has a polished tailored line, which aligns with the recommended silhouettes for ceremony guests. The bag's earthy tone also matches the user's query keywords.",
+            "image_url": "https://static.zara.net/assets/public/8449/fa30/ec90473a8216/86f7bb8d3244/16064710624-e1/16064710624-e1.jpg?ts=1768486877935&w=4800",
+            "product_url": "https://www.zara.com/es/en/maxi-bucket-bag-with-side-zip-p16064710.html",
+            "final_score": 0.1451489210128784,
+            "relevance_score": 0.21667982637882233,
+            "occasion_score": 0.037852562963962555
+          }
+        ]
+      },
+      "eval": {
+        "parser": {
+          "parser_no_hallucination": {
+            "score": 5,
+            "reasoning": "Step 1: The user's query indicates they need an outfit for a wedding as a guest, expressing a desire to look elegant but not overdressed, and they prefer earthy tones or burgundy. Step 2: The parsed output includes colors (burgundy, earth), an occasion (wedding_guest), and indicates that the occasion mode is 'on'. There are no categories or fit constraints, and no price range is specified. Step 3: The extracted colors (burgundy, earth) are explicitly mentioned in the query. The occasion (wedding_guest) is also clearly stated. Step 4: There are no constraints in the parsed output that were not mentioned in the query. The output aligns well with the user's request without adding any hallucinated constraints. Step 5: Since there are no hallucinated constraints and all extracted elements are directly supported by the user's query, I assign a score of 5."
+          },
+          "parser_occasion_detection": {
+            "score": 5,
+            "reasoning": "Step 1: The user's query is about needing an outfit for a wedding as a guest. Step 2: An occasion is clearly mentioned in the query, which is a wedding. Step 3: The parsed output indicates that the occasion mode is 'on' and the target label is 'wedding_guest'. Step 4: Since an occasion was mentioned, we do not penalize for a false positive. Step 5: The occasion mode is correctly set to 'on', and the target label 'wedding_guest' accurately reflects the occasion mentioned in the query. Step 6: The detection and mapping are both correct, so the score is 5."
+          },
+          "parser_completeness": {
+            "score": 2,
+            "reasoning": "Step 1: The user's query is about finding an outfit for a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \nStep 2: The constraints explicitly stated by the user include: \n- Occasion: wedding as a guest \n- Colors: earthy tones, burgundy \n- Fit: elegant but not overdressed (implying a preference for a certain style but not explicitly stated as a fit type) \n- Price: no price limits mentioned \nStep 3: The parsed output includes: \n- Categories: [] (not extracted) \n- Colors: [burgundy, earth] (extracted correctly) \n- Fit: [] (not extracted) \n- Price_min: null (not mentioned by user) \n- Price_max: null (not mentioned by user) \n- Occasion_mode: 'on' (indicating occasion is considered) \n- Occasion_target: 'wedding_guest' (extracted correctly) \nStep 4: The constraints mentioned by the user that were NOT extracted in the parsed output include: \n- Categories (none extracted) \n- Fit (none extracted, although the user implied a preference) \nStep 5: The parsed output extracted the colors and occasion correctly but missed the categories and fit preferences. Therefore, it missed several constraints. \nFinal score: 2."
+          }
+        },
+        "clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is a jacket, which is a suitable category for a wedding guest outfit. Step 3: The product color is burgundy, which aligns perfectly with the user's color preference. Step 4: There are no specific fit preferences mentioned in the query, but a fitted blazer generally conveys elegance. Step 5: The price of 55.95 EUR is not specified in the user's query, so it is not a factor in this evaluation. Step 6: The product name and description suggest a polished and tailored look, which aligns with the user's intent to look elegant without being overdressed. Overall, the product is highly relevant to the user's request."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates that the item is a 'FITTED BLAZER WITH SHOULDER PADS', categorized as 'JACKETS', in the color 'BURGUNDY', priced at '55.95 EUR', and has no description provided. \nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \nStep 3: The generated explanation states that the blazer is suitable for a wedding guest due to its polished tailored lines and that the earthy tone matches the user's query keywords. \nStep 4: The explanation correctly identifies the color 'burgundy' from the metadata, which aligns with the user's preference. However, the claim about 'polished tailored lines' is not directly confirmed by the metadata, as there is no description provided to support this claim. This can be flagged as a hallucination. \nStep 5: The explanation mentions specific attributes like 'fitted blazer' and 'shoulder pads', but the phrase 'polished tailored lines' is vague and not grounded in the metadata. \nStep 6: The explanation connects the product to the user's query by mentioning the suitability for a wedding guest and the color preference, but it lacks a strong logical connection due to the hallucinated claim about tailored lines. \nStep 7: The hallucination regarding 'polished tailored lines' detracts from the overall quality of the explanation, and while it does mention specific attributes, the lack of a description limits its effectiveness. \nStep 8: Given the presence of a hallucinated claim and the somewhat generic nature of the explanation, I would assign a score of 3, as it is mostly grounded and somewhat useful, but not fully effective due to the issues identified."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding as a guest. \nStep 2: Typical clothing for this occasion includes elegant, semi-formal to formal attire. A blazer can be appropriate if paired well with other suitable attire like a dress or tailored pants. \nStep 3: The product image shows a burgundy fitted blazer with shoulder pads, which appears formal and elegant. \nStep 4: The product metadata indicates it's a 'FITTED BLAZER WITH SHOULDER PADS,' under the category 'JACKETS,' with the color 'BURGUNDY,' precisely matching the request for earthy tones. \nStep 5: A wedding guest could realistically wear this item, especially in context with other elegant pieces, as it meets the formality and color preferences. \nStep 6: The visual cues of the tailored fit and rich color, combined with the textual information, suggest appropriateness for the occasion. \nStep 7: Based on the elegance, color preference, and context, it is appropriate for a wedding guest outfit."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is categorized as trousers, which is a suitable clothing item for a wedding guest. Step 3: The product color is burgundy, which aligns perfectly with the user's color preference. Step 4: There are no specific fit preferences mentioned in the query, so this step is not applicable. Step 5: The price of the trousers is 29.95 EUR, and there is no specified price range in the query, making this step also not applicable. Step 6: The overall semantic alignment is strong; the product name and description suggest it is suitable for a wedding guest, and the color matches the user's request. Therefore, the product is highly relevant to the user's needs."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata includes the name 'HIGH-WAIST STRAIGHT-LEG TROUSERS', category 'TROUSERS', color 'BURGUNDY', price '29.95 EUR', and an empty description. Step 2: The user query indicates a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. Step 3: The generated explanation states that the trousers are 'burgundy', fit the user's query keywords, are suitable for 'celebratory daytime dressing', and that the color is a fitting choice for a wedding guest. Step 4: The explanation correctly identifies the color 'burgundy' from the metadata. However, the claim about being suitable for 'celebratory daytime dressing' is not directly supported by the metadata, as the description is empty and does not provide context for this claim. Step 5: The explanation mentions specific attributes like the color and the type of trousers, but the phrase 'celebratory daytime dressing' is somewhat generic and not grounded in the product metadata. Step 6: The explanation connects the product to the user's query by mentioning the color preference and the occasion of a wedding, but the reasoning about suitability is vague. Step 7: The explanation contains a hallucinated claim about 'celebratory daytime dressing' and includes some generic phrasing. Step 8: Given the presence of a hallucinated claim and some generic statements, the explanation is not fully grounded or specific. Therefore, I would assign a score of 3, as it is mostly grounded and somewhat useful, but has notable issues."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding guest attire. \nStep 2: Wedding guest attire often requires semi-formal to formal wear, with an emphasis on elegance and style. Common choices include dresses or polished separates, often leaning towards suits or chic trousers in refined colors. \nStep 3: The image shows high-waist, straight-leg trousers that appear polished and elegant. The style is classic and can be appropriate for a semi-formal event.\nStep 4: The product metadata indicates that these are burgundy trousers, a color that aligns with the user's preference for earthy tones and is often considered suitable for elegant settings.\nStep 5: A wedding guest could realistically wear these trousers, especially when paired with a sophisticated top or jacket.\nStep 6: The image depicts a formal style, and the metadata supports the visual impression by highlighting the sophisticated burgundy color.\nStep 7: Given the elegant and classic style of the trousers combined with the fitting color choice, these trousers are appropriate for a wedding guest outfit."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: The user is looking for an elegant outfit to wear to a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is categorized as trousers, which does not align with the user's request for a wedding guest outfit, as they likely expect a dress or a more formal attire. Step 3: The product is burgundy, which matches one of the colors specified in the query. Step 4: There is no fit preference mentioned in the query, so this step is neutral. Step 5: The price is 99.95 EUR, and since no price range was specified, this is also neutral. Step 6: The overall semantic alignment is weak because trousers are not typically considered elegant enough for a wedding guest outfit, despite the color being appropriate. Therefore, while the color is relevant, the product category does not meet the user's needs. Overall, the product is partially relevant due to the color but not suitable for the occasion. Thus, the score is 3."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates that the item is a 'WATER-RESISTANT WINDPROOF RECCO® TECHNOLOGY SKI COLLECTION JUMPSUIT', categorized as 'TROUSERS', in the color 'BURGUNDY', priced at '99.95 EUR', with no description provided. \nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \nStep 3: The generated explanation states that the jumpsuit is 'suitable for a wedding guest due to its polished tailored lines' and mentions the 'burgundy color' matching the user's query. \nStep 4: The explanation correctly identifies the color 'burgundy' from the metadata. However, the claim about 'polished tailored lines' is not supported by the metadata, as there is no description provided to confirm this attribute, marking it as a hallucination. \nStep 5: The explanation does mention a specific product attribute (the color), but the mention of 'polished tailored lines' is vague and not grounded in the metadata. \nStep 6: The explanation attempts to connect the product to the user's query by stating it is suitable for a wedding guest and matches the color preference. However, the reasoning is weak due to the unsupported claim about tailored lines. \nStep 7: The hallucinated claim about 'polished tailored lines' detracts from the overall quality of the explanation, and while the color is relevant, the lack of a description limits the specificity. \nStep 8: Given the presence of a hallucinated claim and the generic nature of the explanation, I would assign a score of 3, as it is mostly grounded but not entirely useful due to the issues identified."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step 1: The stated occasion is a wedding as a guest.\nStep 2: Typical clothing for a wedding guest includes suits, dresses, or elegant separates in formal or semi-formal styles. Earthy tones or burgundy could be suitable.\nStep 3: The product is a burgundy jumpsuit with a ski-wear design, windproof and water-resistant, suggesting a sporty and casual aesthetic.\nStep 4: The product metadata describes it as a ski collection jumpsuit in the category 'trousers' and 'burgundy' color.\nStep 5: A person attending a wedding would typically not wear a ski jumpsuit, especially since the style and materials are geared towards outdoor activities rather than formal events.\nStep 6: The ski-specific design conflicts with wedding attire expectations, despite the matching color preference.\nStep 7: Given its style and purpose, the jumpsuit is unlikely to be appropriate for a wedding guest.\n"
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is a shirt, which is a suitable category for a wedding guest outfit. Step 3: The product color is burgundy, which aligns perfectly with the user's color preference. Step 4: There are no specific fit preferences mentioned in the query, so this step is not applicable. Step 5: There is no price range specified in the query, so this step is also not applicable. Step 6: The product name 'SATIN BALLOON SHIRT' suggests a stylish and potentially elegant piece, which aligns with the user's intent to look elegant but not overdressed. Overall, the product matches the user's request well."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates the name is 'SATIN BALLOON SHIRT', the category is 'SHIRTS', the color is 'BURGUNDY', and the price is '25.95 EUR'. The description is empty. \nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \nStep 3: The generated explanation states that the 'SATIN BALLOON SHIRT in BURGUNDY is suitable for a wedding guest' and mentions that it fits the occasion as a 'celebratory daytime dress', and that its satin blend aligns with suggested fabrics for such events. It also notes that the burgundy color matches the user's query keywords. \nStep 4: The explanation correctly identifies the product name, color, and occasion suitability based on the metadata. However, the claim about it being a 'celebratory daytime dress' is not directly supported by the metadata, as the description does not provide this context. The mention of 'satin blend' is also not confirmed by the metadata, which lacks a description of the fabric. Therefore, these are considered hallucinations. \nStep 5: The explanation does mention specific attributes like the color and occasion, but the claims about the fabric and the nature of the shirt as a 'celebratory daytime dress' are vague and not grounded in the metadata. \nStep 6: The explanation connects the product to the user's query by highlighting the burgundy color and suitability for a wedding guest, which is logical reasoning. However, the lack of concrete details about the fabric and the nature of the shirt weakens this connection. \nStep 7: The hallucinated claims about the fabric and the description of the shirt as a 'celebratory daytime dress' detract from the overall quality of the explanation. \nStep 8: Given the presence of hallucinations and the lack of a detailed description, the explanation is mostly grounded but not fully useful. Therefore, I would assign a score of 3, as it is somewhat useful but has multiple issues."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding, specifically as a guest. \nStep 2: Wedding guest attire typically involves semi-formal to formal wear, elegant styling, and sometimes festive colors. For a wedding, it's important to look polished but not outshine the wedding party.\nStep 3: The product image shows a burgundy satin balloon shirt, which has a sophisticated and elegant appearance. Satin fabric often conveys a more formal and festive vibe. \nStep 4: The product metadata indicates the item is a 'SATIN BALLOON SHIRT' in 'BURGUNDY'. This aligns with the user's preference for burgundy and the shirt's material and style fit a more formal occasion.\nStep 5: A wedding guest could realistically wear this item, especially when paired with dressier pants or a skirt. Saturated or jewel tones like burgundy can be a great choice for an elegant wedding outfit.\nStep 6: The visual cues from the image suggest a slightly elevated level of formality, and the metadata confirms the color choice is as preferred by the user. \nStep 7: This shirt is appropriate for a wedding guest as it combines elegance with a hint of formality, stylishly matching the occasion's demands. \n"
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for an outfit to wear to a wedding as a guest, preferring something elegant but not overdressed, in earthy tones or burgundy. Step 2: The product is a skirt, which is a suitable category for a wedding guest outfit. Step 3: The product color is burgundy, which aligns with the user's specified color preference. Step 4: There are no specific fit preferences mentioned in the query, but a midi skirt is generally considered elegant and appropriate for a wedding. Step 5: There is no price range specified in the query, so the price of 29.95 EUR is acceptable. Step 6: The overall semantic alignment is strong; the product name and description suggest it is suitable for a wedding guest and matches the user's desire for elegance without being overdressed. Therefore, the product is highly relevant to the user's query."
+              },
+              "explanation_quality": {
+                "score": 5,
+                "reasoning": "Step 1: The product metadata includes the name 'FAUX LEATHER MIDI SKIRT WITH BELT', category 'SKIRTS', color 'BURGUNDY', price '29.95 EUR', and an empty description. Step 2: The user query indicates a need for an outfit for a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. Step 3: The generated explanation states that the skirt is 'suitable for a wedding guest', mentions its color 'burgundy', and describes the midi length as 'versatile for celebratory daytime dressing'. Step 4: The claims in the explanation can be confirmed from the metadata: the color is accurately stated as 'burgundy', and the product is indeed a skirt suitable for a wedding guest. The mention of 'midi length' is also grounded in the product name. There are no hallucinated attributes. Step 5: The explanation is specific as it mentions the product's color, type, and length, rather than using generic praise. Step 6: The explanation connects the product to the user's query by highlighting its suitability for a wedding and its alignment with the user's color preference. Step 7: There are no hallucinated claims or generic filler statements present in the explanation. Step 8: The explanation is fully grounded, specific, and genuinely helpful, as it directly addresses the user's needs for a wedding guest outfit in the preferred color. Therefore, the score is 5."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding where the person will be a guest.\nStep 2: Typical attire for a wedding guest includes elegant dresses or skirts with a formal top, often in soft or celebratory colors. The attire should be dressy but not overshadow the wedding party.\nStep 3: The product image shows a faux leather midi skirt with a belt, which has a formal and stylish appearance.\nStep 4: The metadata describes it as a 'FAUX LEATHER MIDI SKIRT WITH BELT,' in the color 'BURGUNDY.'\nStep 5: A wedding guest could realistically wear this item, as midi skirts are often appropriate for weddings. The earthy tone also matches the user's color preference.\nStep 6: The visual and textual information both align with the request for an elegant, appropriate wedding guest outfit in burgundy or earthy tones.\nStep 7: This item is suitable, though pairing it with a dressy top is necessary for complete appropriateness. \n"
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 3,
+              "reasoning": "Step 1: The user is looking for an outfit to wear as a guest to a wedding, aiming for elegance without being overdressed, and prefers earthy tones or burgundy. Step 2: The recommended products include a fitted blazer, high-waist trousers, a jumpsuit, a satin balloon shirt, and a faux leather midi skirt, all in burgundy. Step 3: The set collectively covers the user's request for elegant attire suitable for a wedding, as all items are formal or semi-formal. Step 4: There is a lack of variety in colors since all items are burgundy, which may not fully meet the user's preference for earthy tones. However, the categories (jackets, trousers, shirts, skirts) provide some diversity in styles. Step 5: The products are coherent with the occasion of being a wedding guest, as they are all suitable for a formal event. Step 6: A glaring omission is the absence of options in earthy tones, which the user specifically mentioned. Additionally, the jumpsuit may not align with the user's request for elegance without being overdressed, as it is more casual. Step 7: Overall, the set addresses the user's intent moderately well but has significant gaps in color variety and may include items that do not align perfectly with the user's request for elegance. Therefore, I would assign a score of 3."
+            }
+          }
+        },
+        "fashion_clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is a 'TOPS', which is a relevant category for a wedding guest outfit. Step 3: The product color is 'BURGUNDY', which matches the user's specified color preference. Step 4: There are no specific fit preferences mentioned in the query, so this step is not applicable. Step 5: The price of the product is '19.95 EUR', and there is no price range specified in the query, making this step not applicable. Step 6: The product name 'SATIN HALTER TOP' suggests a more elegant style, which aligns with the user's desire to look elegant but not overdressed. Overall, the product aligns well with the user's intent and preferences."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates that the item is a 'SATIN HALTER TOP' in the category of 'TOPS', with a color of 'BURGUNDY' and a price of '19.95 EUR'. The description is empty. \n\nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \n\nStep 3: The generated explanation states that the satin halter top in burgundy is suitable for a wedding guest and mentions that the satin material aligns with celebratory daytime dressing. It also claims that it fits the user's query keywords, including 'burgundy' and 'earth' tones. \n\nStep 4: The explanation correctly identifies the product as a satin halter top in burgundy, which is grounded in the metadata. However, the claim about the satin material aligning with 'celebratory daytime dressing' is somewhat vague and not directly supported by the metadata. The mention of 'earth' tones is misleading since the product is specifically burgundy, which is not an earthy tone. \n\nStep 5: The explanation is somewhat specific as it mentions the satin material and the color burgundy, but it lacks detail about the fit or style of the top, which could help the shopper make a more informed decision. \n\nStep 6: The explanation connects the product to the user's query by stating it is suitable for a wedding guest and mentions the color preference. However, it does not adequately address the user's desire for something elegant but not overdressed. \n\nStep 7: The explanation contains a hallucinated claim regarding 'earth' tones and includes some generic statements about suitability without providing concrete details about the product's fit or style. \n\nStep 8: Given the issues with hallucinated claims and the lack of specific, helpful information, I would assign a score of 3, as it is mostly grounded but not fully useful for the shopper's decision-making process."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding guest.\nStep 2: Typical clothing styles for weddings often include elegant, semi-formal to formal attire. Common materials are satin, silk, or chiffon, and colors can vary but are often elegant or subdued.\nStep 3: The product image shows a satin halter top in burgundy. It has an elegant appearance and a slight sheen.\nStep 4: The product metadata indicates it's a satin halter top in burgundy.\nStep 5: This top can be appropriate for a wedding guest, especially when paired with a formal skirt or pants. The satin material adds an elegant touch suitable for weddings.\nStep 6: The color and material fit the user's preference and the occasion's requirements.\nStep 7: The item is visually and contextually appropriate for the occasion, given the elegance of the material and color choice."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is trousers, which does not directly match the typical expectations for a wedding guest outfit, which often leans towards dresses or formal attire. Step 3: The product color is burgundy, which aligns with the user's color preference. Step 4: There is no specific fit preference mentioned, so this step is neutral. Step 5: The price is 29.95 EUR, and no price range was specified by the user, so this step is also neutral. Step 6: The product name and description suggest a more casual style (trousers) rather than an elegant outfit suitable for a wedding, which may not fully align with the user's intent. Overall, while the color is a match, the product category does not meet the user's expectations for a wedding guest outfit. Therefore, the relevance is partially there due to the color but lacking in category alignment."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates that the item is named 'HIGH-WAIST STRAIGHT-LEG TROUSERS', belongs to the category 'TROUSERS', is colored 'BURGUNDY', priced at '29.95 EUR', and has no description provided. \n\nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \n\nStep 3: The generated explanation states that the trousers are 'burgundy' and fit the wedding guest occasion due to their 'elegant color and style', and mentions that the 'burgundy hue matches the user's query keywords'. \n\nStep 4: The explanation correctly identifies the color 'burgundy' from the metadata. However, it makes a claim about the trousers being suitable for the occasion based on 'elegant color and style', which is not directly supported by the metadata since there is no description provided to confirm the style or elegance. Thus, the claim about elegance is a hallucination. \n\nStep 5: The explanation does mention specific attributes such as the color 'burgundy', but it lacks concrete details about the style or fit of the trousers, which would be necessary to assess their suitability for a wedding. \n\nStep 6: The explanation attempts to connect the product to the user's query by highlighting the color match with the user's preference. However, it does not provide sufficient reasoning or details about why the trousers would be appropriate for a wedding beyond the color. \n\nStep 7: The hallucinated claim about elegance and style detracts from the overall quality of the explanation, and the lack of specific details makes it somewhat generic. \n\nStep 8: Given the presence of a hallucinated claim and the lack of specific, useful information, I would assign a score of 3, as it is mostly grounded but not fully helpful for the user's decision-making process."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding as a guest. \nStep 2: Typical clothing styles for a wedding guest are elegant, semi-formal to formal attire, often including dresses or suits in sophisticated colors. \nStep 3: The product image shows high-waist straight-leg trousers that have a clean and sophisticated style, suitable for a semi-formal occasion. \nStep 4: The product metadata indicates the trousers are burgundy, a color requested by the user and often chosen for elegance. \nStep 5: Trousers can be appropriate for a wedding guest, especially when paired with a stylish top or blazer. The color and style fit the user's preference for elegance without overdressing. \nStep 6: Both visual cues from the image and the metadata align with a sophisticated aesthetic, appropriate for a wedding guest. \nStep 7: The trousers are appropriate for someone attending a wedding; they meet the elegance requirement and the color preference."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is a jacket, which is a suitable category for a wedding guest outfit. Step 3: The product color is burgundy, which aligns perfectly with the user's color preference. Step 4: There are no specific fit preferences mentioned in the query, so this step is not applicable. Step 5: The price of the product is 55.95 EUR, and there is no specified price range in the query, making this step not applicable. Step 6: The overall semantic alignment is strong; the product is a fitted blazer in burgundy, which is elegant and appropriate for a wedding without being overdressed. Therefore, the product is highly relevant to the user's request."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: The product metadata indicates that the item is a 'FITTED BLAZER WITH SHOULDER PADS', categorized as 'JACKETS', in the color 'BURGUNDY', priced at '55.95 EUR', with no description provided. \nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \nStep 3: The generated explanation states that the 'burgundy fitted blazer with shoulder pads is suitable for a wedding guest' and mentions that the category aligns with the occasion's dress code, suggesting specific fabric types for daytime dressing. It also notes that the blazer's color matches the user's query. \nStep 4: The explanation correctly identifies the product's color (burgundy) and category (jacket) from the metadata. There are no hallucinated attributes present. \nStep 5: The explanation is specific as it mentions the product's color, category, and specific features (fitted, shoulder pads). \nStep 6: The explanation connects the product to the user's query by stating it is suitable for a wedding guest and aligns with the user's color preference for burgundy. However, it could be improved by providing more context on how the blazer's style fits the user's desire for elegance without being overdressed. \nStep 7: There are no hallucinated claims, and while the explanation is specific, it could be seen as slightly generic in its reasoning about the dress code without providing more tailored advice. \nStep 8: Overall, the explanation is well-grounded and specific, but it lacks a bit of depth in connecting the product to the user's desire for elegance without being overdressed. Therefore, I would assign a score of 4 for being well-grounded and specific, but not fully addressing the user's nuanced request for elegance. "
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding as a guest. \nStep 2: Typical styles for a wedding guest include elegant dresses, skirts, and tailored suits or blazers, usually leaning towards semi-formal or formal attire in soft or rich colors. \nStep 3: The product is a fitted blazer with shoulder pads, which is fairly formal and has a sleek, structured design. \nStep 4: The product metadata indicates it is a 'FITTED BLAZER WITH SHOULDER PADS' in the category 'JACKETS,' and the color is 'BURGUNDY.' \nStep 5: A person could realistically wear this blazer to a wedding if styled appropriately, perhaps with a complementary dress or outfit that balances the overall look. \nStep 6: The burgundy color fits the user's preference for earthy tones, and blazers are suitable for semi-formal to formal occasions, making it a practical choice. \nStep 7: The conjunction of the formal style, appropriate color, and context of the occasion leads to the conclusion that this blazer is appropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: The user is looking for something to wear to a wedding as a guest, preferring elegance without being overdressed, and is interested in earthy tones or burgundy. Step 2: The product is categorized as shoes, which is relevant for a wedding guest outfit. Step 3: The product color is 'BURGUNDY RED', which aligns with the user's preference for burgundy. Step 4: There are no specific fit preferences mentioned in the query, so this step is not applicable. Step 5: There is no stated price range in the query, so this step is not applicable. Step 6: The overall semantic alignment is strong; the product is suitable for a wedding guest and matches the user's color preference. Therefore, the product is highly relevant to the user's query."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates that the item is called 'EMBOSSED SLINGBACK SHOES', belongs to the category 'SHOES', is colored 'BURGUNDY RED', and is priced at '35.95 EUR'. The description is empty. \n\nStep 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. \n\nStep 3: The generated explanation states that the shoes are suitable for a wedding guest, aligns with polished tailored lines, and matches the user's query keywords regarding earthy tones. \n\nStep 4: The explanation correctly identifies the color 'BURGUNDY RED' from the metadata. However, the claim about the style aligning with 'polished tailored lines' is not directly supported by the metadata, which lacks a description of the style. This is a hallucination. \n\nStep 5: The explanation mentions specific attributes like the color and suitability for a wedding, but the reference to 'polished tailored lines' is vague and not grounded in the product metadata. \n\nStep 6: The explanation connects the product to the user's query by stating it is suitable for a wedding guest and mentions the color preference. However, the reasoning about the style is not clearly logical due to the lack of supporting metadata. \n\nStep 7: The hallucinated claim about 'polished tailored lines' detracts from the overall quality of the explanation, and the vague praise reduces its specificity. \n\nStep 8: Given the presence of a hallucinated claim and the lack of a detailed description, the explanation is mostly grounded but not fully helpful. Therefore, I would assign a score of 3 for being mostly grounded and somewhat useful, but with notable issues."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding as a guest. Step 2: Typical wedding guest attire is elegant and polished, often semi-formal to formal, with attention to style and subtlety, avoiding overly casual or business-like looks. Step 3: The shoe has a sleek, pointed design with an embossed finish, which gives it a sophisticated and elegant appearance. Step 4: The product metadata describes the shoe as 'EMBOSSED SLINGBACK SHOES', with the color listed as 'BURGUNDY RED', aligning with the user's preference for earthy or burgundy tones. Step 5: This style and color would realistically be worn by a person attending a wedding, providing an elegant touch without being overdressed. Step 6: Visual cues from the image and the color description from metadata indicate these shoes would complement a wedding guest outfit well. Step 7: Based on the style, color, and occasion, these shoes are appropriate for a wedding guest."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: The user is looking for an elegant outfit for a wedding as a guest, preferring earthy tones or burgundy. Step 2: The product is a bag, which does not match the user's request for clothing. Step 3: The product color is burgundy red, which aligns with the user's color preference. Step 4: There is no fit preference mentioned for bags, so this step is not applicable. Step 5: The price is not specified in the user's query, so this step is not applicable. Step 6: While the product's color aligns with the user's preferences, the product category (bag) does not match the user's request for clothing suitable for a wedding. Overall, the product is not relevant to the user's main request for an outfit. Therefore, the product is mostly irrelevant to the user's needs."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: The product metadata indicates that the item is a 'MAXI BUCKET BAG WITH SIDE ZIP', categorized as 'BAGS', in the color 'BURGUNDY RED', priced at '29.95 EUR', and has no description provided. Step 2: The user query specifies a need for something to wear to a wedding as a guest, with a preference for elegance without being overdressed, and a color preference for earthy tones or burgundy. Step 3: The generated explanation states that the bag is suitable for a wedding guest, has a polished tailored line, and matches the user's color preferences. Step 4: The explanation correctly identifies the color 'burgundy red' from the metadata. However, the claim about the bag having a 'polished tailored line' is not supported by the metadata, as there is no description provided to confirm this attribute, marking it as a hallucination. Step 5: The explanation does mention specific attributes like the color and type of bag, but the mention of a 'polished tailored line' is vague and not grounded in the metadata. Step 6: The explanation connects the product to the user's query by stating it is suitable for a wedding guest and aligns with the user's color preferences. However, the reasoning about the 'polished tailored line' is not substantiated. Step 7: The hallucinated claim about the 'polished tailored line' detracts from the overall quality of the explanation, and while it does mention specific attributes, the lack of a description limits the depth of the explanation. Step 8: Given the presence of a hallucinated claim and the somewhat generic nature of the explanation, I would assign a score of 3, as it is mostly grounded and somewhat useful but has notable issues."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: The stated occasion is a wedding guest.\nStep 2: Typical styles for this occasion are elegant, semi-formal to formal, with attention to refined aesthetics. Earthy tones or burgundy can convey elegance without being too flashy.\nStep 3: The product image shows a dark burgundy red bucket bag with a polished, smooth finish, which conveys a tasteful and sophisticated look. The style appears to be a mix of casual and elegant.\nStep 4: Product metadata indicates it's a 'MAXI BUCKET BAG WITH SIDE ZIP' in 'BURGUNDY RED', which aligns with the desired color scheme for the occasion.\nStep 5: A guest at a wedding could realistically wear this item as it's understated yet elegant, fitting both the occasion and the color preference.\nStep 6: Visual cues (elegant and polished appearance) and textual information (appropriate color) both support suitability for a wedding guest.\nStep 7: Overall, the bag is appropriate for the occasion, offering a balance of elegance and practical style without overshadowing more formal attire."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 5,
+              "reasoning": "Step 1: The user is looking for an outfit to wear as a guest to a wedding, aiming for elegance without being overdressed, and prefers earthy tones or burgundy. \nStep 2: The recommended products include a satin halter top, high-waist straight-leg trousers, fitted blazer, embossed slingback shoes, and a maxi bucket bag, all in shades of burgundy. \nStep 3: The set collectively covers the user's request for an elegant outfit suitable for a wedding, as it includes a top, trousers, a blazer, shoes, and a bag, all in the preferred color. \nStep 4: There is reasonable variety in the set, with different categories (tops, trousers, jackets, shoes, bags) represented, all in a cohesive color palette. \nStep 5: The set is coherent with the user's stated occasion of being a wedding guest, as all items are suitable for such an event. \nStep 6: There are no glaring omissions or mismatches; the products align well with the user's intent and occasion. \nStep 7: The set fully and comprehensively addresses the user's intent, providing a complete outfit in the desired color and style. \nFinal score: 5."
+            }
+          }
+        },
+        "cross_model": {
+          "winner": "clip",
+          "clip_score": 5,
+          "fashionclip_score": 4,
+          "reasoning": "Both sets of recommendations include products that align well with the user's query for a wedding guest outfit in burgundy or earthy tones. However, Set A (CLIP) offers a more cohesive selection of clothing items (blazers, trousers, shirts, and skirts) that are all suitable for the occasion, while Set B (FashionCLIP) includes a mix of clothing and accessories (shoes and bags) that, while appropriate, may not fully meet the user's desire for a complete outfit. Set A also has a better variety of styles and fits that cater to the user's request for elegance without being overdressed. Therefore, Set A is slightly more relevant and appropriate for the user's needs."
+        }
+      }
+    }
+  ]
+}

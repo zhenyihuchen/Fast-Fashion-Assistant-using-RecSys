@@ -28,16 +28,12 @@ st.set_page_config(
 ITEM_RUBRICS = [
     "item_relevance",
     "occasion_appropriateness",
-    "explanation_groundedness",
     "explanation_quality",
-    "constraint_adherence",
 ]
 ITEM_LABELS = {
     "item_relevance": "Item Relevance",
     "occasion_appropriateness": "Occasion Appropriateness",
-    "explanation_groundedness": "Groundedness",
     "explanation_quality": "Explanation Quality",
-    "constraint_adherence": "Constraint Adherence",
     "set_answer_relevance": "Set Answer Relevance",
 }
 PARSER_RUBRICS = [

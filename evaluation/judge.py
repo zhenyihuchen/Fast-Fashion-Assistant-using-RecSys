@@ -33,7 +33,8 @@ load_dotenv(BASE_DIR / ".env")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 TEXT_JUDGE_MODEL = os.getenv("OPENAI_TEXT_JUDGE_MODEL", "gpt-4o-mini")
-MULTIMODAL_JUDGE_MODEL = os.getenv("OPENAI_MULTIMODAL_JUDGE_MODEL", "gpt-4o-mini")
+# MULTIMODAL_JUDGE_MODEL = os.getenv("OPENAI_MULTIMODAL_JUDGE_MODEL", "gpt-4o-mini")
+MULTIMODAL_JUDGE_MODEL = os.getenv("OPENAI_MULTIMODAL_JUDGE_MODEL", "gpt-4o")
 TIMEOUT = 60
 
 # max_retries=5: SDK automatically retries 429 rate-limit errors with exponential
@@ -198,7 +199,7 @@ def run_multimodal_judge(rubric: Rubric, inputs: dict) -> dict:
         resp = _client.chat.completions.create(
             model=MULTIMODAL_JUDGE_MODEL,
             messages=[{"role": "user", "content": content}],
-            temperature=0,
+            # temperature=0,  # omitted: reasoning models (o1/o3/o4-mini) only support default (1)
             response_format={"type": "json_object"},
             timeout=TIMEOUT,
         )

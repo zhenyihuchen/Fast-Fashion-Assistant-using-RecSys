@@ -345,3 +345,6 @@ EVALUATION of LLMaaJ
 - per model set
 - comparison of both models 
 
+# TO-DO: review the rubrics for the evaluator!
+# TO-DO: review the test cases
+# TO-DO: content and random recsys 
