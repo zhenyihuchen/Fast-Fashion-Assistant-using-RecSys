@@ -10,6 +10,13 @@ For each query in the test set the script:
   3. Generates explanations
   4. Runs all evaluation rubrics (parser, item, set, cross-model)
   5. Saves per-query results + aggregate statistics to JSON + CSV
+  
+python -m evaluation.run_eval --start 0 --end 30     # day 1 (queries 0-29)
+python -m evaluation.run_eval --start 30 --end 60    # day 2
+python -m evaluation.run_eval --start 60 --end 90    # day 3
+python -m evaluation.run_eval --start 90 --end 120   # day 4
+python -m evaluation.run_eval --start 120 --end 150  # day 5
+
 """
 from __future__ import annotations
 
@@ -259,9 +266,11 @@ def aggregate_results(per_query: list[dict]) -> dict:
 
 # ── Main runner ──────────────────────────────────────────────────────────────
 
-def run(queries_path: Path, out_dir: Path, skip_pipeline: bool = False) -> None:
-    queries = json.loads(queries_path.read_text(encoding="utf-8"))
-    queries = queries[:1]  # TODO: remove to run full test set
+def run(queries_path: Path, out_dir: Path, start: int = 0, end: int | None = None) -> None:
+    all_queries = json.loads(queries_path.read_text(encoding="utf-8"))
+    queries = all_queries[start:end]
+    print(f"Running queries [{start}:{end or len(all_queries)}] "
+          f"({len(queries)} of {len(all_queries)} total)")
     out_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -374,5 +383,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fashion RecSys LLM-as-a-Judge batch evaluator")
     parser.add_argument("--queries", type=Path, default=ROOT / "evaluation" / "test_queries.json")
     parser.add_argument("--out", type=Path, default=ROOT / "evaluation" / "results")
+    parser.add_argument("--start", type=int, default=0, help="Start index (inclusive) for query slice")
+    parser.add_argument("--end", type=int, default=None, help="End index (exclusive) for query slice")
     args = parser.parse_args()
-    run(args.queries, args.out)
+    run(args.queries, args.out, start=args.start, end=args.end)

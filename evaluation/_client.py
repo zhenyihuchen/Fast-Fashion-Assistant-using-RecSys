@@ -17,8 +17,8 @@ load_dotenv(BASE_DIR / ".env")
 TIMEOUT = 60
 
 # ── OpenAI (active) ──────────────────────────────────────────────────────────
-TEXT_MODEL       = os.getenv("OPENAI_TEXT_JUDGE_MODEL",       "gpt-4.1-mini")
-MULTIMODAL_MODEL = os.getenv("OPENAI_MULTIMODAL_JUDGE_MODEL", "gpt-4.1-mini")
+TEXT_MODEL       = os.getenv("OPENAI_TEXT_JUDGE_MODEL",       "gpt-5-mini")
+MULTIMODAL_MODEL = os.getenv("OPENAI_MULTIMODAL_JUDGE_MODEL", "gpt-5-mini")
 
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),

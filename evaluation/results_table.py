@@ -1,9 +1,8 @@
 """Generate the per-tier × per-model comparison table from evaluation results.
 
-Usage (from project root):
-    python -m evaluation.results_table
-    python -m evaluation.results_table --results evaluation/results/eval_20260310_143634.json
-    python -m evaluation.results_table --latest
+python -m evaluation.results_table              # latest single file (same as before)
+python -m evaluation.results_table --all        # merge all eval_*.json files
+python -m evaluation.results_table --results eval_day1.json eval_day2.json  # specific files
 
 Reads a single eval JSON (with tier info + random baseline) and produces:
   1. Formatted tables printed to stdout
@@ -247,23 +246,55 @@ def print_tables(df_long: pd.DataFrame, df_compact: pd.DataFrame) -> None:
         print(cm_pivot.to_string(index=False))
 
 
+def _merge_results(paths: list[Path]) -> dict:
+    """Merge multiple batch eval JSONs into a single data dict."""
+    all_per_query: list[dict] = []
+    for p in paths:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        all_per_query.extend(data.get("per_query", []))
+    return {
+        "run_timestamp": "merged",
+        "total_queries": len(all_per_query),
+        "per_query": all_per_query,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate per-tier comparison table from eval results")
-    parser.add_argument("--results", type=Path, default=None, help="Path to eval JSON file")
+    parser.add_argument("--results", type=Path, nargs="+", default=None,
+                        help="Path(s) to eval JSON file(s). Multiple files are merged.")
     parser.add_argument("--latest", action="store_true", help="Use the most recent result file")
+    parser.add_argument("--all", action="store_true", dest="merge_all",
+                        help="Merge all eval_*.json files in the results directory")
     args = parser.parse_args()
 
     if args.results:
-        results_path = args.results
+        paths = args.results
+    elif args.merge_all:
+        paths = sorted(RESULTS_DIR.glob("eval_*.json"))
+        if not paths:
+            print("No result files found in", RESULTS_DIR)
+            return
     else:
+        # Default: use the most recent file
         files = sorted(RESULTS_DIR.glob("eval_*.json"), reverse=True)
         if not files:
             print("No result files found in", RESULTS_DIR)
             return
-        results_path = files[0]
+        paths = [files[0]]
 
-    print(f"Reading: {results_path}")
-    data = json.loads(results_path.read_text(encoding="utf-8"))
+    if len(paths) == 1:
+        results_path = paths[0]
+        print(f"Reading: {results_path}")
+        data = json.loads(results_path.read_text(encoding="utf-8"))
+        stem = results_path.stem.replace("eval_", "")
+    else:
+        print(f"Merging {len(paths)} result files:")
+        for p in paths:
+            print(f"  {p.name}")
+        data = _merge_results(paths)
+        stem = "merged"
+
     print(f"Queries: {data.get('total_queries', '?')} | Timestamp: {data.get('run_timestamp', '?')}")
 
     df_long = build_tier_table(data)
@@ -272,13 +303,13 @@ def main():
     print_tables(df_long, df_compact)
 
     # Save CSVs
-    stem = results_path.stem.replace("eval_", "")
-    long_csv = results_path.parent / f"tier_table_{stem}.csv"
+    out_dir = paths[0].parent if paths else RESULTS_DIR
+    long_csv = out_dir / f"tier_table_{stem}.csv"
     df_long.to_csv(long_csv, index=False)
     print(f"\nDetailed CSV: {long_csv}")
 
     if not df_compact.empty:
-        compact_csv = results_path.parent / f"tier_compact_{stem}.csv"
+        compact_csv = out_dir / f"tier_compact_{stem}.csv"
         df_compact.to_csv(compact_csv, index=False)
         print(f"Compact CSV:  {compact_csv}")
 

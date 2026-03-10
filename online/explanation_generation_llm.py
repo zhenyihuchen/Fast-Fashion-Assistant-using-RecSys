@@ -18,7 +18,7 @@ load_dotenv(dotenv_path=ENV_PATH)
 # GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # ── OpenAI (active) ──────────────────────────────────────────────────────────
-EXPLANATION_MODEL = os.getenv("OPENAI_EXPLANATION_MODEL", "gpt-4.1-nano")
+EXPLANATION_MODEL = os.getenv("OPENAI_EXPLANATION_MODEL", "gpt-5-nano")
 
 _zai_client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
