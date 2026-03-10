@@ -2,26 +2,44 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Iterable
 
 import numpy as np
 from dotenv import load_dotenv
-from groq import Groq
+# from groq import Groq
+from openai import OpenAI
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-# MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-# MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-# Explanations are short (2-3 sentences) with structured evidence, so a fast
-# small model is sufficient and avoids rate-limit errors from parallel calls.
-# Override with GROQ_EXPLANATION_MODEL in .env if needed.
-EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "llama-3.1-8b-instant")
-# EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "groq/compound-mini")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+# ── OpenAI (active) ──────────────────────────────────────────────────────────
+EXPLANATION_MODEL = os.getenv("OPENAI_EXPLANATION_MODEL", "gpt-4.1-nano")
+
+_zai_client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    timeout=60,
+    max_retries=2,
+)
+
+# ── Z.AI (commented out) ─────────────────────────────────────────────────────
+# ZAI_API_KEY = os.getenv("ZAI_API_KEY")
+# # MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+# # MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+# # EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "llama-3.1-8b-instant")
+# # EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "groq/compound-mini")
+# EXPLANATION_MODEL = os.getenv("ZAI_EXPLANATION_MODEL", "glm-4.5-flash")
+# _zai_client = OpenAI(
+#     api_key=ZAI_API_KEY,
+#     base_url="https://api.z.ai/api/paas/v4/",
+#     timeout=60,
+#     max_retries=2,
+# )
+# ─────────────────────────────────────────────────────────────────────────────
 
 TIMEOUT_SECONDS = 60
 
@@ -139,72 +157,101 @@ def compute_top_prompt_matches(
     }
 
 
-def _build_prompt(evidence: dict) -> tuple[str, str]:
-    system = (
-        "You generate detailed yet concise recommendation explanations for a fashion assistant. "
-        "Use only the provided evidence; do not invent attributes. "
-        "Write 2-3 sentences. If a field is missing or empty, omit it. "
-        "If description is provided, incorporate a short phrase from it (verbatim or lightly paraphrased). "
-        "Do not mention that you are an AI, and do not add extra claims. "
-        "Do not mention numeric scores or technical details."
+def _build_batch_prompt(
+    rows: list[dict],
+    target: str | None,
+    query_keywords: list[str],
+    top_prompt_matches: dict[str, dict[str, float | str]],
+    occasion_scores: dict[str, float],
+) -> tuple[str, str]:
+    system = """
+You generate detailed yet concise recommendation explanations for a fashion assistant.
+Write 2-3 sentences per product. Use only the provided evidence — do not invent attributes.
+If a field is empty, omit it. If a description is provided, incorporate a short phrase from it.
+Do not mention scores, numeric values, or that you are an AI.
+
+Style rules:
+- Ground every statement in the evidence fields only.
+- If occasion_target is missing, do not mention an occasion.
+- If top_occasion_prompt is missing, do not mention it.
+- If price is missing, do not mention price.
+- Explain why the item fits the occasion and the query keywords.
+- Use specific metadata (color, category, price) when available.
+
+Respond ONLY with a valid JSON object: {"<row_id>": "<explanation text>", ...}
+""".strip()
+
+    products_lines = []
+    for row in rows:
+        row_id = str(row.get("row_id", ""))
+        prompt_info = top_prompt_matches.get(row_id, {})
+        lines = [
+            f"row_id: {row_id}",
+            f"  product_title:       {row.get('product_name', '')}",
+            f"  description:         {row.get('product_description', '')}",
+            f"  color:               {row.get('color', '')}",
+            f"  category:            {row.get('product_category', '')}",
+            f"  price:               {row.get('price', '')}",
+            f"  occasion_target:     {target or ''}",
+            f"  top_occasion_prompt: {prompt_info.get('prompt', '')}",
+            f"  query_keywords:      {', '.join(query_keywords)}",
+        ]
+        products_lines.append("\n".join(lines))
+
+    user = (
+        "Generate one explanation per product listed below.\n\n"
+        + "\n\n".join(products_lines)
+        + '\n\nReturn ONLY a JSON object mapping each row_id to its explanation string.'
     )
-    user = {
-        "evidence": evidence,
-        "style_rules": [
-            "Ground every statement in evidence fields only.",
-            "If occasion fields are missing, do not mention an occasion.",
-            "If top_occasion_prompt is missing, do not mention prompt similarity.",
-            "If price is missing, do not mention price.",
-            "If description is present, mention a concrete attribute from it.",
-            "Explain why the item fits the occasion and the user query keywords.",
-            "Use specific metadata like color, category, and price when available.",
-            "Do not mention scores or numeric values from the evidence.",
-        ],
-    }
-    return system, json.dumps(user)
+
+    return system, user
 
 
-def _call_groq_langchain(system: str, evidence_payload: str) -> str:
-    if not GROQ_API_KEY:
-        raise SystemExit("GROQ_API_KEY is not set")
-    client = Groq(api_key=GROQ_API_KEY)
-    chat = client.chat.completions.create(
+# def _call_groq(system: str, evidence_payload: str) -> str:
+#     if not GROQ_API_KEY:
+#         raise SystemExit("GROQ_API_KEY is not set")
+#     client = Groq(api_key=GROQ_API_KEY)
+#     chat = client.chat.completions.create(
+#         model=EXPLANATION_MODEL,
+#         messages=[
+#             {"role": "system", "content": system},
+#             {"role": "user", "content": evidence_payload},
+#         ],
+#         temperature=0.2,
+#         timeout=TIMEOUT_SECONDS,
+#     )
+#     return chat.choices[0].message.content.strip()
+
+def _call_zai_batch(system: str, evidence_payload: str) -> dict[str, str]:
+    chat = _zai_client.chat.completions.create(
         model=EXPLANATION_MODEL,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": evidence_payload},
         ],
         temperature=0.2,
-        timeout=TIMEOUT_SECONDS,
+        response_format={"type": "json_object"},
     )
-    return chat.choices[0].message.content.strip()
-
-
-def _generate_one_explanation(
-    row: dict,
-    target: str | None,
-    query_keywords: list[str],
-    top_prompt_matches: dict[str, dict[str, float | str]],
-    occasion_scores: dict[str, float],
-) -> tuple[str, str]:
-    row_id = str(row.get("row_id", ""))
-    if not row_id:
-        return "", ""
-    prompt_info = top_prompt_matches.get(row_id, {})
-    evidence = {
-        "product_title": row.get("product_name", ""),
-        "description": row.get("product_description", ""),
-        "color": row.get("color", ""),
-        "category": row.get("product_category", ""),
-        "price": row.get("price", ""),
-        "occasion_target": target,
-        "occasion_score": occasion_scores.get(row_id),
-        "top_occasion_prompt": prompt_info.get("prompt"),
-        "top_occasion_prompt_score": prompt_info.get("score"),
-        "query_keywords": query_keywords,
-    }
-    system, payload = _build_prompt(evidence)
-    return row_id, _call_groq_langchain(system, payload)
+    raw = chat.choices[0].message.content.strip()
+    # Strip markdown code fences if the model wraps the JSON anyway
+    if raw.startswith("```"):
+        raw = re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw).strip()
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return {}
+    # Normalise: ensure every value is a plain string
+    result: dict[str, str] = {}
+    for k, v in data.items():
+        if isinstance(v, str):
+            result[str(k)] = v.strip()
+        elif isinstance(v, dict):
+            # Model occasionally returns {"explanation": "..."} per item
+            result[str(k)] = str(v.get("explanation", v)).strip()
+        else:
+            result[str(k)] = str(v).strip()
+    return result
 
 
 def generate_explanations(
@@ -230,21 +277,22 @@ def generate_explanations(
         prompts_meta_path=prompts_meta_path,
     )
 
-    explanations: dict[str, str] = {}
     work_rows = [row for row in rows if str(row.get("row_id", ""))]
     if not work_rows:
-        return explanations
+        return {}
 
-    # Sequential to avoid hitting Groq free-tier TPM limits (6 000 TPM on llama-3.1-8b-instant)
+    system, payload = _build_batch_prompt(
+        work_rows, target, query_keywords, top_prompt_matches, occasion_scores
+    )
+    try:
+        explanations = _call_zai_batch(system, payload)
+    except Exception as exc:
+        print(f"[explanation] batch call failed: {exc}")
+        explanations = {}
+
+    # Fill missing entries for any row_id not returned by the model
     for row in work_rows:
         row_id = str(row.get("row_id", ""))
-        try:
-            out_row_id, text = _generate_one_explanation(
-                row, target, query_keywords, top_prompt_matches, occasion_scores
-            )
-            if out_row_id:
-                explanations[out_row_id] = text
-        except Exception as exc:
-            print(f"[explanation] failed for row_id={row_id}: {exc}")
+        if row_id not in explanations:
             explanations[row_id] = "Explanation unavailable."
     return explanations

@@ -1,0 +1,259 @@
+{
+  "run_timestamp": "20260310_143634",
+  "queries_file": "/Users/fani/Fast-Fashion-Assistant-using-RecSys/evaluation/test_queries.json",
+  "total_queries": 1,
+  "aggregate": {
+    "clip": {
+      "item_relevance": {
+        "mean": 3.5,
+        "std": 0.7071,
+        "n": 2
+      },
+      "occasion_appropriateness": {
+        "mean": 3,
+        "std": 0.0,
+        "n": 2
+      },
+      "explanation_quality": {
+        "mean": 4,
+        "std": 0.0,
+        "n": 2
+      },
+      "set_answer_relevance": {
+        "mean": 2,
+        "std": null,
+        "n": 1
+      }
+    },
+    "fashion_clip": {
+      "item_relevance": {
+        "mean": 4,
+        "std": 0.0,
+        "n": 2
+      },
+      "occasion_appropriateness": {
+        "mean": 4,
+        "std": 0.0,
+        "n": 2
+      },
+      "explanation_quality": {
+        "mean": 4.5,
+        "std": 0.7071,
+        "n": 2
+      },
+      "set_answer_relevance": {
+        "mean": 2,
+        "std": null,
+        "n": 1
+      }
+    },
+    "parser": {
+      "parser_completeness": {
+        "mean": 3,
+        "std": null,
+        "n": 1
+      },
+      "parser_no_hallucination": {
+        "mean": 4,
+        "std": null,
+        "n": 1
+      },
+      "parser_occasion_detection": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      }
+    },
+    "cross_model": {
+      "clip_wins": 0,
+      "fashionclip_wins": 0,
+      "ties": 1,
+      "total": 1
+    }
+  },
+  "per_query": [
+    {
+      "id": "q01",
+      "query": "I need something to wear to a wedding as a guest, I want to look elegant but not overdressed, I prefer something in earthy tones or maybe burgundy",
+      "type": [
+        "occasion",
+        "color"
+      ],
+      "parsed": {
+        "normalized": "i need something to wear to a wedding as a guest, i want to look elegant but not overdressed, i prefer something in earthy tones or maybe burgundy",
+        "constraints": {
+          "categories": [
+            "dresses"
+          ],
+          "colors": [
+            "burgundy",
+            "dark beige"
+          ],
+          "price_min": null,
+          "price_max": null,
+          "fit": []
+        },
+        "occasion": {
+          "mode": "on",
+          "target": "wedding_guest"
+        },
+        "confidence": {
+          "overall": 0.8,
+          "occasion": 0.9
+        }
+      },
+      "rows_by_model": {
+        "clip": [
+          {
+            "product_name": "CHECKED SHORT DRESS",
+            "product_category": "DRESSES",
+            "color": "ECRU / BEIGE",
+            "price": "35.95 EUR",
+            "explanation": "This checked short dress in ecru/beige is perfect for a wedding guest occasion, offering a celebratory daytime look with its light and neutral tones. Its style aligns well with the query keywords of dresses and dark beige, making it a suitable choice for such events.",
+            "image_url": "https://static.zara.net/assets/public/e217/064f/622243d69a65/c532096adab2/04764302075-e1/04764302075-e1.jpg?ts=1767605416836&w=4800",
+            "product_url": "https://www.zara.com/es/en/checked-short-dress-p04764302.html",
+            "final_score": 0.3467268824577332,
+            "relevance_score": 0.24616307020187378,
+            "occasion_score": 0.4975726008415222
+          },
+          {
+            "product_name": "HERRINGBONE MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "GREY / BEIGE",
+            "price": "29.95 EUR",
+            "explanation": "The herringbone midi dress in grey/beige provides balanced coverage and a softened drape, ideal for attending a wedding. Its discreet ornament and elegant design match the occasion and the query keywords of dresses and dark beige.",
+            "image_url": "https://static.zara.net/assets/public/7980/501a/f05440fcb779/d6294a9b89cc/03644169814-e1/03644169814-e1.jpg?ts=1768835748254&w=4800",
+            "product_url": "https://www.zara.com/es/en/herringbone-midi-dress-p03644169.html",
+            "final_score": 0.3450081765651703,
+            "relevance_score": 0.24006202816963196,
+            "occasion_score": 0.5024273991584778
+          }
+        ],
+        "fashion_clip": [
+          {
+            "product_name": "HERRINGBONE MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "GREY / BEIGE",
+            "price": "29.95 EUR",
+            "explanation": "The HERRINGBONE MIDI DRESS in grey/beige is perfect for a wedding guest, offering a polished and tailored silhouette with its midi length, aligning with occasion-appropriate styles for ceremony guests.",
+            "image_url": "https://static.zara.net/assets/public/7980/501a/f05440fcb779/d6294a9b89cc/03644169814-e1/03644169814-e1.jpg?ts=1768835748254&w=4800",
+            "product_url": "https://www.zara.com/es/en/herringbone-midi-dress-p03644169.html",
+            "final_score": 0.30818812251091005,
+            "relevance_score": 0.17364922165870667,
+            "occasion_score": 0.5099964737892151
+          },
+          {
+            "product_name": "CHECKED SHORT DRESS",
+            "product_category": "DRESSES",
+            "color": "ECRU / BEIGE",
+            "price": "35.95 EUR",
+            "explanation": "The CHECKED SHORT DRESS in ecru/beige is suitable for a wedding guest, featuring a chic and elegant look that complements the occasion with its refined design and neutral tones.",
+            "image_url": "https://static.zara.net/assets/public/e217/064f/622243d69a65/c532096adab2/04764302075-e1/04764302075-e1.jpg?ts=1767605416836&w=4800",
+            "product_url": "https://www.zara.com/es/en/checked-short-dress-p04764302.html",
+            "final_score": 0.29973739087581636,
+            "relevance_score": 0.17289330065250397,
+            "occasion_score": 0.4900035262107849
+          }
+        ]
+      },
+      "eval": {
+        "parser": {
+          "parser_completeness": {
+            "score": 3,
+            "reasoning": "Step 1: The user query explicitly mentions the occasion (wedding as a guest), a style preference (elegant but not overdressed), and color preferences (earthy tones or burgundy). Step 2: Extracted constraints include categories (dresses), colors (burgundy, dark beige), and occasion (wedding_guest). Step 3: The parser missed the explicit style/fit preference 'elegant but not overdressed' which implies a fit or style constraint. Step 4: No price constraints were mentioned, so no omission there. Step 5: Since exactly one explicit constraint (fit/style preference) was missed, the score is 3."
+          },
+          "parser_no_hallucination": {
+            "score": 4,
+            "reasoning": "Step 1: The user mentioned 'earthy tones or maybe burgundy' as color preferences. The parser extracted 'burgundy' and 'dark beige' (dark beige is a reasonable interpretation of 'earthy tones'). Step 2: Categories extracted is 'dresses' which is plausible given the context but not explicitly stated; however, the user said 'I need something to wear' which is ambiguous but dresses is a reasonable inference. Step 3: No price or fit constraints were hallucinated. Step 4: No clear hallucinations, but 'dresses' category and 'dark beige' color are borderline inferences rather than explicit mentions. Step 5: Score 4 for no hallucinations but one borderline over-inference."
+          },
+          "parser_occasion_detection": {
+            "score": 5,
+            "reasoning": "Step 1: The user clearly mentions the occasion: 'to a wedding as a guest'. Step 2: The parser sets occasion_mode to 'on' and occasion_target to 'wedding_guest', which exactly matches the user's stated occasion. Step 3: No mismatch or error in mode or label. Step 4: Perfect detection and mapping."
+          }
+        },
+        "clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "The user requested a dress for a wedding guest occasion in earthy tones or burgundy. The product is a dress, which matches the category. The color is ecru/beige, which aligns with an earthy tone (dark beige is mentioned as a preference), but it is lighter than 'dark beige'. The fit is not specified in the query, so no mismatch on fit. Price constraints are not stated, so irrelevant. Overall, the dress fits the main constraints (dress, earthy tone) well but misses the burgundy option and the exact shade \"dark beige\" is lighter than expected."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "The explanation correctly references the metadata: the dress is checked pattern, short, and in ecru/beige color. It connects the product to the \"wedding guest occasion\" and mentions the light, neutral tones fitting the query preference for dark beige (though the color is lighter ecru/beige). The explanation is specific about these attributes and ties them to the user query and occasion. There are no hallucinations or irrelevant claims, only a minor color shade nuance. Overall, it is well-grounded, specific, and helpful."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "The occasion is a wedding guest event. Wedding attire typically requires a somewhat elegant but not overly formal look. The dress is short and checked with a casual pattern and neutral light earthy tones, which could work for a daytime or semi-formal wedding but might be considered too casual or informal for some weddings. Its style leans more towards casual elegance rather than refined or high formalwear. It could work in some contexts depending on the formality of the wedding and timing (daytime weddings more likely). Thus, it is borderline appropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "The user query requests a dress suitable for a wedding guest, favoring elegant but not overdressed styles, preferably in earthy tones or burgundy. The recommended product is a dress, which matches the category. The color is grey/beige, which partially aligns with the requested dark beige but not with burgundy or explicitly earthy tones. There is no mention of fit preferences or price constraints, so those cannot be evaluated. Overall, the product matches some constraints (dress category and partly color) but misses key color preference and possibly style nuances of 'elegant but not overdressed.' Hence, score is 3 for partial relevance."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "The explanation is grounded in the metadata: it references the 'herringbone midi dress in grey/beige' accurately and notes features like 'balanced coverage' and 'softened drape,' which align with dress style considerations. It connects the product to the occasion (wedding) and query keywords ('dresses' and 'dark beige'). However, it uses somewhat generic phrasing like 'discreet ornament and elegant design' without more concrete details or proof. No hallucinations are evident, but the explanation could be more detailed and precise to achieve a top score."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "The occasion is attending a wedding as a guest. Typically, wedding guest attire calls for elegant, somewhat formal dresses, often in warmer or festive colors. The herringbone midi dress shown is modest, with a neutral and muted color palette (grey/beige), and a midi length that can be appropriate for some weddings. However, its texture and color may be perceived as slightly more casual and less festive or elegant compared to typical wedding guest dresses. Thus, it could work in some contexts depending on the specific wedding formality and theme. Score is 3 for borderline suitability."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 2,
+              "reasoning": "Step 1: The user is looking for an outfit suitable for attending a wedding as a guest, emphasizing elegance without being overdressed, preferably in earthy tones or burgundy. Step 2: Both products are dresses—Product 1 is a checked short dress in ecru/beige, and Product 2 is a herringbone midi dress in grey/beige. Both dresses present a relatively casual and muted color palette, leaning towards earthy but none include burgundy. Step 3: The set only contains two dresses, limiting variety. Neither dress appears clearly formal or elegant enough for a wedding guest; the short checkered dress seems casual, and the grey herringbone midi dress leans more towards business or casual wear rather than wedding attire. Step 4: Both dresses are quite similar in their muted, neutral tones and patterns, lacking visual diversity or richness in color requested by the user. Step 5: Both dresses appear underdressed for a wedding occasion, especially with the desire to look elegant but not overdressed; these options look more casual and not sufficiently refined for the event. Step 6: The set is missing other garment types (such as accessories, shoes, or a jacket) that might help complete an elegant wedding guest look, and also lacks any burgundy or notably earthy-toned options. Step 7: Overall, the set partially addresses the user's need, providing two dress options somewhat matching the color preferences, but both fall short on occasion appropriateness and variety. Step 8: The score is 2 because fewer than half the items fit the intent well; the dresses are somewhat neutral and casual, not fully meeting the elegant wedding guest criterion nor showing strong visual diversity."
+            }
+          }
+        },
+        "fashion_clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: User wants a dress for a wedding guest in earthy tones or burgundy. Step 2: Product is a dress, matching the category. Step 3: Color is grey/beige, which partially aligns with beige (earthy tone) though not explicitly 'dark beige' or burgundy. Step 4: No fit preferences stated by user, product is midi length which is a neutral fit. Step 5: No price range specified, product price is 29.95 EUR. Step 6: The product's style is elegant and tailored as per the image, suitable for the intent. Step 7: Slight mismatch on exact color shade but overall aligns well with category, style, and color tone preference, so score is mostly relevant."
+              },
+              "explanation_quality": {
+                "score": 5,
+                "reasoning": "Step 1: Metadata confirms product name, category, and color as stated. Step 2: Query requests a wedding guest dress in earthy tones; explanation addresses this clearly. Step 3: Explanation states the dress's color and tailored midi length correctly from metadata. Step 4: No hallucinated or unsupported claims present. Step 5: Explanation is specific about silhouette and occasion relevance. Step 6: Logic connects the product's attributes to user query and wedding guest occasion. Step 7: Explanation is fully grounded, specific, and helpful."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: Occasion specified as wedding guest. Step 2: Weddings generally require semi-formal or formal attire. Step 3: Typical wedding guest styles are elegant and polished, often dresses that are not too casual or overly formal. Step 4: The midi dress has a tailored silhouette with muted earthy tones fitting a stylish but not overdressed look. Step 5: Metadata and image confirm dress formality and color appropriate for weddings. Step 6: The dress looks comfortable and elegant to wear as a guest. Step 7: Given no standout extravagance but good suitability, the item is appropriate though not exceptional, earning a 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "The query specifies a dress for a wedding guest in earthy tones or burgundy. The product is a dress, which matches the category requirement. Its color is ecru/beige, which is close to the requested dark beige earth tone but not burgundy, so partially aligns on color. No fit preference was stated, so no mismatch there. Price is unspecified in the query, so not a limiting factor. Overall, the product mostly aligns with the main constraints except slight color deviation from the preferred darker beige shade."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "The explanation references the product name, color, and occasion. It correctly states the dress color as ecru/beige from metadata, links the dress to the wedding guest occasion, and claims it has an elegant look with refined design and neutral tones. While the explanation is somewhat generic in its praise (e.g., 'chic and elegant' without specifics), it is grounded in the correct attributes and connects well to the user's needs without hallucination."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "The occasion is a wedding as a guest. The dress shown is a short, checked pattern in neutral tones with a somewhat casual yet elegant look. It seems refined but not overly formal or overdressed, fitting the user's desire to look elegant without overdressing. Although the pattern and length may lean more casual than typical formal wedding guest attire, it could still work depending on the wedding's formality and context."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 2,
+              "reasoning": "Step 1: The user wants an outfit for attending a wedding as a guest, aiming to look elegant but not overdressed, with a preference for earthy tones or burgundy.\nStep 2: The two products are dresses, which are appropriate categories. The first is a Herringbone midi dress in grey/beige tones, suitable for elegance but possibly leaning a bit casual. The second is a checked short dress in ecru/beige, which has a more casual and possibly less formal look due to the check pattern and flowy sleeves.\nStep 3: Both dresses are in neutral/beige tones, fitting part of the color preference, but neither addresses burgundy. The styles lean more towards casual or business casual rather than distinctly elegant or formal enough for a wedding.\nStep 4: Both items are dresses but have different patterns and sleeve lengths, offering some visual diversity. However, diversity is limited as only two dresses are shown.\nStep 5: The overall formality conveyed is somewhat low to moderate; these dresses might be too casual or understated for a wedding unless it is very informal. There's no indication of more formal or eveningwear elements.\nStep 6: There are notable omissions such as options in burgundy or richer earth tones, accessories, or more distinctly elegant/semi-formal garments.\nStep 7: Overall, the set partially addresses the intent by providing dress options in neutral earthy tones but fails to fully meet the elegance and color preferences required for a wedding guest look.\nStep 8: Score 2 reflects partial relevance with fewer than half the items fitting the elegant wedding guest intent and limited color and formality coverage."
+            }
+          }
+        },
+        "cross_model": {
+          "winner": "tie",
+          "clip_score": 4,
+          "fashionclip_score": 4,
+          "reasoning": "Step 1: The user query requests dresses suitable for a wedding guest—looking elegant but not overdressed, with a preference for earthy tones or burgundy. Step 2: Set A (CLIP) contains two dresses: a checked short dress in ecru/beige and a herringbone midi dress in grey/beige. Both fall within the 'dresses' category and match the 'dark beige' color preference, though no burgundy is present. Step 3: Set B (FashionCLIP) contains the same two dresses, reversed in order with identical descriptions and images. Step 4: Both sets match the category and color constraints similarly, offering earthy tone dresses appropriate for the occasion. Step 5: Visually, both sets feature the same dresses showing a balance of elegance without being overdressed, suitable for a wedding guest event. Step 6: Both sets have low visual diversity, showing just two similar styles: a short checked dress and a midi herringbone dress. Step 7: Overall, both sets equally reflect the user's intent for elegant, not overdressed wedding guest options in earthy tones; neither set includes burgundy or a wider variety of choices. Step 8: Given the parity in relevance, occasion appropriateness, and visual quality, both sets merit a score of 4 for providing majority suitable dresses. Step 9: Since both sets are nearly identical and equally aligned with the query and occasion, the outcome is a tie. There is no clear advantage for CLIP or FashionCLIP in this case."
+        }
+      }
+    }
+  ]
+}

@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from groq import Groq
+# from groq import Groq
+from openai import OpenAI
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,10 +19,29 @@ OCCASION_PROMPTS_CANDIDATES = [
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-#MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# #MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+# MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
+# ── OpenAI (active) ──────────────────────────────────────────────────────────
+MODEL = os.getenv("OPENAI_QUERY_MODEL", "gpt-4.1-nano")
+
+_zai_client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    timeout=60,
+    max_retries=2,
+)
+
+# ── Z.AI (commented out) ─────────────────────────────────────────────────────
+# ZAI_API_KEY = os.getenv("ZAI_API_KEY")
+# MODEL = os.getenv("ZAI_QUERY_MODEL", "glm-4.5-flash")
+# _zai_client = OpenAI(
+#     api_key=ZAI_API_KEY,
+#     base_url="https://api.z.ai/api/paas/v4/",
+#     timeout=60,
+#     max_retries=2,
+# )
+# ─────────────────────────────────────────────────────────────────────────────
 
 TIMEOUT_SECONDS = 60
 
@@ -242,72 +262,78 @@ def _load_occasions() -> list[str]:
 
 def _build_prompt(query: str) -> list[dict[str, str]]:
     occasions = _load_occasions()
-    system = (
-        "You are a strict JSON generator for fashion query parsing. "
-        "Return ONLY valid JSON matching the schema below. "
-        "Do not include extra keys or explanations."
-    )
-    schema = {
-        "normalized": "string",
-        "constraints": {
-            "categories": "list of category strings from allowed_categories; empty [] if no category explicitly mentioned by the user",
-            "colors": (
-                "list of color strings; prefer the closest match from allowed_colors "
-                "(e.g. 'navy' → 'navy blue', 'forest green' → 'dark green', 'wine red' → 'wine'); "
-                "if the user's term has no close match, use the user's exact descriptive term in lowercase; "
-                "empty [] if no color explicitly mentioned by the user"
-            ),
-            "price_min": "number or null",
-            "price_max": "number or null",
-            "fit": (
-                "list of fit descriptors; prefer the closest match from allowed_fit "
-                "(e.g. 'relaxed' → 'loose', 'baggy' → 'oversized', 'flowy' → 'wide leg', 'fitted' → 'slim'); "
-                "if the user's term has no close match, use the user's exact descriptive term in lowercase; "
-                "empty [] if no fit explicitly mentioned by the user"
-            ),
-        },
-        "occasion": {
-            "mode": "\"on\" or \"off\"",
-            "target": "string from allowed occasions or null",
-        },
-        "confidence": {
-            "overall": "number 0-1",
-            "occasion": "number 0-1",
-        },
-    }
-    user = {
-        "query": query,
-        "allowed_categories": CATEGORY_KEYWORDS,
-        "allowed_colors": COLOR_KEYWORDS,
-        "allowed_fit": FIT_KEYWORDS,
-        "allowed_occasions": occasions,
-        "output_schema": schema,
-        "notes": [
-            "Only extract categories, colors, and fit that are EXPLICITLY mentioned by the user — leave lists empty if not mentioned.",
-            "For categories: only use values from allowed_categories; do not guess or infer.",
-            "For colors: map to the closest allowed_colors entry when possible; otherwise keep the user's descriptive term.",
-            "For fit: map to the closest allowed_fit entry when possible; otherwise keep the user's descriptive term.",
-            "If no price is found, use nulls.",
-            "If no occasion is clear, set mode=off, target=null.",
-            "All string values must be lowercase.",
-        ],
-    }
+
+    system = """
+You are a strict JSON generator for fashion query parsing.
+Return ONLY valid JSON matching the schema below. Do not include extra keys or explanations.
+
+Output schema:
+{
+  "normalized": "<lowercase cleaned query string>",
+  "constraints": {
+    "categories": ["<value from allowed_categories>", ...],
+    "colors":     ["<value from allowed_colors or user's term>", ...],
+    "price_min":  <number or null>,
+    "price_max":  <number or null>,
+    "fit":        ["<value from allowed_fit or user's term>", ...]
+  },
+  "occasion": {
+    "mode":   "on" or "off",
+    "target": "<value from allowed_occasions or null>"
+  },
+  "confidence": {
+    "overall":  <number 0-1>,
+    "occasion": <number 0-1>
+  }
+}
+
+Rules:
+- Extract only categories, colors, and fit that are EXPLICITLY mentioned — leave lists empty [] if not mentioned.
+- categories: only use values from allowed_categories; do not guess or infer.
+- colors: map to the closest allowed_colors entry (e.g. "navy" → "navy blue", "forest green" → "dark green", "wine red" → "wine"); if no close match, keep the user's exact term in lowercase.
+- fit: map to the closest allowed_fit entry (e.g. "relaxed" → "loose", "baggy" → "oversized", "flowy" → "wide leg", "fitted" → "slim"); if no close match, keep the user's exact term in lowercase.
+- price: use nulls if not mentioned.
+- occasion: set mode="off", target=null if no occasion is clear.
+- All string values must be lowercase.
+""".strip()
+
+    user = f"""
+Query: {query}
+
+allowed_categories: {", ".join(CATEGORY_KEYWORDS)}
+
+allowed_colors: {", ".join(COLOR_KEYWORDS)}
+
+allowed_fit: {", ".join(FIT_KEYWORDS)}
+
+allowed_occasions: {", ".join(occasions)}
+""".strip()
+
     return [
         {"role": "system", "content": system},
-        {"role": "user", "content": json.dumps(user)},
+        {"role": "user", "content": user},
     ]
 
 
-def _call_groq(messages: list[dict[str, str]]) -> dict[str, Any]:
-    if not GROQ_API_KEY:
-        raise SystemExit("GROQ_API_KEY is not set")
-    client = Groq(api_key=GROQ_API_KEY)
-    chat = client.chat.completions.create(
+# def _call_groq(messages: list[dict[str, str]]) -> dict[str, Any]:
+#     if not GROQ_API_KEY:
+#         raise SystemExit("GROQ_API_KEY is not set")
+#     client = Groq(api_key=GROQ_API_KEY)
+#     chat = client.chat.completions.create(
+#         model=MODEL,
+#         messages=messages,
+#         temperature=0,
+#         response_format={"type": "json_object"},
+#         timeout=TIMEOUT_SECONDS,
+#     )
+#     return {"content": chat.choices[0].message.content}
+
+def _call_zai(messages: list[dict[str, str]]) -> dict[str, Any]:
+    chat = _zai_client.chat.completions.create(
         model=MODEL,
         messages=messages,
-        temperature=0,
+        temperature=0.01,
         response_format={"type": "json_object"},
-        timeout=TIMEOUT_SECONDS,
     )
     return {"content": chat.choices[0].message.content}
 
@@ -322,7 +348,7 @@ def _parse_llm_json(content: str) -> dict[str, Any]:
 def parse_query_llm(query: str) -> dict[str, Any]:
     normalized = normalize_query(query)
     messages = _build_prompt(normalized)
-    resp = _call_groq(messages)
+    resp = _call_zai(messages)
     content = resp["content"]
     result = _parse_llm_json(content)
     result["normalized"] = normalized

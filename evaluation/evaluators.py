@@ -1,236 +1,84 @@
 """High-level evaluation functions.
 
-Three evaluation scopes:
-  evaluate_parser()      — Query parsing quality (3 rubrics, text-only)
-  evaluate_item()        — Single product quality (5 rubrics: 4 text + 1 multimodal)
-  evaluate_set()         — Full model result set quality (1 rubric, text-only)
-  evaluate_cross_model() — CLIP vs FashionCLIP pairwise preference (1 rubric, text-only)
+Four evaluation scopes — each independent, each a single API call:
+  evaluate_parser()      — 3 parser rubrics, 1 text call      (gpt-4o-mini)
+  evaluate_item()        — 3 item rubrics,   1 multimodal call (gpt-4o + image)
+  evaluate_set()         — 1 set rubric,     1 multimodal call (gpt-4o + 5 images)
+  evaluate_cross_model() — 1 pairwise rubric, 1 multimodal call (gpt-4o + 10 images)
 
-All functions return a dict keyed by rubric name with {"score", "reasoning"} values,
-except evaluate_cross_model() which returns {"winner", "clip_score", "fashionclip_score", "reasoning"}.
+All levels evaluate from raw evidence independently — no score chaining.
 
-Parallelism strategy (OpenAI — no Groq rate-limit constraints):
-  evaluate_parser()       — 3 rubrics in parallel
-  evaluate_item()         — 5 rubrics in parallel per product
-  evaluate_query_result() — products evaluated in parallel per model;
-                            both models evaluated in parallel;
-                            parser + models + cross-model all in parallel
+Parallelism (evaluate_query_result):
+  Parser + all item evals + both set evals + cross-model all run in parallel.
+  Only the multimodal_semaphore (cap=3) limits concurrent vision calls.
 """
 from __future__ import annotations
 
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from evaluation.judge import run_judge
-from evaluation.rubrics import (
-    CROSS_MODEL_PREFERENCE,
-    ITEM_RUBRICS,
-    PARSER_RUBRICS,
-    SET_RUBRICS,
-    Rubric,
-)
+from evaluation.cross_model_judge import run_cross_model_judge
+from evaluation.item_judge import run_item_judge
+from evaluation.parser_judge import run_parser_judge
+from evaluation.set_judge import run_set_judge
+
+_ITEM_RUBRICS = ("item_relevance", "occasion_appropriateness", "explanation_quality")
 
 
-# ── Helpers ─────────────────────────────────────────────────────────────────
-
-def _product_metadata(product: dict) -> dict:
-    return {
-        "name": product.get("product_name", ""),
-        "category": product.get("product_category", ""),
-        "color": product.get("color", ""),
-        "price": product.get("price", ""),
-        "description": product.get("product_description", ""),
-    }
-
-
-def _occasion_target(parsed: dict) -> str | None:
-    occ = parsed.get("occasion") or {}
-    if isinstance(occ, dict) and occ.get("mode") == "on":
-        return occ.get("target")
-    return None
-
-
-def _run_rubric_safe(rubric: Rubric, inputs: dict) -> tuple[str, dict]:
-    """Run a single rubric and catch any exception so one failure doesn't abort the batch."""
-    try:
-        result = run_judge(rubric, inputs)
-    except Exception as exc:
-        traceback.print_exc()
-        result = {"score": -1, "reasoning": f"Judge error: {exc}"}
-    return rubric.name, result
-
-
-# ── Parser evaluation ────────────────────────────────────────────────────────
+# ── Public convenience wrappers ──────────────────────────────────────────────
 
 def evaluate_parser(query: str, parsed: dict) -> dict[str, dict]:
-    """Evaluate query parsing quality on 3 rubrics — all 3 run in parallel.
-
-    Args:
-        query:  Original user query string.
-        parsed: Output of parse_query_llm(query).
+    """Evaluate query parsing quality — single text call, 3 rubrics at once.
 
     Returns:
         {rubric_name: {"score": int, "reasoning": str}, ...}
     """
-    inputs = {
-        "query": query,
-        "parsed_output": {
-            "categories": (parsed.get("constraints") or {}).get("categories", []),
-            "colors": (parsed.get("constraints") or {}).get("colors", []),
-            "fit": (parsed.get("constraints") or {}).get("fit", []),
-            "price_min": (parsed.get("constraints") or {}).get("price_min"),
-            "price_max": (parsed.get("constraints") or {}).get("price_max"),
-            "occasion_mode": (parsed.get("occasion") or {}).get("mode"),
-            "occasion_target": (parsed.get("occasion") or {}).get("target"),
-        },
-    }
-    results: dict[str, dict] = {}
-    with ThreadPoolExecutor(max_workers=len(PARSER_RUBRICS)) as executor:
-        futures = {executor.submit(_run_rubric_safe, rubric, inputs): rubric for rubric in PARSER_RUBRICS}
-        for future in as_completed(futures):
-            name, result = future.result()
-            results[name] = result
-    return results
+    return run_parser_judge(query, parsed)
 
-
-# ── Item-level evaluation ────────────────────────────────────────────────────
 
 def evaluate_item(product: dict, query: str, parsed: dict) -> dict[str, dict]:
-    """Evaluate a single product recommendation on 5 rubrics — all 5 run in parallel.
-
-    Args:
-        product: Product dict with keys: product_name, product_category, color,
-                 price, product_description, explanation, image_url, local_image_path.
-        query:   Original user query string.
-        parsed:  Output of parse_query_llm(query).
+    """Evaluate a single product — single multimodal call, 3 rubrics at once.
 
     Returns:
-        {rubric_name: {"score": int, "reasoning": str}, ...}
+        {rubric_name: {"score": int|None, "reasoning": str}, ...}
     """
-    occasion = _occasion_target(parsed)
-    meta = _product_metadata(product)
-    constraints = (parsed.get("constraints") or {})
+    return run_item_judge(query, product, parsed)
 
-    base_inputs = {
-        "query": query,
-        "parsed_constraints": constraints,
-        "occasion_target": occasion,
-        "product_metadata": meta,
-        "explanation": product.get("explanation", ""),
-        "image_url": product.get("image_url", ""),
-        "local_image_path": product.get("local_image_path", ""),
-    }
-
-    results: dict[str, dict] = {}
-
-    # Separate rubrics that can run from those that must be skipped
-    runnable: list[Rubric] = []
-    for rubric in ITEM_RUBRICS:
-        if rubric.judge_type == "multimodal" and not occasion:
-            results[rubric.name] = {"score": None, "reasoning": "No occasion specified — skipped."}
-        else:
-            runnable.append(rubric)
-
-    with ThreadPoolExecutor(max_workers=len(runnable)) as executor:
-        futures = {executor.submit(_run_rubric_safe, rubric, base_inputs): rubric for rubric in runnable}
-        for future in as_completed(futures):
-            name, result = future.result()
-            results[name] = result
-
-    return results
-
-
-# ── Set-level evaluation ─────────────────────────────────────────────────────
 
 def evaluate_set(products: list[dict], query: str, parsed: dict) -> dict[str, dict]:
-    """Evaluate the full recommendation set (top-5) of one model on set-level rubrics.
-
-    Args:
-        products: List of up to 5 product dicts (same structure as evaluate_item).
-        query:    Original user query string.
-        parsed:   Output of parse_query_llm(query).
+    """Evaluate the recommendation set — single multimodal call with 5 images.
 
     Returns:
-        {rubric_name: {"score": int, "reasoning": str}, ...}
+        {"set_answer_relevance": {"score": int, "reasoning": str}}
     """
-    occasion = _occasion_target(parsed)
-    products_summary = [
-        {
-            "name": p.get("product_name", ""),
-            "category": p.get("product_category", ""),
-            "color": p.get("color", ""),
-            "price": p.get("price", ""),
-        }
-        for p in products
-    ]
-    inputs = {
-        "query": query,
-        "occasion_target": occasion,
-        "products_summary": products_summary,
-    }
-    results: dict[str, dict] = {}
-    for rubric in SET_RUBRICS:
-        name, result = _run_rubric_safe(rubric, inputs)
-        results[name] = result
-    return results
+    return run_set_judge(query, products, parsed)
 
-
-# ── Cross-model pairwise evaluation ──────────────────────────────────────────
 
 def evaluate_cross_model(
     query: str,
     parsed: dict,
     clip_products: list[dict],
-    fashionclip_products: list[dict],
+    fc_products: list[dict],
 ) -> dict:
-    """Pairwise CLIP vs FashionCLIP preference evaluation.
-
-    Args:
-        query:               Original user query string.
-        parsed:              Output of parse_query_llm(query).
-        clip_products:       CLIP model top-5 products.
-        fashionclip_products: FashionCLIP model top-5 products.
+    """Pairwise CLIP vs FashionCLIP — single multimodal call with 10 images.
 
     Returns:
         {"winner": str, "clip_score": int, "fashionclip_score": int, "reasoning": str}
     """
-    def summarise(products: list[dict]) -> list[dict]:
-        return [
-            {
-                "name": p.get("product_name", ""),
-                "category": p.get("product_category", ""),
-                "color": p.get("color", ""),
-                "price": p.get("price", ""),
-                "explanation": p.get("explanation", ""),
-            }
-            for p in products
-        ]
-
-    inputs = {
-        "query": query,
-        "parsed_constraints": (parsed.get("constraints") or {}),
-        "occasion_target": _occasion_target(parsed),
-        "clip_products": summarise(clip_products),
-        "fashionclip_products": summarise(fashionclip_products),
-    }
-    _, result = _run_rubric_safe(CROSS_MODEL_PREFERENCE, inputs)
-    return result
+    return run_cross_model_judge(query, parsed, clip_products, fc_products)
 
 
-# ── Convenience: evaluate all scopes for one query result ───────────────────
+# ── Full pipeline evaluation ─────────────────────────────────────────────────
 
 def evaluate_query_result(
     query: str,
     parsed: dict,
     rows_by_model: dict[str, list[dict]],
 ) -> dict:
-    """Run all evaluations for a single query pipeline result — fully parallelised.
+    """Run all evaluations for a single query result — fully parallel.
 
-    Parallelism layout:
-      - Parser rubrics run in parallel with model evaluations
-      - Both models (clip, fashion_clip) evaluate their items in parallel
-      - Within each model, all products evaluate in parallel
-      - Within each product, all rubrics run in parallel
+    All levels are independent (no score chaining), so everything runs
+    concurrently. The multimodal_semaphore in _client.py caps vision calls at 3.
 
     Args:
         query:          Original user query.
@@ -241,56 +89,84 @@ def evaluate_query_result(
         {
           "parser": {rubric: result, ...},
           "clip": {
-            "items": [{rubric: result, ...}, ...],   # one dict per product
-            "set": {rubric: result, ...},
+            "items": [{rubric: result, ...}, ...],
+            "set":   {rubric: result, ...},
           },
           "fashion_clip": { same structure },
           "cross_model": {winner, clip_score, fashionclip_score, reasoning},
         }
     """
-    out: dict = {}
+    items_by_model: dict[str, list[dict | None]] = {
+        m: [None] * len(prods) for m, prods in rows_by_model.items()
+    }
+    set_results:  dict[str, dict] = {}
+    parser_result: dict = {}
+    cross: dict = {"winner": "n/a", "reasoning": "One or both models returned no results."}
 
-    def _eval_model(model_name: str, products: list[dict]) -> tuple[str, dict]:
-        """Evaluate all products for one model — products run in parallel."""
-        with ThreadPoolExecutor(max_workers=len(products)) as ex:
-            item_futures = {
-                ex.submit(evaluate_item, product, query, parsed): i
-                for i, product in enumerate(products)
-            }
-            item_scores = [None] * len(products)
-            for future in as_completed(item_futures):
-                i = item_futures[future]
-                item_scores[i] = future.result()
+    clip_products = rows_by_model.get("clip", [])
+    fc_products   = rows_by_model.get("fashion_clip", [])
 
-        set_score = evaluate_set(products, query, parsed)
-        return model_name, {"items": item_scores, "set": set_score}
-
-    # Run parser + all models in parallel
-    with ThreadPoolExecutor(max_workers=2 + len(rows_by_model)) as executor:
+    with ThreadPoolExecutor() as ex:
         futures: dict = {}
 
         # Parser
-        futures[executor.submit(evaluate_parser, query, parsed)] = "parser"
+        futures[ex.submit(run_parser_judge, query, parsed)] = ("parser",)
 
-        # Per-model evaluations
+        # Item evals — all products across all models
         for model_name, products in rows_by_model.items():
-            futures[executor.submit(_eval_model, model_name, products)] = ("model", model_name)
+            for i, product in enumerate(products):
+                f = ex.submit(run_item_judge, query, product, parsed)
+                futures[f] = ("item", model_name, i)
 
-        for future in as_completed(futures):
-            key = futures[future]
-            if key == "parser":
-                out["parser"] = future.result()
-            else:
-                _, model_name = key
-                model_name, model_result = future.result()
-                out[model_name] = model_result
+        # Set evals — one per model
+        for model_name, products in rows_by_model.items():
+            f = ex.submit(run_set_judge, query, products, parsed)
+            futures[f] = ("set", model_name)
 
-    # Cross-model pairwise (needs both models to be done first — runs after the block above)
-    clip_products = rows_by_model.get("clip", [])
-    fc_products = rows_by_model.get("fashion_clip", [])
-    if clip_products and fc_products:
-        out["cross_model"] = evaluate_cross_model(query, parsed, clip_products, fc_products)
-    else:
-        out["cross_model"] = {"winner": "n/a", "reasoning": "One or both models returned no results."}
+        # Cross-model
+        if clip_products and fc_products:
+            f = ex.submit(run_cross_model_judge, query, parsed, clip_products, fc_products)
+            futures[f] = ("cross_model",)
 
-    return out
+        for f in as_completed(futures):
+            tag = futures[f]
+            try:
+                result = f.result()
+            except Exception:
+                traceback.print_exc()
+                result = None
+
+            if tag[0] == "parser":
+                parser_result = result or {
+                    r: {"score": -1, "reasoning": "Judge error."}
+                    for r in ("parser_completeness", "parser_no_hallucination", "parser_occasion_detection")
+                }
+            elif tag[0] == "item":
+                _, model_name, i = tag
+                items_by_model[model_name][i] = result or {
+                    r: {"score": -1, "reasoning": "Judge error."}
+                    for r in _ITEM_RUBRICS
+                }
+            elif tag[0] == "set":
+                _, model_name = tag
+                set_results[model_name] = result or {
+                    "set_answer_relevance": {"score": -1, "reasoning": "Judge error."}
+                }
+            elif tag[0] == "cross_model":
+                cross = result or {
+                    "winner": "tie", "clip_score": -1,
+                    "fashionclip_score": -1, "reasoning": "Judge error.",
+                }
+
+    return {
+        "parser": parser_result,
+        "clip": {
+            "items": items_by_model.get("clip", []),
+            "set":   set_results.get("clip", {}),
+        },
+        "fashion_clip": {
+            "items": items_by_model.get("fashion_clip", []),
+            "set":   set_results.get("fashion_clip", {}),
+        },
+        "cross_model": cross,
+    }

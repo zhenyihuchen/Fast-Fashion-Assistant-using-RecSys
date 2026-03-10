@@ -18,7 +18,7 @@ from online.candidate_retrieval import (
     PARQUET_PATH,
     retrieve_candidates,
 )
-from online.explanation_generation_groq import generate_explanations
+from online.explanation_generation_llm import generate_explanations
 from online.final_ranking import rank_candidates
 from online.occasion_suitability_scores import (
     MODEL_OCCASION_EMBEDDINGS_PATHS,

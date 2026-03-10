@@ -36,7 +36,7 @@ from groq import Groq
 from pydantic import BaseModel
 
 from online.candidate_retrieval import MODEL_PATHS, PARQUET_PATH, retrieve_candidates
-from online.explanation_generation_groq import generate_explanations
+from online.explanation_generation_llm import generate_explanations
 from online.final_ranking import rank_candidates
 from online.occasion_suitability_scores import (
     MODEL_OCCASION_EMBEDDINGS_PATHS,
@@ -98,9 +98,9 @@ def _sse(event: str, data: Any) -> str:
     return f"event: {event}\ndata: {json.dumps(_safe_json(data))}\n\n"
 
 
-def _occasion_missing(parsed: dict) -> bool:
+def _has_occasion(parsed: dict) -> bool:
     occasion = parsed.get("occasion") or {}
-    return occasion.get("mode") != "on" or not occasion.get("target")
+    return occasion.get("mode") == "on" and bool(occasion.get("target"))
 
 
 def _build_summary(rows: list[dict], parsed: dict) -> str:
@@ -153,9 +153,7 @@ def _run_pipeline_sync(query: str) -> dict:
     """Synchronous pipeline execution (called from thread pool)."""
     parsed = parse_query_llm(query)
     parsed_safe = _safe_json(parsed)
-
-    if _occasion_missing(parsed_safe):
-        return {"status": "needs_occasion", "parsed": parsed_safe}
+    has_occ = _has_occasion(parsed_safe)
 
     candidates_by_model = retrieve_candidates(
         query,
@@ -180,15 +178,19 @@ def _run_pipeline_sync(query: str) -> dict:
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
         embeddings = np.load(paths["image_embeddings"]).astype("float32", copy=False)
 
-        occasion_scores = compute_occasion_scores(
-            candidates,
-            parsed=parsed,
-            product_ids=product_ids,
-            embeddings=embeddings,
-            model_name=model_name,
-            occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
-        )
-        ranked = rank_candidates(candidates, occasion_scores)
+        if has_occ:
+            occasion_scores = compute_occasion_scores(
+                candidates,
+                parsed=parsed,
+                product_ids=product_ids,
+                embeddings=embeddings,
+                model_name=model_name,
+                occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
+            )
+            ranked = rank_candidates(candidates, occasion_scores)
+        else:
+            occasion_scores = {}
+            ranked = rank_candidates(candidates, occasion_scores, alpha=1.0, beta=0.0)
 
         rows: list[dict] = []
         for row_id, relevance, occ_score, final_score in ranked:
@@ -254,9 +256,7 @@ async def _stream_pipeline(query: str) -> AsyncGenerator[str, None]:
         parsed = await run(parse_query_llm, query)
         parsed_safe = _safe_json(parsed)
 
-        if _occasion_missing(parsed_safe):
-            yield _sse("needs_occasion", {"parsed": parsed_safe})
-            return
+        has_occ = _has_occasion(parsed_safe)
 
         # Step 2: Retrieve candidates
         yield _sse("progress", {"step": 2, "total": 6, "message": "Retrieving candidates via CLIP & FashionCLIP…"})
@@ -297,12 +297,16 @@ async def _stream_pipeline(query: str) -> AsyncGenerator[str, None]:
             product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
             embeddings = np.load(paths["image_embeddings"]).astype("float32", copy=False)
 
-            occasion_scores = await run(
-                compute_occasion_scores,
-                candidates, parsed, product_ids, embeddings, model_name,
-                MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
-            )
-            ranked = await run(rank_candidates, candidates, occasion_scores)
+            if has_occ:
+                occasion_scores = await run(
+                    compute_occasion_scores,
+                    candidates, parsed, product_ids, embeddings, model_name,
+                    MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
+                )
+                ranked = await run(rank_candidates, candidates, occasion_scores)
+            else:
+                occasion_scores = {}
+                ranked = await run(rank_candidates, candidates, occasion_scores, alpha=1.0, beta=0.0)
 
             rows: list[dict] = []
             for row_id, relevance, occ_score, final_score in ranked:

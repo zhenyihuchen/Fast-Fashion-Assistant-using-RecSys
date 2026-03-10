@@ -18,8 +18,7 @@ RESULTS_DIR = Path(__file__).resolve().parent / "results"
 # ── Page config ───────────────────────────────────────────────────────────────
 
 st.set_page_config(
-    page_title="Fashion RecSys Evaluation",
-    page_icon="👗",
+    page_title="Fashion RecSys — Evaluation",
     layout="wide",
 )
 
@@ -53,7 +52,7 @@ MODEL_COLORS = {"CLIP": "#3B82F6", "FashionCLIP": "#F59E0B", "Tie": "#9CA3AF"}
 result_files = sorted(RESULTS_DIR.glob("eval_*.json"), reverse=True) if RESULTS_DIR.exists() else []
 
 with st.sidebar:
-    st.title("👗 RecSys Eval")
+    st.title("RecSys Evaluation")
     st.markdown("---")
 
     if not result_files:
@@ -72,7 +71,7 @@ with st.sidebar:
     st.caption(f"**Timestamp:** {data.get('run_timestamp', '—')}")
     st.caption(f"**Queries:** {data.get('total_queries', 0)}")
     st.markdown("---")
-    st.caption("CLIP = blue · FashionCLIP = orange")
+    st.caption("CLIP — blue  ·  FashionCLIP — orange")
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -87,15 +86,6 @@ def _model_overall_avg(model_key: str) -> float | None:
     valid = [s for s in scores if s is not None]
     return round(sum(valid) / len(valid), 2) if valid else None
 
-def _score_color(score: int | None) -> str:
-    if score is None or score < 0:
-        return "#9CA3AF"
-    if score >= 4:
-        return "#22C55E"
-    if score >= 3:
-        return "#F59E0B"
-    return "#EF4444"
-
 def _score_badge(score: int | None) -> str:
     if score is None or score < 0:
         return "—"
@@ -105,10 +95,10 @@ def _score_badge(score: int | None) -> str:
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 
 tab_overview, tab_comparison, tab_parser, tab_explorer = st.tabs([
-    "📊 Overview",
-    "🔍 Model Comparison",
-    "🧩 Parser Analysis",
-    "🔎 Query Explorer",
+    "Overview",
+    "Model Comparison",
+    "Parser Analysis",
+    "Query Explorer",
 ])
 
 # ── TAB 1: Overview ───────────────────────────────────────────────────────────
@@ -227,7 +217,7 @@ with tab_comparison:
 
     st.divider()
 
-    # Per-query scores scatter: one rubric selector
+    # Per-query scores: one rubric selector
     st.subheader("Per-Query Score Distribution")
     selected_rubric = st.selectbox(
         "Rubric",
@@ -337,7 +327,7 @@ with tab_parser:
         if not failed.empty:
             st.warning(f"**{len(failed)} queries** scored < 3 on occasion detection:")
             for _, row in failed.iterrows():
-                st.caption(f"  • {row['ID']}: {row['Query']}")
+                st.caption(f"  {row['ID']}: {row['Query']}")
 
 # ── TAB 4: Query Explorer ─────────────────────────────────────────────────────
 
@@ -378,22 +368,31 @@ with tab_explorer:
                 f"**{PARSER_LABELS.get(r, r)}:** {parser_ev.get(r, {}).get('score', '—')}/5"
                 for r in PARSER_RUBRICS
             )
-            st.caption(f"Parser → {p_badges}")
+            st.caption(f"Parser — {p_badges}")
 
             # Cross-model result
             cm_result = ev.get("cross_model", {})
             winner = cm_result.get("winner", "—")
-            winner_display = {"clip": "🔵 CLIP", "fashion_clip": "🟠 FashionCLIP", "tie": "🟰 Tie"}.get(winner, winner)
-            st.info(f"**Cross-model winner:** {winner_display}  ·  CLIP {cm_result.get('clip_score', '—')}/5 vs FashionCLIP {cm_result.get('fashionclip_score', '—')}/5\n\n_{cm_result.get('reasoning', '')}_")
+            winner_display = {"clip": "CLIP", "fashion_clip": "FashionCLIP", "tie": "Tie"}.get(winner, winner)
+            st.info(
+                f"**Cross-model preference: {winner_display}**  "
+                f"·  CLIP {cm_result.get('clip_score', '—')}/5  "
+                f"·  FashionCLIP {cm_result.get('fashionclip_score', '—')}/5\n\n"
+                f"_{cm_result.get('reasoning', '')}_"
+            )
 
             st.divider()
 
             # Product cards: CLIP | FashionCLIP side by side
             for model_key, model_label, color in [
-                ("clip", "CLIP", "#3B82F6"),
-                ("fashion_clip", "FashionCLIP", "#F59E0B"),
+                ("clip", "CLIP", MODEL_COLORS["CLIP"]),
+                ("fashion_clip", "FashionCLIP", MODEL_COLORS["FashionCLIP"]),
             ]:
-                st.markdown(f"<h4 style='color:{color}'>{'🔵' if color == '#3B82F6' else '🟠'} {model_label}</h4>", unsafe_allow_html=True)
+                st.markdown(
+                    f"<p style='font-size:1.1rem; font-weight:600; "
+                    f"color:{color}; margin-bottom:4px'>{model_label}</p>",
+                    unsafe_allow_html=True,
+                )
 
                 products = (q_data.get("rows_by_model") or {}).get(model_key, [])
                 item_scores = (ev.get(model_key) or {}).get("items", [{}] * 5)
@@ -403,7 +402,6 @@ with tab_explorer:
                     st.caption("No results returned for this model.")
                     continue
 
-                # Set-level score
                 set_s = set_score.get("score")
                 st.caption(f"Set Answer Relevance: **{_score_badge(set_s)}**")
 
@@ -414,7 +412,7 @@ with tab_explorer:
                         if img_url:
                             st.image(img_url, width="stretch")
                         else:
-                            st.markdown("📷")
+                            st.caption("No image")
 
                         st.markdown(f"**{prod.get('product_name', '—')}**")
                         st.caption(
@@ -422,7 +420,6 @@ with tab_explorer:
                             f"{prod.get('price', '')}"
                         )
 
-                        # Eval scores as compact table
                         score_lines = []
                         for r in ITEM_RUBRICS:
                             s = (item_ev.get(r) or {}).get("score")

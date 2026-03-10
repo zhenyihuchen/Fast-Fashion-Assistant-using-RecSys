@@ -18,7 +18,8 @@ import json
 import os
 import statistics
 import sys
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -33,7 +34,7 @@ load_dotenv(ROOT / ".env")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 from online.candidate_retrieval import MODEL_PATHS, PARQUET_PATH, retrieve_candidates
-from online.explanation_generation_groq import generate_explanations
+from online.explanation_generation_llm import generate_explanations
 from online.final_ranking import rank_candidates
 from online.occasion_suitability_scores import (
     MODEL_OCCASION_EMBEDDINGS_PATHS,
@@ -70,9 +71,7 @@ def run_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
     """
     parsed = parse_query_llm(query)
     occ = parsed.get("occasion") or {}
-    if occ.get("mode") != "on" or not occ.get("target"):
-        # Return empty results if no occasion detected — parser eval still runs
-        return parsed, {}
+    has_occasion = occ.get("mode") == "on" and bool(occ.get("target"))
 
     candidates_by_model = retrieve_candidates(
         query,
@@ -96,15 +95,20 @@ def run_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
         embeddings = np.load(paths["image_embeddings"]).astype("float32", copy=False)
 
-        occasion_scores = compute_occasion_scores(
-            candidates,
-            parsed=parsed,
-            product_ids=product_ids,
-            embeddings=embeddings,
-            model_name=model_name,
-            occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
-        )
-        ranked = rank_candidates(candidates, occasion_scores)
+        if has_occasion:
+            occasion_scores = compute_occasion_scores(
+                candidates,
+                parsed=parsed,
+                product_ids=product_ids,
+                embeddings=embeddings,
+                model_name=model_name,
+                occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
+            )
+            ranked = rank_candidates(candidates, occasion_scores)
+        else:
+            # No occasion: skip occasion scoring, rank purely by retrieval relevance
+            occasion_scores = {}
+            ranked = rank_candidates(candidates, occasion_scores, alpha=1.0, beta=0.0)
 
         rows: list[dict] = []
         for row_id, relevance, occ_score, final_score in ranked:
@@ -186,8 +190,7 @@ def aggregate_results(per_query: list[dict]) -> dict:
         ]
 
     item_rubric_names = [
-        "item_relevance", "occasion_appropriateness",
-        "explanation_groundedness", "explanation_quality", "constraint_adherence",
+        "item_relevance", "occasion_appropriateness", "explanation_quality",
     ]
     set_rubric_names = ["set_answer_relevance"]
     parser_rubric_names = ["parser_completeness", "parser_no_hallucination", "parser_occasion_detection"]
@@ -228,26 +231,43 @@ def run(queries_path: Path, out_dir: Path, skip_pipeline: bool = False) -> None:
 
     per_query_results: list[dict] = []
     total = len(queries)
+    elapsed_times: list[float] = []
+    run_start = time.monotonic()
 
     for i, q in enumerate(queries, 1):
         qid = q.get("id", f"q{i:03d}")
         query_text = q["query"]
-        print(f"[{i}/{total}] {qid}: {query_text[:60]}")
+        query_start = time.monotonic()
+        print(f"\n[{i}/{total}] {qid}: {query_text[:60]}")
 
         try:
+            t0 = time.monotonic()
             parsed, rows_by_model = run_pipeline(query_text)
-            print(f"  → parsed occasion: {(parsed.get('occasion') or {}).get('target')} | "
+            pipeline_s = time.monotonic() - t0
+            print(f"  → pipeline: {pipeline_s:.1f}s | "
+                  f"occasion: {(parsed.get('occasion') or {}).get('target')} | "
                   f"clip={len(rows_by_model.get('clip', []))} fc={len(rows_by_model.get('fashion_clip', []))}")
 
+            t0 = time.monotonic()
             eval_result = evaluate_query_result(query_text, parsed, rows_by_model)
+            eval_s = time.monotonic() - t0
 
-            # Log parser scores
             parser_scores = {k: v.get("score") for k, v in eval_result.get("parser", {}).items()}
-            print(f"  → parser scores: {parser_scores}")
+            print(f"  → eval: {eval_s:.1f}s | parser scores: {parser_scores}")
 
         except Exception as exc:
             print(f"  ERROR: {exc}")
             parsed, rows_by_model, eval_result = {}, {}, {"error": str(exc)}
+
+        query_elapsed = time.monotonic() - query_start
+        elapsed_times.append(query_elapsed)
+        avg_s = sum(elapsed_times) / len(elapsed_times)
+        remaining = total - i
+        eta_s = avg_s * remaining
+        total_elapsed = time.monotonic() - run_start
+        print(f"  → query done in {query_elapsed:.1f}s | "
+              f"total elapsed: {timedelta(seconds=int(total_elapsed))} | "
+              f"ETA: {timedelta(seconds=int(eta_s))} ({remaining} left)")
 
         per_query_results.append({
             "id": qid,

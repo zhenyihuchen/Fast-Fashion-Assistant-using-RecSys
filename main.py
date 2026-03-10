@@ -10,7 +10,7 @@ from online.candidate_retrieval import (
     PARQUET_PATH,
     retrieve_candidates,
 )
-from online.explanation_generation_groq import generate_explanations
+from online.explanation_generation_llm import generate_explanations
 from online.final_ranking import rank_candidates
 from online.occasion_suitability_scores import (
     MODEL_OCCASION_EMBEDDINGS_PATHS,
@@ -35,7 +35,8 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_query:
-        args.query = "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black" 
+        args.query = "I am looking for a night short red dress but that costs less than 50 euros"
+            # "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black" 
             # "I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be wide-leg"
             # "I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be wide-leg"
             # #"I am looking for a night short red dress but that costs less than 50 euros"
@@ -48,7 +49,7 @@ def main() -> None:
             # "I want a pair of dark blue color straight jeans for a chill and casual day in the park, high-rise" (para mejorar)
             
             # "I want something to wear for halloween, I have no idea what type of clothes, what do you suggest me?"
-            
+            # "I want something to wear for Oktoberfest, I have no idea what type of clothes, what do you suggest me?"
     if not args.query:
         raise SystemExit("Provide --query or use --test-query")
 
