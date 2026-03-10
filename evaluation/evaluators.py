@@ -158,15 +158,10 @@ def evaluate_query_result(
                     "fashionclip_score": -1, "reasoning": "Judge error.",
                 }
 
-    return {
-        "parser": parser_result,
-        "clip": {
-            "items": items_by_model.get("clip", []),
-            "set":   set_results.get("clip", {}),
-        },
-        "fashion_clip": {
-            "items": items_by_model.get("fashion_clip", []),
-            "set":   set_results.get("fashion_clip", {}),
-        },
-        "cross_model": cross,
-    }
+    result = {"parser": parser_result, "cross_model": cross}
+    for model_name in rows_by_model:
+        result[model_name] = {
+            "items": items_by_model.get(model_name, []),
+            "set":   set_results.get(model_name, {}),
+        }
+    return result

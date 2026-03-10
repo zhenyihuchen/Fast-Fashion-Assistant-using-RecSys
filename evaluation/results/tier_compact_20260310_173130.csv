@@ -1,0 +1,4 @@
+Tier,Rubric,Random,CLIP,FashionCLIP,CLIP_gain,FC_gain
+Basic,explanation_quality,1.0,4.4,4.2,3.4,3.2
+Basic,item_relevance,1.0,5.0,5.0,4.0,4.0
+Basic,set_answer_relevance,1.0,5.0,5.0,4.0,4.0

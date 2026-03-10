@@ -1,422 +1,154 @@
 [
-  {
-    "id": "q01",
-    "query": "I need something to wear to a wedding as a guest, I want to look elegant but not overdressed, I prefer something in earthy tones or maybe burgundy",
-    "type": ["occasion", "color"],
-    "expected_occasion": "wedding_guest",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["burgundy"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Earthy tones is vague — parser may map to beige/camel. Burgundy is the explicit color. No category mentioned."
-  },
-  {
-    "id": "q02",
-    "query": "Looking for a dress or a skirt outfit for a wedding in autumn, I want to look elegant but not overdressed",
-    "type": ["occasion", "category"],
-    "expected_occasion": "wedding_guest",
-    "expected_constraints": {
-      "categories": ["dresses", "skirts"],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Two categories explicitly mentioned. No color or fit. Autumn is season context, not an occasion."
-  },
-  {
-    "id": "q03",
-    "query": "I want something to wear for a party night out with friends, I like dresses and skirts, I want to look elegant but also feel comfortable, I want to wear something red or black",
-    "type": ["occasion", "category", "color"],
-    "expected_occasion": "party_night_out",
-    "expected_constraints": {
-      "categories": ["dresses", "skirts"],
-      "colors": ["red", "black"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Rich query with occasion + two categories + two colors. Canonical party_night_out test case."
-  },
-  {
-    "id": "q04",
-    "query": "Going out this Saturday night, I want something that stands out, I like dark colors like navy or forest green",
-    "type": ["occasion", "color"],
-    "expected_occasion": "party_night_out",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["navy blue", "dark green"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Navy maps to 'navy blue'. Forest green maps to 'dark green' or 'bottle green'. No category stated."
-  },
-  {
-    "id": "q05",
-    "query": "I need an outfit for a night out with friends, I prefer a trousers and top combination, something stylish and a bit edgy",
-    "type": ["occasion", "category"],
-    "expected_occasion": "party_night_out",
-    "expected_constraints": {
-      "categories": ["trousers", "tops"],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Two categories explicitly named. Edgy is style description, not a fit keyword."
-  },
-  {
-    "id": "q06",
-    "query": "I need something professional for work, I want to look put together but comfortable, I prefer neutral tones like beige or navy",
-    "type": ["occasion", "color"],
-    "expected_occasion": "work_office",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["beige", "navy blue"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Work office occasion. Two explicit colors. No category or fit mentioned."
-  },
-  {
-    "id": "q07",
-    "query": "Looking for office wear, maybe a blazer or structured trousers, something smart and polished",
-    "type": ["occasion", "category"],
-    "expected_occasion": "work_office",
-    "expected_constraints": {
-      "categories": ["jackets", "trousers"],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Blazer maps to 'jackets'. Structured is a style hint, not a fit keyword."
-  },
-  {
-    "id": "q08",
-    "query": "I have an important meeting next week and need to look professional and polished, I have no idea what to wear",
-    "type": ["occasion"],
-    "expected_occasion": "work_office",
-    "expected_constraints": {
-      "categories": [],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Occasion-only. No constraints. Tests that parser doesn't hallucinate categories."
-  },
-  {
-    "id": "q09",
-    "query": "I have a gala dinner and need something really elegant and formal, I prefer dark colors like black or midnight blue",
-    "type": ["occasion", "color"],
-    "expected_occasion": "formal_event",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["black", "navy blue"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Midnight blue maps to 'navy blue' or 'dark navy'. Formal event occasion."
-  },
-  {
-    "id": "q10",
-    "query": "I need a formal outfit for an awards ceremony, something sophisticated and timeless, I like long silhouettes and classic cuts",
-    "type": ["occasion", "fit"],
-    "expected_occasion": "formal_event",
-    "expected_constraints": {
-      "categories": [],
-      "colors": [],
-      "fit": ["maxi"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Long silhouettes maps to 'maxi'. No color explicitly stated."
-  },
-  {
-    "id": "q11",
-    "query": "I want a pair of dark blue color jeans for a chill and casual day in the park, I like the cut to be wide-leg",
-    "type": ["occasion", "category", "color", "fit"],
-    "expected_occasion": "casual_everyday",
-    "expected_constraints": {
-      "categories": ["jeans"],
-      "colors": ["dark indigo"],
-      "fit": ["wide leg"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Dark blue maps to 'dark indigo' or 'denim blue'. All constraint types present."
-  },
-  {
-    "id": "q12",
-    "query": "I want a pair of wine color jeans for a chill and casual day in the park, I like the cut to be straight",
-    "type": ["occasion", "category", "color", "fit"],
-    "expected_occasion": "casual_everyday",
-    "expected_constraints": {
-      "categories": ["jeans"],
-      "colors": ["wine"],
-      "fit": ["straight leg"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Wine is in the allowed colors list. Straight maps to 'straight leg'."
-  },
-  {
-    "id": "q13",
-    "query": "Looking for something comfortable and casual to wear on weekends, I like relaxed and oversized fits, nothing too tight",
-    "type": ["occasion", "fit"],
-    "expected_occasion": "casual_everyday",
-    "expected_constraints": {
-      "categories": [],
-      "colors": [],
-      "fit": ["loose", "oversized"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Relaxed maps to 'loose'. Oversized is in the list. No color or category."
-  },
-  {
-    "id": "q14",
-    "query": "I am looking for a night short red dress but that costs less than 50 euros",
-    "type": ["occasion", "category", "color", "fit", "price"],
-    "expected_occasion": "date_night",
-    "expected_constraints": {
-      "categories": ["dresses"],
-      "colors": ["red"],
-      "fit": ["short"],
-      "price_min": null,
-      "price_max": 50
-    },
-    "notes": "All constraint types present including price. Classic multi-constraint test case."
-  },
-  {
-    "id": "q15",
-    "query": "Going on a date and want to look feminine and attractive, I prefer rich dark colors, maybe something in burgundy or black",
-    "type": ["occasion", "color"],
-    "expected_occasion": "date_night",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["burgundy", "black"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Two explicit colors. No category or fit mentioned."
-  },
-  {
-    "id": "q16",
-    "query": "I need a warm coat for winter, I want something stylish not just functional, I like camel or dark grey tones",
-    "type": ["occasion", "category", "color"],
-    "expected_occasion": "winter_outerwear",
-    "expected_constraints": {
-      "categories": ["coats"],
-      "colors": ["camel", "dark grey"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Category and two colors explicit. Winter outerwear occasion."
-  },
-  {
-    "id": "q17",
-    "query": "Looking for an oversized coat or jacket for winter, something that looks good with any outfit and keeps me warm",
-    "type": ["occasion", "category", "fit"],
-    "expected_occasion": "winter_outerwear",
-    "expected_constraints": {
-      "categories": ["coats", "jackets"],
-      "colors": [],
-      "fit": ["oversized"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Fit and category explicit. No color mentioned."
-  },
-  {
-    "id": "q18",
-    "query": "I want to look smart but relaxed for a dinner with friends this weekend, not too formal but put together, I like neutral earthy tones",
-    "type": ["occasion", "color"],
-    "expected_occasion": "smart_casual",
-    "expected_constraints": {
-      "categories": [],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Earthy tones is descriptive but too vague for a specific color. Relaxed is a style hint here, not a fit keyword in this context. Parser should leave lists empty."
-  },
-  {
-    "id": "q19",
-    "query": "I want a pair of black jeans for a chill and casual day in the park, I like the cut to be straight",
-    "type": ["occasion", "category", "color", "fit"],
-    "expected_occasion": "casual_everyday",
-    "expected_constraints": {
-      "categories": ["jeans"],
-      "colors": ["black"],
-      "fit": ["straight leg"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Variant of q12 with black instead of wine. Tests consistent handling of color + fit + category."
-  },
-  {
-    "id": "q20",
-    "query": "Looking for a smart casual outfit for a weekend brunch, something that looks polished without being too dressed up, I prefer slim trousers or a midi skirt",
-    "type": ["occasion", "category", "fit"],
-    "expected_occasion": "smart_casual",
-    "expected_constraints": {
-      "categories": ["trousers", "skirts"],
-      "colors": [],
-      "fit": ["slim", "midi"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Slim trousers → fit:slim. Midi skirt → fit:midi, category:skirts. Two categories and two fits."
-  },
-  {
-    "id": "q21",
-    "query": "I need something elegant for Christmas dinner with family, I want to look festive without going over the top, maybe in dark green or burgundy red",
-    "type": ["occasion", "color"],
-    "expected_occasion": "navidad_dinner",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["dark green", "burgundy"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Burgundy red maps to 'burgundy'. Dark green is in the allowed list. navidad_dinner occasion."
-  },
-  {
-    "id": "q22",
-    "query": "Looking for an outfit for Navidad dinner with the family, something warm, elegant and festive, I love jewel tones like deep red or emerald",
-    "type": ["occasion", "color"],
-    "expected_occasion": "navidad_dinner",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["dark red", "dark green"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Deep red maps to 'dark red'. Emerald maps to 'dark green' or 'bottle green'. No category stated."
-  },
-  {
-    "id": "q23",
-    "query": "I want something glamorous for New Year's Eve, I love metallics or sequins, something that really stands out",
-    "type": ["occasion", "color"],
-    "expected_occasion": "nochevieja_nye",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["silver", "bronze"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Metallics maps to silver/bronze. Sequins is a style descriptor. nochevieja_nye occasion."
-  },
-  {
-    "id": "q24",
-    "query": "Need an outfit for Nochevieja, I want to look stunning, I prefer dresses, something in gold or silver and with a short or mini silhouette",
-    "type": ["occasion", "category", "color", "fit"],
-    "expected_occasion": "nochevieja_nye",
-    "expected_constraints": {
-      "categories": ["dresses"],
-      "colors": ["silver"],
-      "fit": ["mini", "short"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Gold → bronze/silver. Mini and short are both in allowed fit. Category explicit."
-  },
-  {
-    "id": "q25",
-    "query": "I want something to wear for Halloween, I have no idea what type of clothes, what do you suggest me?",
-    "type": ["occasion"],
-    "expected_occasion": "halloween",
-    "expected_constraints": {
-      "categories": [],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Occasion-only with fully open constraints. Tests whether parser correctly detects Halloween without hallucinating categories."
-  },
-  {
-    "id": "q26",
-    "query": "Looking for a Halloween outfit that has a dark and edgy vibe, I like black or deep purple, something dramatic and bold",
-    "type": ["occasion", "color"],
-    "expected_occasion": "halloween",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["black", "purple"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Deep purple maps to 'purple'. No category explicitly stated."
-  },
-  {
-    "id": "q27",
-    "query": "I need something for an Oktoberfest celebration, I want to look festive and fun but still fashionable, what would you suggest?",
-    "type": ["occasion"],
-    "expected_occasion": "oktoberfest",
-    "expected_constraints": {
-      "categories": [],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Occasion-only. No explicit constraints. Tests Oktoberfest detection."
-  },
-  {
-    "id": "q28",
-    "query": "Going to an Oktoberfest event and want an outfit with a festive feel, I like warm autumn colors like rust, burnt orange or chocolate brown",
-    "type": ["occasion", "color"],
-    "expected_occasion": "oktoberfest",
-    "expected_constraints": {
-      "categories": [],
-      "colors": ["burnt orange", "chocolate brown"],
-      "fit": [],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "Rust maps to 'burnt orange'. Chocolate brown is in the allowed list."
-  },
-  {
-    "id": "q29",
-    "query": "Looking for a warm cardigan or cozy sweater for the autumn, something in khaki or olive green tones, nothing too fitted",
-    "type": ["category", "color", "fit"],
-    "expected_occasion": null,
-    "expected_constraints": {
-      "categories": ["cardigans"],
-      "colors": ["khaki", "olive green"],
-      "fit": ["loose"],
-      "price_min": null,
-      "price_max": null
-    },
-    "notes": "No occasion. Nothing too fitted maps to 'loose'. Sweater maps to cardigans or sweatshirts."
-  },
-  {
-    "id": "q30",
-    "query": "I need something affordable under 40 euros, I want dark colored trousers or jeans, something versatile for everyday use",
-    "type": ["category", "price"],
-    "expected_occasion": null,
-    "expected_constraints": {
-      "categories": ["trousers", "jeans"],
-      "colors": [],
-      "fit": [],
-      "price_min": null,
-      "price_max": 40
-    },
-    "notes": "Price + category only. 'Dark colored' is too vague to extract a specific color. No occasion."
-  }
+  {"id": "q001", "query": "blue jeans", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q002", "query": "I want a red dress", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q003", "query": "black trousers", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q004", "query": "show me white shirts", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q005", "query": "looking for a beige coat", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q006", "query": "green cardigan please", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q007", "query": "navy blue skirt", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q008", "query": "I need a grey jacket", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q009", "query": "cream top", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q010", "query": "brown shoes", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q011", "query": "burgundy sweatshirt", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q012", "query": "khaki trousers", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q013", "query": "camel coat", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q014", "query": "do you have pink dresses?", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q015", "query": "dark green jacket", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q016", "query": "I'm looking for a lilac top", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q017", "query": "mustard cardigan", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q018", "query": "olive green jeans", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q019", "query": "wine colored skirt", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q020", "query": "show me silver bags", "tier": 1, "tags": ["category", "color"]},
+  {"id": "q021", "query": "oversized coat", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q022", "query": "slim jeans", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q023", "query": "skinny trousers", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q024", "query": "I want a cropped jacket", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q025", "query": "midi dress", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q026", "query": "wide leg trousers", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q027", "query": "maxi skirt", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q028", "query": "short sleeve shirt", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q029", "query": "long sleeve top", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q030", "query": "loose cardigan", "tier": 1, "tags": ["category", "fit"]},
+  {"id": "q031", "query": "jeans under 40 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q032", "query": "I need a dress under 50 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q033", "query": "shoes max 60 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q034", "query": "show me coats under 100 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q035", "query": "bags around 30 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q036", "query": "trousers no more than 45 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q037", "query": "cheap t-shirts under 20 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q038", "query": "jackets budget 80 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q039", "query": "skirts under 35 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q040", "query": "tops max 25 euros", "tier": 1, "tags": ["category", "price"]},
+  {"id": "q041", "query": "something in black", "tier": 1, "tags": ["color"]},
+  {"id": "q042", "query": "dresses", "tier": 1, "tags": ["category"]},
+  {"id": "q043", "query": "I want something red", "tier": 1, "tags": ["color"]},
+  {"id": "q044", "query": "show me jackets", "tier": 1, "tags": ["category"]},
+  {"id": "q045", "query": "anything in dark blue", "tier": 1, "tags": ["color"]},
+  {"id": "q046", "query": "what coats do you have?", "tier": 1, "tags": ["category"]},
+  {"id": "q047", "query": "sweatshirts", "tier": 1, "tags": ["category"]},
+  {"id": "q048", "query": "something in ecru", "tier": 1, "tags": ["color"]},
+  {"id": "q049", "query": "I need new shoes", "tier": 1, "tags": ["category"]},
+  {"id": "q050", "query": "chocolate brown bag", "tier": 1, "tags": ["category", "color"]},
+
+  {"id": "q051", "query": "slim fit dark navy trousers", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q052", "query": "I want an oversized black coat", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q053", "query": "looking for a cropped beige cardigan", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q054", "query": "midi green skirt", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q055", "query": "wide leg cream trousers", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q056", "query": "skinny blue jeans", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q057", "query": "show me loose white shirts", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q058", "query": "I need a maxi burgundy dress", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q059", "query": "short sleeve grey t-shirt", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q060", "query": "long sleeve red top", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q061", "query": "slim khaki jeans", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q062", "query": "oversized camel jacket", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q063", "query": "cropped brown sweatshirt", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q064", "query": "mini black skirt", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q065", "query": "straight leg dark green trousers", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q066", "query": "loose fit lilac dress", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q067", "query": "I'm looking for a slim navy blue shirt", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q068", "query": "wide leg ecru trousers", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q069", "query": "oversized dark grey cardigan", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q070", "query": "skinny wine colored jeans", "tier": 2, "tags": ["category", "color", "fit"]},
+  {"id": "q071", "query": "dark red jacket around 90 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q072", "query": "I want a blue dress under 60 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q073", "query": "beige trousers no more than 50 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q074", "query": "show me black shoes under 80 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q075", "query": "cream coat, budget around 120 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q076", "query": "green cardigan max 40 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q077", "query": "I need white jeans under 55 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q078", "query": "brown bag around 45 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q079", "query": "navy blue top under 30 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q080", "query": "pink skirt, budget 35 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q081", "query": "grey sweatshirt no more than 40 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q082", "query": "camel shirt under 50 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q083", "query": "olive green dress around 70 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q084", "query": "burgundy shoes max 90 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q085", "query": "mustard jacket under 65 euros", "tier": 2, "tags": ["category", "color", "price"]},
+  {"id": "q086", "query": "slim fit dark blue jeans under 60 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q087", "query": "I want an oversized cream coat, max 130 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q088", "query": "looking for a midi black dress under 80 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q089", "query": "cropped beige cardigan around 45 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q090", "query": "wide leg grey trousers no more than 55 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q091", "query": "skinny dark green jeans under 50 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q092", "query": "loose white shirt, budget 35 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q093", "query": "maxi burgundy skirt around 70 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q094", "query": "short sleeve navy top under 25 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q095", "query": "long sleeve brown jacket max 100 euros", "tier": 2, "tags": ["category", "color", "fit", "price"]},
+  {"id": "q096", "query": "dress in black or red", "tier": 2, "tags": ["category", "color"]},
+  {"id": "q097", "query": "I want trousers in navy or grey", "tier": 2, "tags": ["category", "color"]},
+  {"id": "q098", "query": "show me coats in camel or brown", "tier": 2, "tags": ["category", "color"]},
+  {"id": "q099", "query": "jeans in dark blue or black", "tier": 2, "tags": ["category", "color"]},
+  {"id": "q100", "query": "looking for a cardigan in cream or beige", "tier": 2, "tags": ["category", "color"]},
+
+  {"id": "q101", "query": "I need something elegant for my friend's wedding, maybe a burgundy dress, nothing too tight", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q102", "query": "looking for a wedding guest outfit, preferably a midi dress in dusty pink under 100 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q103", "query": "I'm going to a wedding next month and need a green skirt, something elegant", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q104", "query": "can you help me find a cream coat for a spring wedding? budget around 130 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q105", "query": "wedding coming up, I want a maxi dress in navy blue", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q106", "query": "going out this Saturday night, I want a short black dress under 50 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q107", "query": "I need something for a party, maybe a red top, something that stands out", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q108", "query": "clubbing this weekend, looking for a silver mini skirt", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q109", "query": "party outfit, I want a mini dress in wine or burgundy", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q110", "query": "night out with friends, need skinny black jeans under 45 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q111", "query": "I need professional trousers for the office, slim fit, dark navy", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q112", "query": "looking for a work shirt in white or cream, nothing too casual", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q113", "query": "office dress, something smart in grey, midi length", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q114", "query": "I need a blazer for work, preferably in black, under 80 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q115", "query": "smart work top in beige, something I can wear with trousers", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q116", "query": "I have a gala dinner and need a long black dress, something really elegant", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q117", "query": "formal event next week, looking for a dark navy coat under 150 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q118", "query": "awards ceremony coming up, I need a maxi dress in silver or dark green", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q119", "query": "black tie event, I want something in burgundy, maybe a midi dress", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q120", "query": "just need something comfortable for weekends, maybe oversized jeans in blue", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q121", "query": "casual outfit for running errands, I want loose brown trousers under 40 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q122", "query": "everyday wear, looking for a relaxed beige cardigan", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q123", "query": "I want comfortable blue jeans for daily use, straight leg, max 50 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q124", "query": "going on a date tonight, I want a red dress, something feminine and short", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q125", "query": "date night outfit, looking for a slim black skirt", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q126", "query": "dinner date this Friday, I need an elegant green dress under 80 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q127", "query": "first date, want something pretty in pink, maybe a midi dress", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q128", "query": "I need a warm coat for winter, something in camel, not too boxy", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q129", "query": "looking for a heavy winter jacket in dark grey, oversized, under 120 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q130", "query": "cold weather coat, I want something in dark green or khaki", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q131", "query": "winter is coming and I need a long warm coat in brown, max 150 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q132", "query": "weekend brunch, I want something polished but relaxed, slim trousers in beige", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q133", "query": "smart casual dinner with friends, looking for a navy shirt", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q134", "query": "I need a smart but comfortable outfit, cream cardigan under 60 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q135", "query": "casual Friday at work, I want a nice top in ecru, nothing too formal", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q136", "query": "Christmas dinner outfit, I want something festive in dark green or burgundy", "tier": 3, "tags": ["occasion", "color"]},
+  {"id": "q137", "query": "looking for a dress for Navidad dinner, red, elegant but not over the top", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q138", "query": "family Christmas dinner, need a nice top in dark red under 50 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q139", "query": "Navidad celebration, want a midi skirt in wine", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q140", "query": "New Year's Eve outfit, I want something glamorous, a silver dress", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q141", "query": "looking for a NYE party dress, short, in black, under 70 euros", "tier": 3, "tags": ["occasion", "category", "color", "fit", "price"]},
+  {"id": "q142", "query": "Nochevieja outfit, I want a mini dress, something bold in red", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q143", "query": "ringing in the new year, need a stunning dark navy maxi dress", "tier": 3, "tags": ["occasion", "category", "color", "fit"]},
+  {"id": "q144", "query": "Halloween party outfit, I want something dark and edgy, a black dress", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q145", "query": "looking for a Halloween look, maybe a purple top, something dramatic", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q146", "query": "need something spooky for Halloween night, a dark red skirt under 40 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]},
+  {"id": "q147", "query": "going to Oktoberfest, want something in warm autumn colors, a brown or burnt orange dress", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q148", "query": "Oktoberfest outfit, I need a dress in cream or beige, something festive", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q149", "query": "beer festival coming up, looking for a fun skirt in mustard or olive green", "tier": 3, "tags": ["occasion", "category", "color"]},
+  {"id": "q150", "query": "Oktoberfest party, want a cozy cardigan in brown or camel, under 50 euros", "tier": 3, "tags": ["occasion", "category", "color", "price"]}
 ]
