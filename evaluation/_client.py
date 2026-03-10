@@ -7,6 +7,7 @@ import os
 import re
 import threading
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -57,3 +58,44 @@ def parse_json(content: str) -> dict:
     """Strip markdown fences and parse JSON; raises json.JSONDecodeError on failure."""
     cleaned = re.sub(r"```(?:json)?|```", "", content).strip()
     return json.loads(cleaned)
+
+
+def create_json_response(
+    *,
+    model: str,
+    instructions: str | None,
+    user_text: str,
+    schema_name: str,
+    schema: dict[str, Any],
+    images: list[dict[str, str]] | None = None,
+) -> dict:
+    """Call the Responses API with low-cost GPT-5 defaults and JSON Schema output."""
+    content: list[dict[str, Any]] = []
+    if user_text:
+        content.append({"type": "input_text", "text": user_text})
+    for image in images or []:
+        content.append(
+            {
+                "type": "input_image",
+                "image_url": image["url"],
+                "detail": image.get("detail", "low"),
+            }
+        )
+
+    response = client.responses.create(
+        model=model,
+        instructions=instructions,
+        input=[{"role": "user", "content": content}],
+        reasoning={"effort": "low"},
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": schema_name,
+                "schema": schema,
+                "strict": True,
+            },
+            "verbosity": "low",
+        },
+        timeout=TIMEOUT,
+    )
+    return parse_json(response.output_text)

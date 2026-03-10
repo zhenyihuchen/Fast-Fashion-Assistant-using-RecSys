@@ -12,7 +12,46 @@ from __future__ import annotations
 import json
 import traceback
 
-from evaluation._client import TEXT_MODEL, TIMEOUT, client, parse_json
+from evaluation._client import TEXT_MODEL, create_json_response
+
+PARSER_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "parser_completeness": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {"type": "integer", "minimum": 1, "maximum": 5},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        },
+        "parser_no_hallucination": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {"type": "integer", "minimum": 1, "maximum": 5},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        },
+        "parser_occasion_detection": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {"type": "integer", "minimum": 1, "maximum": 5},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        },
+    },
+    "required": [
+        "parser_completeness",
+        "parser_no_hallucination",
+        "parser_occasion_detection",
+    ],
+}
 
 PARSER_PROMPT = """\
 You are an expert evaluator for a fashion recommendation system.
@@ -118,14 +157,13 @@ def run_parser_judge(query: str, parsed: dict) -> dict:
     )
 
     try:
-        resp = client.chat.completions.create(
+        data = create_json_response(
             model=TEXT_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-            response_format={"type": "json_object"},
-            timeout=TIMEOUT,
+            instructions="You are an expert evaluator for a fashion recommendation system.",
+            user_text=prompt,
+            schema_name="parser_evaluation",
+            schema=PARSER_SCHEMA,
         )
-        data = parse_json(resp.choices[0].message.content)
         result = {}
         for rubric in ("parser_completeness", "parser_no_hallucination", "parser_occasion_detection"):
             entry = data.get(rubric, {})

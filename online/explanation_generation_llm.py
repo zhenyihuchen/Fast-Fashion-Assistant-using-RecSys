@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from pathlib import Path
 from typing import Iterable
 
@@ -17,23 +16,23 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 # GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# ── OpenAI (active) ──────────────────────────────────────────────────────────
+# ── OpenAI ───────────────────────────────────────────────────────────────────
 EXPLANATION_MODEL = os.getenv("OPENAI_EXPLANATION_MODEL", "gpt-5-nano")
 
-_zai_client = OpenAI(
+_client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
     timeout=60,
     max_retries=2,
 )
 
-# ── Z.AI (commented out) ─────────────────────────────────────────────────────
+# ── Z.AI (old, commented out) ────────────────────────────────────────────────
 # ZAI_API_KEY = os.getenv("ZAI_API_KEY")
 # # MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 # # MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 # # EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "llama-3.1-8b-instant")
 # # EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "groq/compound-mini")
 # EXPLANATION_MODEL = os.getenv("ZAI_EXPLANATION_MODEL", "glm-4.5-flash")
-# _zai_client = OpenAI(
+# _client = OpenAI(
 #     api_key=ZAI_API_KEY,
 #     base_url="https://api.z.ai/api/paas/v4/",
 #     timeout=60,
@@ -42,6 +41,26 @@ _zai_client = OpenAI(
 # ─────────────────────────────────────────────────────────────────────────────
 
 TIMEOUT_SECONDS = 60
+
+EXPLANATION_BATCH_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "items": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "row_id": {"type": "string"},
+                    "explanation": {"type": "string"},
+                },
+                "required": ["row_id", "explanation"],
+            }
+        }
+    },
+    "required": ["items"],
+}
 
 PROMPT_EMBEDDINGS_DIR = BASE_DIR / "offline" / "data" / "prompt_embeddings"
 MODEL_PROMPT_EMBEDDINGS_PATHS: dict[str, Path] = {
@@ -178,7 +197,8 @@ Style rules:
 - Explain why the item fits the occasion and the query keywords.
 - Use specific metadata (color, category, price) when available.
 
-Respond ONLY with a valid JSON object: {"<row_id>": "<explanation text>", ...}
+Respond ONLY with a valid JSON object shaped like:
+{"items": [{"row_id": "<row_id>", "explanation": "<text>"}]}
 """.strip()
 
     products_lines = []
@@ -201,7 +221,9 @@ Respond ONLY with a valid JSON object: {"<row_id>": "<explanation text>", ...}
     user = (
         "Generate one explanation per product listed below.\n\n"
         + "\n\n".join(products_lines)
-        + '\n\nReturn ONLY a JSON object mapping each row_id to its explanation string.'
+        + "\n\nReturn ONLY a JSON object with this shape: "
+          '{"items": [{"row_id": "<row_id>", "explanation": "<text>"}]}. '
+          "Include exactly one item per listed row_id."
     )
 
     return system, user
@@ -222,35 +244,38 @@ Respond ONLY with a valid JSON object: {"<row_id>": "<explanation text>", ...}
 #     )
 #     return chat.choices[0].message.content.strip()
 
-def _call_zai_batch(system: str, evidence_payload: str) -> dict[str, str]:
-    chat = _zai_client.chat.completions.create(
+def _call_llm_batch(system: str, evidence_payload: str) -> dict[str, str]:
+    response = _client.responses.create(
         model=EXPLANATION_MODEL,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": evidence_payload},
+        instructions=system,
+        input=[
+            {
+                "role": "user",
+                "content": [{"type": "input_text", "text": evidence_payload}],
+            }
         ],
-        temperature=0.2,
-        response_format={"type": "json_object"},
+        reasoning={"effort": "low"},
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "batch_explanations",
+                "schema": EXPLANATION_BATCH_SCHEMA,
+                "strict": True,
+            },
+            "verbosity": "low",
+        },
+        timeout=TIMEOUT_SECONDS,
     )
-    raw = chat.choices[0].message.content.strip()
-    # Strip markdown code fences if the model wraps the JSON anyway
-    if raw.startswith("```"):
-        raw = re.sub(r"^```(?:json)?\s*", "", raw)
-        raw = re.sub(r"\s*```$", "", raw).strip()
     try:
-        data = json.loads(raw)
+        data = json.loads(response.output_text)
     except json.JSONDecodeError:
         return {}
-    # Normalise: ensure every value is a plain string
     result: dict[str, str] = {}
-    for k, v in data.items():
-        if isinstance(v, str):
-            result[str(k)] = v.strip()
-        elif isinstance(v, dict):
-            # Model occasionally returns {"explanation": "..."} per item
-            result[str(k)] = str(v.get("explanation", v)).strip()
-        else:
-            result[str(k)] = str(v).strip()
+    for item in data.get("items", []):
+        row_id = str(item.get("row_id", "")).strip()
+        if not row_id:
+            continue
+        result[row_id] = str(item.get("explanation", "")).strip()
     return result
 
 
@@ -285,7 +310,7 @@ def generate_explanations(
         work_rows, target, query_keywords, top_prompt_matches, occasion_scores
     )
     try:
-        explanations = _call_zai_batch(system, payload)
+        explanations = _call_llm_batch(system, payload)
     except Exception as exc:
         print(f"[explanation] batch call failed: {exc}")
         explanations = {}

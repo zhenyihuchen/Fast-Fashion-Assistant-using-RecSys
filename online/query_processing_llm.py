@@ -23,19 +23,19 @@ load_dotenv(dotenv_path=ENV_PATH)
 # #MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 # MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
-# ── OpenAI (active) ──────────────────────────────────────────────────────────
+# ── OpenAI ───────────────────────────────────────────────────────────────────
 MODEL = os.getenv("OPENAI_QUERY_MODEL", "gpt-5-nano")
 
-_zai_client = OpenAI(
+_client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
     timeout=60,
     max_retries=2,
 )
 
-# ── Z.AI (commented out) ─────────────────────────────────────────────────────
+# ── Z.AI (old, commented out) ────────────────────────────────────────────────
 # ZAI_API_KEY = os.getenv("ZAI_API_KEY")
 # MODEL = os.getenv("ZAI_QUERY_MODEL", "glm-4.5-flash")
-# _zai_client = OpenAI(
+# _client = OpenAI(
 #     api_key=ZAI_API_KEY,
 #     base_url="https://api.z.ai/api/paas/v4/",
 #     timeout=60,
@@ -44,6 +44,45 @@ _zai_client = OpenAI(
 # ─────────────────────────────────────────────────────────────────────────────
 
 TIMEOUT_SECONDS = 60
+
+QUERY_PARSE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "normalized": {"type": "string"},
+        "constraints": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "categories": {"type": "array", "items": {"type": "string"}},
+                "colors": {"type": "array", "items": {"type": "string"}},
+                "price_min": {"anyOf": [{"type": "number"}, {"type": "null"}]},
+                "price_max": {"anyOf": [{"type": "number"}, {"type": "null"}]},
+                "fit": {"type": "array", "items": {"type": "string"}},
+            },
+            "required": ["categories", "colors", "price_min", "price_max", "fit"],
+        },
+        "occasion": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "mode": {"type": "string", "enum": ["on", "off"]},
+                "target": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+            },
+            "required": ["mode", "target"],
+        },
+        "confidence": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "overall": {"type": "number", "minimum": 0, "maximum": 1},
+                "occasion": {"type": "number", "minimum": 0, "maximum": 1},
+            },
+            "required": ["overall", "occasion"],
+        },
+    },
+    "required": ["normalized", "constraints", "occasion", "confidence"],
+}
 
 CATEGORY_KEYWORDS = [
     "jackets",
@@ -328,14 +367,37 @@ allowed_occasions: {", ".join(occasions)}
 #     )
 #     return {"content": chat.choices[0].message.content}
 
-def _call_zai(messages: list[dict[str, str]]) -> dict[str, Any]:
-    chat = _zai_client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=0.01,
-        response_format={"type": "json_object"},
+def _call_llm(messages: list[dict[str, str]]) -> dict[str, Any]:
+    system_message = next(
+        (message["content"] for message in messages if message["role"] == "system"),
+        "",
     )
-    return {"content": chat.choices[0].message.content}
+    user_message = next(
+        (message["content"] for message in messages if message["role"] == "user"),
+        "",
+    )
+    response = _client.responses.create(
+        model=MODEL,
+        instructions=system_message,
+        input=[
+            {
+                "role": "user",
+                "content": [{"type": "input_text", "text": user_message}],
+            }
+        ],
+        reasoning={"effort": "low"},
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "fashion_query_parse",
+                "schema": QUERY_PARSE_SCHEMA,
+                "strict": True,
+            },
+            "verbosity": "low",
+        },
+        timeout=TIMEOUT_SECONDS,
+    )
+    return {"content": response.output_text}
 
 
 def _parse_llm_json(content: str) -> dict[str, Any]:
@@ -348,7 +410,7 @@ def _parse_llm_json(content: str) -> dict[str, Any]:
 def parse_query_llm(query: str) -> dict[str, Any]:
     normalized = normalize_query(query)
     messages = _build_prompt(normalized)
-    resp = _call_zai(messages)
+    resp = _call_llm(messages)
     content = resp["content"]
     result = _parse_llm_json(content)
     result["normalized"] = normalized

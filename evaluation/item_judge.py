@@ -17,12 +17,54 @@ import traceback
 
 from evaluation._client import (
     MULTIMODAL_MODEL,
-    TIMEOUT,
-    client,
+    create_json_response,
     load_image_b64,
     multimodal_semaphore,
-    parse_json,
 )
+
+ITEM_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "item_relevance": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {"type": "integer", "minimum": 1, "maximum": 5},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        },
+        "occasion_appropriateness": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {
+                    "anyOf": [
+                        {"type": "integer", "minimum": 1, "maximum": 5},
+                        {"type": "null"},
+                    ]
+                },
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        },
+        "explanation_quality": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {"type": "integer", "minimum": 1, "maximum": 5},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        },
+    },
+    "required": [
+        "item_relevance",
+        "occasion_appropriateness",
+        "explanation_quality",
+    ],
+}
 
 ITEM_PROMPT = """\
 You are an expert evaluator for a fashion recommendation system.
@@ -160,25 +202,22 @@ def run_item_judge(query: str, product: dict, parsed: dict) -> dict:
     )
 
     # Build multimodal content: [image (if available), text]
-    content: list[dict] = []
+    images: list[dict[str, str]] = []
     b64_result = load_image_b64(product.get("local_image_path", ""))
     if b64_result:
         b64_data, media_type = b64_result
-        content.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:{media_type};base64,{b64_data}"},
-        })
-    content.append({"type": "text", "text": prompt})
+        images.append({"url": f"data:{media_type};base64,{b64_data}", "detail": "low"})
 
     try:
         with multimodal_semaphore:
-            resp = client.chat.completions.create(
+            data = create_json_response(
                 model=MULTIMODAL_MODEL,
-                messages=[{"role": "user", "content": content}],
-                response_format={"type": "json_object"},
-                timeout=TIMEOUT,
+                instructions="You are an expert evaluator for a fashion recommendation system.",
+                user_text=prompt,
+                schema_name="item_evaluation",
+                schema=ITEM_SCHEMA,
+                images=images,
             )
-        data = parse_json(resp.choices[0].message.content)
 
         result: dict = {}
         for rubric in ("item_relevance", "explanation_quality"):

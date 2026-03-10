@@ -14,12 +14,27 @@ import traceback
 
 from evaluation._client import (
     MULTIMODAL_MODEL,
-    TIMEOUT,
-    client,
+    create_json_response,
     load_image_b64,
     multimodal_semaphore,
-    parse_json,
 )
+
+SET_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "set_answer_relevance": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "score": {"type": "integer", "minimum": 1, "maximum": 5},
+                "reasoning": {"type": "string"},
+            },
+            "required": ["score", "reasoning"],
+        }
+    },
+    "required": ["set_answer_relevance"],
+}
 
 SET_PROMPT = """\
 You are an expert evaluator for a fashion recommendation system.
@@ -105,26 +120,23 @@ def run_set_judge(
     )
 
     # Build multimodal content: images first (in product order), then the prompt
-    content: list[dict] = []
+    images: list[dict[str, str]] = []
     for product in products:
         b64 = load_image_b64(product.get("local_image_path", ""))
         if b64:
             b64_data, media_type = b64
-            content.append({
-                "type": "image_url",
-                "image_url": {"url": f"data:{media_type};base64,{b64_data}"},
-            })
-    content.append({"type": "text", "text": prompt})
+            images.append({"url": f"data:{media_type};base64,{b64_data}", "detail": "low"})
 
     try:
         with multimodal_semaphore:
-            resp = client.chat.completions.create(
+            data = create_json_response(
                 model=MULTIMODAL_MODEL,
-                messages=[{"role": "user", "content": content}],
-                response_format={"type": "json_object"},
-                timeout=TIMEOUT,
+                instructions="You are an expert evaluator for a fashion recommendation system.",
+                user_text=prompt,
+                schema_name="set_evaluation",
+                schema=SET_SCHEMA,
+                images=images,
             )
-        data = parse_json(resp.choices[0].message.content)
         entry = data.get("set_answer_relevance", {})
         score = int(entry.get("score", -1))
         if not (1 <= score <= 5):

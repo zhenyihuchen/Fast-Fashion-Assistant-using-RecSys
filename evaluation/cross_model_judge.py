@@ -18,12 +18,22 @@ import traceback
 
 from evaluation._client import (
     MULTIMODAL_MODEL,
-    TIMEOUT,
-    client,
+    create_json_response,
     load_image_b64,
     multimodal_semaphore,
-    parse_json,
 )
+
+CROSS_MODEL_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "reasoning": {"type": "string"},
+        "winner": {"type": "string", "enum": ["clip", "fashion_clip", "tie"]},
+        "clip_score": {"type": "integer", "minimum": 1, "maximum": 5},
+        "fashionclip_score": {"type": "integer", "minimum": 1, "maximum": 5},
+    },
+    "required": ["reasoning", "winner", "clip_score", "fashionclip_score"],
+}
 
 CROSS_MODEL_PROMPT = """\
 You are an expert evaluator for a fashion recommendation system.
@@ -127,26 +137,23 @@ def run_cross_model_judge(
     )
 
     # Build multimodal content: CLIP images first (1-5), then FashionCLIP (6-10)
-    content: list[dict] = []
+    images: list[dict[str, str]] = []
     for product in clip_products + fc_products:
         b64 = load_image_b64(product.get("local_image_path", ""))
         if b64:
             b64_data, media_type = b64
-            content.append({
-                "type": "image_url",
-                "image_url": {"url": f"data:{media_type};base64,{b64_data}"},
-            })
-    content.append({"type": "text", "text": prompt})
+            images.append({"url": f"data:{media_type};base64,{b64_data}", "detail": "low"})
 
     try:
         with multimodal_semaphore:
-            resp = client.chat.completions.create(
+            data = create_json_response(
                 model=MULTIMODAL_MODEL,
-                messages=[{"role": "user", "content": content}],
-                response_format={"type": "json_object"},
-                timeout=TIMEOUT,
+                instructions="You are an expert evaluator for a fashion recommendation system.",
+                user_text=prompt,
+                schema_name="cross_model_evaluation",
+                schema=CROSS_MODEL_SCHEMA,
+                images=images,
             )
-        data = parse_json(resp.choices[0].message.content)
         winner = data.get("winner", "tie")
         if winner not in {"clip", "fashion_clip", "tie"}:
             winner = "tie"
