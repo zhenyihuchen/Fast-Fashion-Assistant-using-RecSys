@@ -272,11 +272,38 @@ def aggregate_results(per_query: list[dict]) -> dict:
 
 # ── Main runner ──────────────────────────────────────────────────────────────
 
-def run(queries_path: Path, out_dir: Path, start: int = 0, end: int | None = None) -> None:
+def _load_query_ids(ids_file: Path) -> list[str]:
+    return [
+        line.strip()
+        for line in ids_file.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+
+def run(
+    queries_path: Path,
+    out_dir: Path,
+    start: int = 0,
+    end: int | None = None,
+    ids_file: Path | None = None,
+) -> None:
     all_queries = json.loads(queries_path.read_text(encoding="utf-8"))
-    queries = all_queries[start:end]
-    print(f"Running queries [{start}:{end or len(all_queries)}] "
-          f"({len(queries)} of {len(all_queries)} total)")
+    if ids_file is not None:
+        requested_ids = _load_query_ids(ids_file)
+        requested_set = set(requested_ids)
+        queries = [q for q in all_queries if q.get("id") in requested_set]
+        found_ids = {q.get("id") for q in queries}
+        missing_ids = [qid for qid in requested_ids if qid not in found_ids]
+        print(
+            f"Running {len(queries)} queries from ids file {ids_file} "
+            f"({len(requested_ids)} requested, {len(all_queries)} total available)"
+        )
+        if missing_ids:
+            print(f"Warning: {len(missing_ids)} query ids were not found: {', '.join(missing_ids)}")
+    else:
+        queries = all_queries[start:end]
+        print(f"Running queries [{start}:{end or len(all_queries)}] "
+              f"({len(queries)} of {len(all_queries)} total)")
     out_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -391,5 +418,11 @@ if __name__ == "__main__":
     parser.add_argument("--out", type=Path, default=ROOT / "evaluation" / "results")
     parser.add_argument("--start", type=int, default=0, help="Start index (inclusive) for query slice")
     parser.add_argument("--end", type=int, default=None, help="End index (exclusive) for query slice")
+    parser.add_argument(
+        "--ids-file",
+        type=Path,
+        default=None,
+        help="Path to a text file containing one query id per line; overrides --start/--end slicing",
+    )
     args = parser.parse_args()
-    run(args.queries, args.out, start=args.start, end=args.end)
+    run(args.queries, args.out, start=args.start, end=args.end, ids_file=args.ids_file)

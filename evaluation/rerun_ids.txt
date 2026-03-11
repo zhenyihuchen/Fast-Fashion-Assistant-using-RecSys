@@ -1,0 +1,33 @@
+# Queries with no recommendations from either clip or fashion_clip
+# Extracted from the 5 most recent evaluation result files in evaluation/results
+
+# eval_20260311_130851.json
+q091
+q101
+q102
+q104
+q108
+q109
+
+# eval_20260311_120738.json
+q061
+q066
+q070
+q075
+q077
+q083
+q085
+q087
+
+# eval_20260311_105429.json
+q055
+q058
+
+# eval_20260310_184034.json
+q009
+q011
+q016
+q017
+q018
+q019
+q020
