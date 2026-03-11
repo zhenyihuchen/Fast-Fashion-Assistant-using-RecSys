@@ -162,17 +162,21 @@ def _run_pipeline_sync(query: str) -> dict:
         filter_first=True,
         use_faiss=True,
         embedding_model="both",
+        return_metadata=True,
     )
 
-    if not any(candidates_by_model.values()):
+    if not any(result.get("candidates") for result in candidates_by_model.values()):
         return {"status": "no_results", "parsed": parsed_safe, "rows_by_model": {}}
 
     df = _get_catalog()
     rows_by_model: dict[str, list[dict]] = {}
 
-    for model_name, candidates in candidates_by_model.items():
+    for model_name, result in candidates_by_model.items():
+        candidates = result.get("candidates", [])
         if not candidates:
             continue
+        match_stage = result.get("match_stage", "strict")
+        match_message = result.get("match_message", "")
 
         paths = MODEL_PATHS[model_name]
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
@@ -211,6 +215,8 @@ def _run_pipeline_sync(query: str) -> dict:
                     "color": str(row.get("color", "") or ""),
                     "product_category": str(row.get("product_category", "") or ""),
                     "image_url": str(row.get("image_url", "") or ""),
+                    "match_stage": match_stage,
+                    "match_message": match_message,
                 }
             )
 
@@ -271,9 +277,10 @@ async def _stream_pipeline(query: str) -> AsyncGenerator[str, None]:
             0.7,      # image_weight
             0.3,      # text_weight
             "both",   # embedding_model
+            True,     # return_metadata
         )
 
-        if not any(candidates_by_model.values()):
+        if not any(result.get("candidates") for result in candidates_by_model.values()):
             yield _sse("results", {"parsed": parsed_safe, "rows_by_model": {}, "summary": ""})
             yield _sse("done", {})
             return
@@ -283,9 +290,12 @@ async def _stream_pipeline(query: str) -> AsyncGenerator[str, None]:
         df = await run(_get_catalog)
 
         rows_by_model: dict[str, list[dict]] = {}
-        available = [(m, c) for m, c in candidates_by_model.items() if c]
+        available = [(m, r) for m, r in candidates_by_model.items() if r.get("candidates")]
 
-        for idx, (model_name, candidates) in enumerate(available, 1):
+        for idx, (model_name, result) in enumerate(available, 1):
+            candidates = result.get("candidates", [])
+            match_stage = result.get("match_stage", "strict")
+            match_message = result.get("match_message", "")
             # Step 4: Score & rank
             yield _sse("progress", {
                 "step": 4,
@@ -326,6 +336,8 @@ async def _stream_pipeline(query: str) -> AsyncGenerator[str, None]:
                     "color": str(row.get("color", "") or ""),
                     "product_category": str(row.get("product_category", "") or ""),
                     "image_url": str(row.get("image_url", "") or ""),
+                    "match_stage": match_stage,
+                    "match_message": match_message,
                 })
 
             # Step 5: Explain

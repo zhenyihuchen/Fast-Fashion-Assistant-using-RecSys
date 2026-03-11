@@ -8,6 +8,7 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 import json
 from pathlib import Path
 import re
+from typing import Any
 
 import open_clip
 import torch  # import before numpy to avoid MKL issues
@@ -55,6 +56,12 @@ MODEL_PATHS: dict[str, dict[str, Path]] = {
 _clip_cache: tuple | None = None   # (model, tokenizer, device)
 _fclip_cache: FashionCLIP | None = None
 _fclip_loader_patched = False
+
+MATCH_STAGE_MESSAGES = {
+    "strict": "Exact or near-exact matches for your requested constraints.",
+    "relaxed_color": "No exact color matches found. Showing similar items in the requested category.",
+    "category_only": "No exact matches found. Showing similar items from the requested category.",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -162,22 +169,53 @@ def _category_to_dataset(cat: str) -> str:
     return cat.strip().upper()
 
 
-def _filter_rows(df: pd.DataFrame, parsed: dict) -> pd.DataFrame:
-    filtered = df
+def _get_constraint_values(parsed: dict) -> dict[str, Any]:
     constraints = parsed.get("constraints")
     if not constraints:
+        return {
+            "categories": [],
+            "colors": [],
+            "price_min": None,
+            "price_max": None,
+        }
+    return {
+        "categories": constraints.categories if hasattr(constraints, "categories") else constraints.get("categories", []),
+        "colors": constraints.colors if hasattr(constraints, "colors") else constraints.get("colors", []),
+        "price_min": constraints.price_min if hasattr(constraints, "price_min") else constraints.get("price_min"),
+        "price_max": constraints.price_max if hasattr(constraints, "price_max") else constraints.get("price_max"),
+    }
+
+
+def _filter_rows(
+    df: pd.DataFrame,
+    parsed: dict,
+    *,
+    use_categories: bool = True,
+    use_colors: bool = True,
+    use_price: bool = True,
+) -> pd.DataFrame:
+    filtered = df
+    constraints = _get_constraint_values(parsed)
+    if not any(
+        [
+            constraints["categories"],
+            constraints["colors"],
+            constraints["price_min"] is not None,
+            constraints["price_max"] is not None,
+        ]
+    ):
         return filtered
 
-    categories = constraints.categories if hasattr(constraints, "categories") else constraints.get("categories", [])
-    colors     = constraints.colors     if hasattr(constraints, "colors")      else constraints.get("colors", [])
-    price_min  = constraints.price_min  if hasattr(constraints, "price_min")   else constraints.get("price_min")
-    price_max  = constraints.price_max  if hasattr(constraints, "price_max")   else constraints.get("price_max")
+    categories = constraints["categories"]
+    colors = constraints["colors"]
+    price_min = constraints["price_min"]
+    price_max = constraints["price_max"]
 
-    if categories:
+    if use_categories and categories:
         mapped = {_category_to_dataset(c) for c in categories}
         filtered = filtered[filtered["product_category"].isin(mapped)]
 
-    if colors:
+    if use_colors and colors:
         color_norm = filtered["color"].astype(str).map(_normalize_color)
         color_set  = {_normalize_color(c) for c in colors}
         requested_tokens: set[str] = set()
@@ -193,7 +231,7 @@ def _filter_rows(df: pd.DataFrame, parsed: dict) -> pd.DataFrame:
         mask = color_norm.apply(_matches_color)
         filtered = filtered[mask]
 
-    if price_min is not None or price_max is not None:
+    if use_price and (price_min is not None or price_max is not None):
         prices = filtered["price"].astype(str).map(_parse_price)
         if price_min is not None:
             filtered = filtered[prices >= float(price_min)]
@@ -201,6 +239,50 @@ def _filter_rows(df: pd.DataFrame, parsed: dict) -> pd.DataFrame:
             filtered = filtered[prices <= float(price_max)]
 
     return filtered
+
+
+def _build_filter_stages(parsed: dict) -> list[tuple[str, dict[str, bool]]]:
+    constraints = _get_constraint_values(parsed)
+    has_categories = bool(constraints["categories"])
+    has_colors = bool(constraints["colors"])
+    has_price = constraints["price_min"] is not None or constraints["price_max"] is not None
+
+    stages: list[tuple[str, dict[str, bool]]] = [
+        (
+            "strict",
+            {
+                "use_categories": has_categories,
+                "use_colors": has_colors,
+                "use_price": has_price,
+            },
+        ),
+        (
+            "relaxed_color",
+            {
+                "use_categories": has_categories,
+                "use_colors": False,
+                "use_price": has_price,
+            },
+        ),
+        (
+            "category_only",
+            {
+                "use_categories": has_categories,
+                "use_colors": False,
+                "use_price": False,
+            },
+        ),
+    ]
+
+    deduped: list[tuple[str, dict[str, bool]]] = []
+    seen: set[tuple[bool, bool, bool]] = set()
+    for stage_name, flags in stages:
+        key = (flags["use_categories"], flags["use_colors"], flags["use_price"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append((stage_name, flags))
+    return deduped
 
 
 # ---------------------------------------------------------------------------
@@ -286,24 +368,27 @@ def _retrieve_for_model(
         text_emb = np.load(paths["text_embeddings"]).astype("float32", copy=False)
 
     if filter_first:
-        filtered    = _filter_rows(df, parsed)
-        allowed_ids = set(filtered["row_id"].astype(str))
-        mask        = np.array([pid in allowed_ids for pid in product_ids])
-        if not mask.any():
-            return []
-        results = _search_embeddings(q_vec, embeddings[mask], product_ids[mask], topk)
-        if use_text_embeddings and text_ids is not None and text_emb is not None:
-            results = _rerank_with_text(results, q_vec, text_ids, text_emb, image_weight, text_weight)
-        return results
+        for match_stage, stage_flags in _build_filter_stages(parsed):
+            filtered = _filter_rows(df, parsed, **stage_flags)
+            allowed_ids = set(filtered["row_id"].astype(str))
+            mask = np.array([pid in allowed_ids for pid in product_ids])
+            if not mask.any():
+                continue
+            results = _search_embeddings(q_vec, embeddings[mask], product_ids[mask], topk)
+            if use_text_embeddings and text_ids is not None and text_emb is not None:
+                results = _rerank_with_text(results, q_vec, text_ids, text_emb, image_weight, text_weight)
+            if results:
+                return results, match_stage
+        return [], "strict"
 
     # search-first, filter-after
     results = _search_embeddings(q_vec, embeddings, product_ids, topk, paths["faiss_index"])
     if use_text_embeddings and text_ids is not None and text_emb is not None:
         results = _rerank_with_text(results, q_vec, text_ids, text_emb, image_weight, text_weight)
     if not parsed:
-        return results
+        return results, "strict"
     allowed_ids = set(_filter_rows(df, parsed)["row_id"].astype(str))
-    return [(pid, score) for pid, score in results if pid in allowed_ids]
+    return [(pid, score) for pid, score in results if pid in allowed_ids], "strict"
 
 
 # ---------------------------------------------------------------------------
@@ -320,7 +405,8 @@ def retrieve_candidates(
     image_weight: float = 0.7,
     text_weight: float = 0.3,
     embedding_model: str = "both",   # "clip" | "fashion_clip" | "both"
-) -> dict[str, list[tuple[str, float]]]:
+    return_metadata: bool = False,
+) -> dict[str, Any]:
     """Return candidates for each embedding model separately.
 
     Returns ``{"clip": [...], "fashion_clip": [...]}`` (or a single-key dict
@@ -333,13 +419,21 @@ def retrieve_candidates(
         raise ValueError("embedding_model must be one of: 'clip', 'fashion_clip', 'both'")
     models_to_run = ["clip", "fashion_clip"] if embedding_model == "both" else [embedding_model]
 
-    results: dict[str, list[tuple[str, float]]] = {}
+    results: dict[str, Any] = {}
     for model_name in models_to_run:
-        results[model_name] = _retrieve_for_model(
+        candidates, match_stage = _retrieve_for_model(
             model_name, query, parsed, df,
             topk, filter_first,
             use_text_embeddings, image_weight, text_weight,
         )
+        if return_metadata:
+            results[model_name] = {
+                "candidates": candidates,
+                "match_stage": match_stage,
+                "match_message": MATCH_STAGE_MESSAGES.get(match_stage, ""),
+            }
+        else:
+            results[model_name] = candidates
     return results
 
 

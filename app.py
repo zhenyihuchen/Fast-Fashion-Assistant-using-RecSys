@@ -119,16 +119,20 @@ def _run_pipeline(query: str, topk: int = 30) -> RecoResult:
         filter_first=True,
         use_faiss=True,
         embedding_model="both",
+        return_metadata=True,
     )
-    if not any(candidates_by_model.values()):
+    if not any(result.get("candidates") for result in candidates_by_model.values()):
         return RecoResult(rows_by_model={}, parsed=parsed)
 
     df = _load_catalog()
     rows_by_model: dict[str, list[dict[str, Any]]] = {}
 
-    for model_name, candidates in candidates_by_model.items():
+    for model_name, result in candidates_by_model.items():
+        candidates = result.get("candidates", [])
         if not candidates:
             continue
+        match_stage = result.get("match_stage", "strict")
+        match_message = result.get("match_message", "")
 
         paths = MODEL_PATHS[model_name]
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
@@ -163,6 +167,8 @@ def _run_pipeline(query: str, topk: int = 30) -> RecoResult:
                     "color": row.get("color", ""),
                     "product_category": row.get("product_category", ""),
                     "image_url": row.get("image_url", ""),
+                    "match_stage": match_stage,
+                    "match_message": match_message,
                 }
             )
 
@@ -209,9 +215,10 @@ def _run_pipeline_with_progress(
         filter_first=True,
         use_faiss=True,
         embedding_model="both",
+        return_metadata=True,
     )
 
-    if not any(candidates_by_model.values()):
+    if not any(result.get("candidates") for result in candidates_by_model.values()):
         update(6, total_steps, "6/6 Done (no candidates found).")
         progress.empty()
         status.empty()
@@ -221,10 +228,12 @@ def _run_pipeline_with_progress(
     df = _load_catalog()
 
     rows_by_model: dict[str, list[dict[str, Any]]] = {}
-    available_models = [m for m, c in candidates_by_model.items() if c]
-    for idx, model_name in enumerate(available_models, start=1):
+    available_models = [(m, r) for m, r in candidates_by_model.items() if r.get("candidates")]
+    for idx, (model_name, result) in enumerate(available_models, start=1):
         update(4, total_steps, f"4/6 Scoring and ranking {model_name} ({idx}/{len(available_models)})...")
-        candidates = candidates_by_model[model_name]
+        candidates = result.get("candidates", [])
+        match_stage = result.get("match_stage", "strict")
+        match_message = result.get("match_message", "")
         paths = MODEL_PATHS[model_name]
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
         embeddings = np.load(paths["image_embeddings"]).astype("float32", copy=False)
@@ -258,6 +267,8 @@ def _run_pipeline_with_progress(
                     "color": row.get("color", ""),
                     "product_category": row.get("product_category", ""),
                     "image_url": row.get("image_url", ""),
+                    "match_stage": match_stage,
+                    "match_message": match_message,
                 }
             )
 
@@ -290,6 +301,11 @@ def _occasion_missing(parsed: dict[str, Any]) -> bool:
 def _render_recs_by_model(recs_by_model: dict[str, list[dict[str, Any]]]) -> None:
     for model_name, recs in recs_by_model.items():
         st.markdown(f"### {model_name.upper()} recommendations")
+        if recs:
+            match_stage = recs[0].get("match_stage", "strict")
+            match_message = recs[0].get("match_message", "")
+            if match_stage != "strict" and match_message:
+                st.info(match_message)
         for row in recs:
             st.markdown(f"**{row.get('product_name', '')}**")
             image_url = row.get("image_url", "")

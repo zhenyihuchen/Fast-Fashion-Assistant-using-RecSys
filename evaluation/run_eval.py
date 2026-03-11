@@ -14,7 +14,7 @@ For each query in the test set the script:
 (done) python -m evaluation.run_eval --start 0 --end 30     # day 1 (queries 0-29)
 (done) python -m evaluation.run_eval --start 30 --end 60    # day 2
 (done) python -m evaluation.run_eval --start 60 --end 90    # day 3
-python -m evaluation.run_eval --start 90 --end 120   # day 4
+(done) python -m evaluation.run_eval --start 90 --end 120   # day 4
 python -m evaluation.run_eval --start 120 --end 150  # day 5
 
 """
@@ -113,16 +113,20 @@ def run_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
         filter_first=True,
         use_faiss=True,
         embedding_model="both",
+        return_metadata=True,
     )
-    if not any(candidates_by_model.values()):
+    if not any(result.get("candidates") for result in candidates_by_model.values()):
         return parsed, {}
 
     df = _get_catalog()
     rows_by_model: dict[str, list[dict]] = {}
 
-    for model_name, candidates in candidates_by_model.items():
+    for model_name, result in candidates_by_model.items():
+        candidates = result.get("candidates", [])
         if not candidates:
             continue
+        match_stage = result.get("match_stage", "strict")
+        match_message = result.get("match_message", "")
 
         paths = MODEL_PATHS[model_name]
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
@@ -163,6 +167,8 @@ def run_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
                 "local_image_path": str(
                     IMAGES_DIR / (str(row.get("reference_number", "") or "").replace("/", "_") + ".jpg")
                 ),
+                "match_stage": match_stage,
+                "match_message": match_message,
             })
 
         explanations = generate_explanations(

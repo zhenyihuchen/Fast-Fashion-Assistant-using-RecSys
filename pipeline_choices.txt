@@ -348,3 +348,7 @@ EVALUATION of LLMaaJ
 # TO-DO: review the rubrics for the evaluator!
 # TO-DO: review the test cases
 # TO-DO: content and random recsys 
+
+
+
+soft filters to avoid 0 rows dataset

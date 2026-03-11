@@ -1,0 +1,584 @@
+{
+  "run_timestamp": "20260311_154048",
+  "queries_file": "/Users/fani/Fast-Fashion-Assistant-using-RecSys/evaluation/test_queries.json",
+  "total_queries": 1,
+  "aggregate": {
+    "clip": {
+      "item_relevance": {
+        "mean": 3.4,
+        "std": 0.8944,
+        "n": 5
+      },
+      "occasion_appropriateness": {
+        "mean": 4.4,
+        "std": 0.5477,
+        "n": 5
+      },
+      "explanation_quality": {
+        "mean": 2.8,
+        "std": 0.8367,
+        "n": 5
+      },
+      "set_answer_relevance": {
+        "mean": 3,
+        "std": null,
+        "n": 1
+      }
+    },
+    "fashion_clip": {
+      "item_relevance": {
+        "mean": 3,
+        "std": 1.2247,
+        "n": 5
+      },
+      "occasion_appropriateness": {
+        "mean": 4.2,
+        "std": 0.4472,
+        "n": 5
+      },
+      "explanation_quality": {
+        "mean": 3.2,
+        "std": 0.4472,
+        "n": 5
+      },
+      "set_answer_relevance": {
+        "mean": 2,
+        "std": null,
+        "n": 1
+      }
+    },
+    "random": {
+      "item_relevance": {
+        "mean": 1,
+        "std": 0.0,
+        "n": 5
+      },
+      "occasion_appropriateness": {
+        "mean": 2.6,
+        "std": 1.1402,
+        "n": 5
+      },
+      "explanation_quality": {
+        "mean": 1,
+        "std": 0.0,
+        "n": 5
+      },
+      "set_answer_relevance": {
+        "mean": 1,
+        "std": null,
+        "n": 1
+      }
+    },
+    "parser": {
+      "parser_completeness": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      },
+      "parser_no_hallucination": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      },
+      "parser_occasion_detection": {
+        "mean": 5,
+        "std": null,
+        "n": 1
+      }
+    },
+    "cross_model": {
+      "clip_wins": 1,
+      "fashionclip_wins": 0,
+      "ties": 0,
+      "total": 1
+    }
+  },
+  "per_query": [
+    {
+      "id": "q109",
+      "query": "party outfit, I want a mini dress in wine or burgundy",
+      "tier": 3,
+      "tags": [
+        "occasion",
+        "category",
+        "color",
+        "fit"
+      ],
+      "parsed": {
+        "normalized": "party outfit, i want a mini dress in wine or burgundy",
+        "constraints": {
+          "categories": [
+            "dresses"
+          ],
+          "colors": [
+            "wine",
+            "burgundy"
+          ],
+          "price_min": null,
+          "price_max": null,
+          "fit": [
+            "mini"
+          ]
+        },
+        "occasion": {
+          "mode": "on",
+          "target": "party_night_out"
+        },
+        "confidence": {
+          "overall": 0.8,
+          "occasion": 0.8
+        }
+      },
+      "rows_by_model": {
+        "clip": [
+          {
+            "product_name": "SHORT CHECK DRESS WITH LACE",
+            "product_category": "DRESSES",
+            "color": "089",
+            "price": "29.95 EUR",
+            "explanation": "SHORT CHECK DRESS WITH LACE in DRESSES is offered in color 089 and priced at 29.95 EUR. It suits a party night out, aligning with after-dark dressiness and the mini, wine, burgundy vibe from the query keywords.",
+            "image_url": "https://static.zara.net/assets/public/0983/8da5/6f554ff6aaa6/e2d5e98b8c0c/02180314089-e1/02180314089-e1.jpg?ts=1768900593984&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-check-dress-with-lace-p02180314.html",
+            "final_score": 0.17583890855312345,
+            "relevance_score": 0.2712288200855255,
+            "occasion_score": 0.032754041254520416
+          },
+          {
+            "product_name": "SHORT DRESS WITH CONTRAST LACE",
+            "product_category": "DRESSES",
+            "color": "758",
+            "price": "35.95 EUR",
+            "explanation": "SHORT DRESS WITH CONTRAST LACE in DRESSES is available in color 758 for 35.95 EUR. For a party night out, its after-dark dressiness fits the bold, club-oriented confidence described in the top prompt, matching the dresses, wine, burgundy, mini keywords.",
+            "image_url": "https://static.zara.net/assets/public/0a9b/e106/fa10476cac7b/bb560bee1a7b/07200305758-e1/07200305758-e1.jpg?ts=1768900419735&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-contrast-lace-p07200305.html",
+            "final_score": 0.17412900775671003,
+            "relevance_score": 0.2682224214076996,
+            "occasion_score": 0.032988887280225754
+          },
+          {
+            "product_name": "SHORT BALLOON DRESS",
+            "product_category": "DRESSES",
+            "color": "AUBERGINE",
+            "price": "39.95 EUR",
+            "explanation": "SHORT BALLOON DRESS in DRESSES comes in color AUBERGINE and costs 39.95 EUR. It matches the party night out occasion with after-dark dressiness suitable for dresses, wine and burgundy mini styling.",
+            "image_url": "https://static.zara.net/assets/public/3df6/23e2/25044fd580a9/6798f91eebd4/02268541610-e1/02268541610-e1.jpg?ts=1768305387155&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-balloon-dress-p02268541.html",
+            "final_score": 0.1738054260611534,
+            "relevance_score": 0.2673856317996979,
+            "occasion_score": 0.033435117453336716
+          },
+          {
+            "product_name": "LEATHER-EFFECT JUMPSUIT DRESS WITH PUFF SLEEVES",
+            "product_category": "DRESSES",
+            "color": "DARK BROWN",
+            "price": "35.95 EUR",
+            "explanation": "LEATHER-EFFECT JUMPSUIT DRESS WITH PUFF SLEEVES in DRESSES is DARK BROWN and 35.95 EUR. For a party night out, its sequins, coated jersey, leather and metallic knits with visual impact align with the top-occasion vibe and mini keywords.",
+            "image_url": "https://static.zara.net/assets/public/c266/d1d4/ce5544b8b864/bd6782df2df3/04772309716-e1/04772309716-e1.jpg?ts=1767863825948&w=4800",
+            "product_url": "https://www.zara.com/es/en/leather-effect-jumpsuit-dress-with-puffball-skirt-p04772309.html",
+            "final_score": 0.17071086168289182,
+            "relevance_score": 0.262077271938324,
+            "occasion_score": 0.03366124629974365
+          },
+          {
+            "product_name": "SHORT POLYAMIDE BLEND DRESS",
+            "product_category": "DRESSES",
+            "color": "BLACK",
+            "price": "29.95 EUR",
+            "explanation": "SHORT POLYAMIDE BLEND DRESS in DRESSES is BLACK and priced at 29.95 EUR. On party night out, its after-dark dressiness fits the wine, burgundy, mini theme from the query keywords.",
+            "image_url": "https://static.zara.net/assets/public/f176/06a6/49354d64b5f3/1d680f32bc18/01355015800-e1/01355015800-e1.jpg?ts=1768466232205&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-polyamide-blend-dress-p01355015.html",
+            "final_score": 0.16861818581819532,
+            "relevance_score": 0.2587820887565613,
+            "occasion_score": 0.03337233141064644
+          }
+        ],
+        "fashion_clip": [
+          {
+            "product_name": "SHORT BALLOON DRESS",
+            "product_category": "DRESSES",
+            "color": "AUBERGINE",
+            "price": "39.95 EUR",
+            "explanation": "The SHORT BALLOON DRESS in AUBERGINE comes from DRESSES. Its party_night_out target aligns with an after-dark vibe, and the mini silhouette fits the dresses, wine, burgundy, mini keywords.",
+            "image_url": "https://static.zara.net/assets/public/3df6/23e2/25044fd580a9/6798f91eebd4/02268541610-e1/02268541610-e1.jpg?ts=1768305387155&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-balloon-dress-p02268541.html",
+            "final_score": 0.19957126080989837,
+            "relevance_score": 0.31051167845726013,
+            "occasion_score": 0.03316063433885574
+          },
+          {
+            "product_name": "SHORT DRESS WITH PLEATS AND POCKETS",
+            "product_category": "DRESSES",
+            "color": "DARK MINK",
+            "price": "35.95 EUR",
+            "explanation": "The SHORT DRESS WITH PLEATS AND POCKETS in DARK MINK is a DRESSES option. It targets party_night_out, and the after-dark energy supports a bold, club-ready look with a practical touch.",
+            "image_url": "https://static.zara.net/assets/public/0ec6/8a96/583943f38df2/e65b3ba73a60/03067322742-e1/03067322742-e1.jpg?ts=1764586468033&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-pleats-and-pockets-p03067322.html",
+            "final_score": 0.1874849572777748,
+            "relevance_score": 0.2905227243900299,
+            "occasion_score": 0.032928306609392166
+          },
+          {
+            "product_name": "LEATHER-EFFECT JUMPSUIT DRESS WITH PUFF SLEEVES",
+            "product_category": "DRESSES",
+            "color": "DARK BROWN",
+            "price": "35.95 EUR",
+            "explanation": "LEATHER-EFFECT JUMPSUIT DRESS WITH PUFF SLEEVES in DARK BROWN falls under DRESSES. Its party_night_out focus and the prompt about visual impact guide a bold, evening ensemble.",
+            "image_url": "https://static.zara.net/assets/public/c266/d1d4/ce5544b8b864/bd6782df2df3/04772309716-e1/04772309716-e1.jpg?ts=1767863825948&w=4800",
+            "product_url": "https://www.zara.com/es/en/leather-effect-jumpsuit-dress-with-puffball-skirt-p04772309.html",
+            "final_score": 0.1703631803393364,
+            "relevance_score": 0.26144808530807495,
+            "occasion_score": 0.03373582288622856
+          },
+          {
+            "product_name": "DRAPED VELVET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "DARK BROWN",
+            "price": "29.95 EUR",
+            "explanation": "DRAPED VELVET MIDI DRESS in DARK BROWN is a DRESSES piece. The party_night_out aim and after-dark energy support a rich, evening-ready option.",
+            "image_url": "https://static.zara.net/assets/public/e238/09ce/b6fa461a9428/9c68b2750fd5/09801242716-e1/09801242716-e1.jpg?ts=1765294582699&w=4800",
+            "product_url": "https://www.zara.com/es/en/draped-velvet-midi-dress-p09801242.html",
+            "final_score": 0.1647578403353691,
+            "relevance_score": 0.25194990634918213,
+            "occasion_score": 0.03396974131464958
+          },
+          {
+            "product_name": "LACE MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "59.95 EUR",
+            "explanation": "LACE MIDI DRESS in BROWN belongs to DRESSES. With party_night_out and a prompt about visual impact, it suits a refined yet striking evening look.",
+            "image_url": "https://static.zara.net/assets/public/1809/b754/c539440ca9fd/e5e1f9828c61/01067101700-e1/01067101700-e1.jpg?ts=1764837925189&w=4800",
+            "product_url": "https://www.zara.com/es/en/lace-midi-dress-p01067101.html",
+            "final_score": 0.15944566279649736,
+            "relevance_score": 0.24304842948913574,
+            "occasion_score": 0.03404151275753975
+          }
+        ],
+        "random": [
+          {
+            "product_name": "QUILTED COMBINED WATER-RESISTANT WINDPROOF RECCO® TECHNOLOGY SKI COLLECTION JUMPSUIT",
+            "product_category": "TROUSERS",
+            "color": "ECRU",
+            "price": "189.00 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/53f2/d217/3b44411f8bfd/ed5c47d10744/08073051712-e1/08073051712-e1.jpg?ts=1764780300170&w=4800",
+            "product_url": "https://www.zara.com/es/en/water-resistant-windproof-combined-quilted-overall-recco--technology-ski-collection-p08073051.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "ZW COLLECTION LIMITED EDITION TOPSTITCHING TROUSERS",
+            "product_category": "TROUSERS",
+            "color": "BLACK",
+            "price": "59.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/2b15/c4a9/91794272b656/ebf23fdc947d/02178461800-e1/02178461800-e1.jpg?ts=1769083162534&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-limited-edition-topstitch-trousers-p02178461.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "ZW COLLECTION WIDE-LEG TROUSERS WITH PLEATS",
+            "product_category": "TROUSERS",
+            "color": "BROWN",
+            "price": "39.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/6ff7/31d1/96d84ccdaeba/522f7687546e/05247041700-000-e1/05247041700-000-e1.jpg?ts=1764159957892&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-wide-leg-trousers-with-pleats-p08490666.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "CROPPED HOODIE",
+            "product_category": "SWEATSHIRTS",
+            "color": "CHALK PINK",
+            "price": "25.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/d945/1f12/436749a585f7/91761eda5e6b/03199303626-e1/03199303626-e1.jpg?ts=1768213167605&w=4800",
+            "product_url": "https://www.zara.com/es/en/cropped-hoodie-p03199303.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "ZW COLLECTION LIMITED EDITION 100% LEATHER SKIRT",
+            "product_category": "SKIRTS",
+            "color": "BLACK",
+            "price": "139.00 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/12ba/6dba/a33440ccb699/f429cdcf15ed/01758108800-e1/01758108800-e1.jpg?ts=1762430723874&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-limited-edition-100-leather-skirt-p01758108.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          }
+        ]
+      },
+      "eval": {
+        "parser": {
+          "parser_completeness": {
+            "score": 5,
+            "reasoning": "Step 1: Query mentions occasion 'party', item 'mini dress', colors 'wine' or 'burgundy', no price. Step 2: Parsed output includes categories 'dresses', fit 'mini', colors ['wine','burgundy'], no price_min/price_max. Step 3: All explicit constraints from the query are present. Step 4: No stated constraint was missed."
+          },
+          "parser_no_hallucination": {
+            "score": 5,
+            "reasoning": "Step 1: Parsed fields are categories, colors, fit, and occasion. Step 2: Each extracted constraint (dresses, mini, wine, burgundy, party) is explicitly in the query. Step 3: No additional or invented constraints appear in the parsed output."
+          },
+          "parser_occasion_detection": {
+            "score": 5,
+            "reasoning": "Step 1: Query explicitly mentions 'party'. Step 2: Parsed occasion_mode is 'on' and occasion_target 'party_night_out' correctly maps the mentioned occasion. Step 3: Mode and label appropriately reflect the query."
+          }
+        },
+        "cross_model": {
+          "winner": "clip",
+          "clip_score": 3,
+          "fashionclip_score": 2,
+          "reasoning": "Step 1: User wants a party/night-out mini dress in wine/burgundy. Hard constraints: category = dresses, fit = mini, color = wine/burgundy, occasion = party_night_out. Step 2 (Set A - CLIP): Items include two lace slip-style minis (beige/pink tones), one SHORT BALLOON DRESS labeled AUBERGINE (image 3 is a short burgundy/wine mini), a dark brown leather-effect mini and a black short polyamide mini. Visuals: image 3 clearly matches color (aubergine/burgundy), images 4 and 5 are minis but wrong color; images 1 and 2 are light/neutral and less on-target colorwise. Overall A has 1 excellent match (aubergine mini), plus a couple of correct silhouettes but wrong colors. Step 3 (Set B - FashionCLIP): Items include the same SHORT BALLOON DRESS AUBERGINE (good), a DARK MINK short, the DARK BROWN leather-effect, and three midis/long (velvet midi, lace midi/long). Visuals: only one clear burgundy/wine mini; several items are midi/long or brown tones not matching requested color/mini constraint. Step 4 (Relevance to constraints): CLIP set has more mini silhouettes overall and one strong color match; FashionCLIP repeats the aubergine mini but contains more midis/longs and browns that violate the color/fit constraints. Step 5 (Occasion appropriateness): Both sets include party-ready styles, but CLIP offers more short/club-ready minis. Step 6 (Visual diversity): CLIP is more varied in fabrics and minis (lace, leather-effect, balloon mini), giving the user more mini options; FashionCLIP is heavier on midis/longs and less useful. Step 7 (Overall intent): CLIP better reflects the explicit intent (mini + burgundy) because it contains the aubergine mini plus additional mini silhouettes even if some colors are off. Step 8 (Scores): CLIP = 3 (average — contains a clear aubergine mini and multiple minis though some colors miss the wine/burgundy constraint). FashionCLIP = 2 (below average — only one strong match and several midis/longs or off-color pieces). Step 9 (Winner): CLIP wins: better matching mini silhouettes and one clear burgundy/aubergine option."
+        },
+        "clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: User wants a mini dress in wine/burgundy. Step2: Product category is DRESSES — matches. Step3: Color metadata is only \"089\" (not explicit); image shows a beige/cream base with red/burgundy check lines — partial color match but not a solid wine/burgundy item. Step4: Name \"SHORT CHECK DRESS\" and image show a short/mini silhouette with thin straps — fit largely matches. Step5: No price constraints. Step6: Semantic alignment is partial: category and mini fit match, color only partially matches (patterned with burgundy lines rather than a wine dress). Overall: partially relevant."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step1: Metadata: name, category, color code '089', price 29.95 EUR, no description. Step2: Query and occasion present. Step3: Generated explanation claims color '089' and price — those are factual. Step4: It also claims the dress \"suits a party night out\" and that it aligns with the \"mini, wine, burgundy vibe\" — \"mini\" is reasonable inference from name but not explicitly stated in metadata; color claims of wine/burgundy are not supported by metadata (only code) and the image shows a beige base with burgundy checks (so claiming a wine/burgundy solid is a mild overstatement). Step5: Explanation is somewhat specific (name, color code, price) but includes unstated/overstated color attributes and subjective suitability. Step6: Useful but contains minor unsupported color inference; penalised accordingly."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target is party_night_out. Step2: Expected style: flirty, short, dressy or smart-casual for a night out. Step3: The dress is short with a fitted bodice and playful handkerchief hem — visually appropriate for a party/night out in many casual-to-smart settings. Step4: The checked pattern and lighter base make it slightly more casual than a formal club dress, but it would still be suitable for many night-out occasions. Step5: Metadata (short dress) supports this. Step6: A person could realistically wear this to a party night out. Step7: Appropriate with minor style/casualty caveat."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a mini dress in wine/burgundy. Step 2: Product category is DRESSES — matches. Step 3: Metadata color is '758' and the image shows a pale pink/neutral dress with dark lace — does not match wine/burgundy. Step 4: The product appears to be a short/mini style (name: SHORT DRESS) — matches fit. Step 5: No price constraints were specified. Step 6: Overall semantic alignment: category and fit align but color constraint is not met. Step 7: Score 3 because it matches some constraints (category, mini) but misses the key color requirement."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata shows name, category, color '758', price 35.95 EUR, no description. Step 2: Query requests mini dress in wine/burgundy for party. Step 3: Explanation states name, category, color 758, price — these are grounded in metadata. Step 4: The explanation then claims the dress \"fits the bold, club-oriented confidence\" and that it \"matches the dresses, wine, burgundy, mini keywords.\" The claim that it matches wine/burgundy is not supported by metadata or the image (color differs) — hallucinated. Step 5: Explanation is partly specific (price, color code) but includes a generic/style claim and an incorrect color match. Step 6: It connects to the occasion but does so with one unsupported color assertion. Step 7: Penalize the hallucinated color match; overall score 3 for mostly grounded content with a notable issue."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present: party_night_out. Step 2: Occasion implies a dressy, club/after-dark aesthetic. Step 3: Expected: short, stylish, possibly lace or bold details. Step 4: Image shows a short, lace-trimmed slip-style dress with a flared hem — visually dressy and suitable for nightlife. Step 5: Metadata (SHORT DRESS WITH CONTRAST LACE) supports the visual read. Step 6: A person attending a party/night out could realistically wear this item, though the muted color is less bold than wine/burgundy. Step 7: Score 4 — appropriate for the occasion with minor aesthetic caveat."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: User requested a mini dress in wine/burgundy. Step 2: Product category is DRESSES — matches. Step 3: Product color is AUBERGINE, which semantically aligns with wine/burgundy. Step 4: Image and name (SHORT BALLOON DRESS) show a short/mini silhouette. Step 5: No price constraints were given; price is present. Step 6: Overall semantic alignment is strong between query intent and product metadata/image. Step 7: Assigned 5 (highly relevant)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata contains name, category, color, price; description empty. Step 2: Query and occasion present. Step 3: Generated explanation repeats name, category, color, price — all present in metadata (grounded). Step 4: The claim that it \"matches the party night out occasion\" is a reasonable subjective judgment supported by image/metadata. Step 5: The explanation is somewhat generic and adds phrasing like \"after-dark dressiness\" and \"mini styling\"; mini fit is visible in the image but not stated in metadata. Step 6: It connects product to the user's query/occasion but lacks detail (fabric, fit specifics). Step 7: Minor overreach on fit wording but mostly grounded — assigned 4."
+              },
+              "occasion_appropriateness": {
+                "score": 5,
+                "reasoning": "Step 1: occasion_target is party_night_out. Step 2: Occasion identified as a night-out/party. Step 3: Expected style is dressy, short, and fashionable. Step 4: Image shows a short, structured balloon-hem dress in a dark wine tone appropriate for evening. Step 5: Metadata (SHORT BALLOON DRESS, AUBERGINE) supports evening styling. Step 6: A person attending a party/night out would realistically wear this item. Step 7: Assigned 5 (clearly and well suited)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: User wants a mini dress in wine/burgundy. Step2: Product category = DRESSES — matches. Step3: Product color = DARK BROWN — does not match requested wine/burgundy. Step4: Fit: image shows a short/mini silhouette (bubble hem) so fit matches. Step5: No price constraints. Step6: Name includes 'JUMPSUIT DRESS' but metadata/category is DRESSES and image is a dress; overall partially aligned. Step7: Conclusion: partially relevant — matches category and fit but misses color."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step1: Metadata available: name, category, color, price. Step2: Query and occasion noted. Step3: Generated explanation repeats name, category, color, price correctly. Step4: Explanation then claims features — 'sequins, coated jersey, metallic knits' — none of these attributes appear in the metadata or are visible in the image (hallucinations). Step5: The explanation attempts to connect to the occasion and 'mini' keyword but 'mini' is not in metadata; the connection is weak. Step6: Multiple hallucinated material/texture claims and some unsupported assertions reduce usefulness. Step7: Conclusion: multiple issues/hallucinations so low groundedness."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target present = party_night_out. Step2: Occasion = party/night out. Step3: Typical styles = night-out mini dresses, statement textures, slightly dressy/edgy. Step4: Image shows a leather-effect, sleeveless, short dress with a bubble hem — edgy and dressy. Step5: Metadata (leather-effect name, dark brown color) supports a night-out aesthetic. Step6: A person could realistically wear this to a party/night out. Step7: Conclusion: appropriate for the occasion, though not necessarily exemplary (color/style may not suit all party looks)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: User requested a mini dress in wine/burgundy. Step 2: Product category is DRESSES — matches. Step 3: Product color is BLACK — does not match the requested wine/burgundy. Step 4: Metadata name 'SHORT POLYAMIDE BLEND DRESS' and the image show a short/mini silhouette — matches fit. Step 5: No price constraints to check. Step 6: Overall semantic alignment: matches category and mini fit but fails the explicit color constraint. Step 7: Assigned score 3 (partially relevant — matches some constraints but misses the key color)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name, category, color=BLACK, price. Step 2: Query asks for wine/burgundy mini for party. Step 3: Generated explanation correctly states name, category, color, and price. Step 4: It then claims the item “fits the wine, burgundy, mini theme” — that links the product to requested colors despite metadata showing BLACK (hallucination/incorrect inference). Step 5: Explanation is partly specific (mentions price, color) but also makes an unsupported color-based claim. Step 6: It attempts to connect to the user’s occasion/query but does so inaccurately. Step 7: Penalize for the hallucinated/color-mismatch claim. Assigned score 2 (multiple issues: partly grounded but contains a key incorrect claim)."
+              },
+              "occasion_appropriateness": {
+                "score": 5,
+                "reasoning": "Step 1: occasion_target present: party_night_out. Step 2: Occasion is a night-out/party. Step 3: Expected styles: short, dressy, evening-appropriate. Step 4: Image shows a short, form-fitting, strap dress in a dark color with structured cups — visually evening/party appropriate. Step 5: Metadata (short dress, price) aligns with a casual party piece. Step 6: A person attending a night-out would realistically wear this item. Step 7: Score 5 — clearly and suitably appropriate for a party night out."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 3,
+              "reasoning": "Step 1: Intent — user wants a mini dress for a party/night out in wine/burgundy. Step 2: Products reviewed — all five are short/mini dresses (suitable silhouette for party). Visually: #1 beige checked slip, #2 blush with brown lace, #3 aubergine (burgundy) short balloon dress, #4 dark brown leather-effect mini, #5 black fitted mini with bustier top. Step 3: Coverage — the set provides party-appropriate minis and a reasonable price range, but only one item (#3, labeled AUBERGINE) directly matches the requested wine/burgundy color. Step 4: Visual diversity — good variety in fabrics and styles (checked, lace-trim, structured burgundy, leather-effect, black bustier) so stylistically diverse. Step 5: Coherence with occasion — overall coherent for a night out; most items read as partywear. Step 6: Omissions — user specifically requested wine/burgundy options; the set lacks multiple color matches (only one burgundy option). Step 7: Synthesis — majority of items are mini party dresses and visually appropriate, but the key color requirement (wine/burgundy) is underrepresented. Therefore the set moderately addresses the intent but has a notable gap."
+            }
+          }
+        },
+        "fashion_clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 5,
+                "reasoning": "Step 1: Query requests a mini dress in wine/burgundy. Step 2: Product category is DRESSES — matches. Step 3: Product color is AUBERGINE, visually a deep wine/burgundy tone — aligns with requested colors. Step 4: Image and name (SHORT BALLOON DRESS) indicate a short/mini silhouette — matches fit. Step 5: No price constraints. Step 6: Semantic intent (party mini dress in wine/burgundy) aligns with product name, color and image. Conclusion: highly relevant."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name SHORT BALLOON DRESS, category DRESSES, color AUBERGINE, price 39.95 EUR. Step 2: Query & occasion present. Step 3: Explanation cites name, color, category and links to party/night and mini keywords. Step 4: Claims that it targets party_night_out and has a mini silhouette are reasonable but 'party_night_out target' is not an explicit metadata field and 'mini' is not stated in metadata (inferred from image/name) — minor hallucination/inference. Step 5: Explanation is somewhat specific (mentions color, name, silhouette) but uses generic phrasing like \"after-dark vibe.\" Step 6: It connects product to query/occasion but relies on inference rather than explicit metadata for fit and occasion. Conclusion: mostly grounded and somewhat useful with minor issues."
+              },
+              "occasion_appropriateness": {
+                "score": 5,
+                "reasoning": "Step 1: occasion_target is party_night_out. Step 2: Occasion expects a stylish, short, evening-appropriate dress. Step 3: Visual assessment — the dress is short, structured with a playful balloon skirt and rich dark color suitable for evening. Step 4: Metadata (category DRESSES, color AUBERGINE) supports evening wear. Step 5: A person attending a party/night out would realistically wear this item. Conclusion: clearly and well suited for the occasion."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: User wants a mini dress in wine/burgundy. Step2: Product category is DRESSES — matches. Step3: Requested colors are wine/burgundy but product color is DARK MINK (brown) — color mismatch. Step4: Name is SHORT DRESS, image shows a short/mini silhouette — fit matches. Step5: No price constraints. Step6: Overall semantic alignment: fits category and fit but fails the requested color. Step7: Score 3 (partially relevant — matches category and fit but misses the key color constraint)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step1: Metadata: name = SHORT DRESS WITH PLEATS AND POCKETS; category = DRESSES; color = DARK MINK; price present; description empty. Step2: User query and occasion noted. Step3: Explanation text: \"The SHORT DRESS WITH PLEATS AND POCKETS in DARK MINK is a DRESSES option. It targets party_night_out, and the after-dark energy supports a bold, club-ready look with a practical touch.\" Step4: Verifiable claims: name, color, category and pockets are grounded in metadata. Step5: Unverified/hallucinated claims: targeting the occasion is not stated in metadata; \"after-dark energy\" and \"club-ready\" are subjective inferences. Step6: Explanation mentions concrete attributes (name, color, pockets) but also adds ungrounded promotional language. Step7: Penalize the hallucinated occasion-target claim and some generic phrasing. Score 3 (mostly grounded with one or two issues)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target present (party_night_out). Step2: Occasion = night out/party. Step3: Expected: short, stylish, slightly dressy/club-appropriate. Step4: Image shows a short, fitted dress with structured sleeves and pocket details — moderately dressy and suitable for evening. Step5: Metadata (short dress, pockets) supports practicality. Step6: A person could realistically wear this for a party/night out, though the dark brown color is less flashy than burgundy. Step7: Score 4 (appropriate for the occasion with minor aesthetic caveat)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: User requested a mini dress in wine/burgundy. Step 2: Product category is DRESSES — matches. Step 3: Product color is DARK BROWN — does not match requested wine/burgundy. Step 4: Fit: product appears to be a short/mini silhouette (bubble hem) so fit likely matches 'mini'. Step 5: No price constraints to check. Step 6: Name contains 'JUMPSUIT DRESS' which introduces ambiguity (not a plain mini dress) and the leather-effect is a style mismatch from a simple mini but still a party style. Step 7: Overall — matches category and likely mini fit but fails the color constraint and has slight style/name mismatch => score 3."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name, category, color, price present. Step 2: Query and occasion noted. Step 3: Explanation states name, color, category and claims 'party_night_out focus' and 'visual impact'. Step 4: Claims that name, color, and category are correct and grounded in metadata. The statement that it has a 'party_night_out focus' is an inference not in metadata (minor hallucination). Step 5: Explanation is brief and somewhat generic — it lacks specific product attributes (length, leather-effect, puff hem) beyond the name. Step 6: It loosely connects product to the occasion but without detailed reasoning. Step 7: Conclusion: mostly grounded but short and mildly inferential => score 3."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present: party_night_out. Step 2: Occasion requires bold, evening-appropriate, somewhat dressy items. Step 3: Expected styles include short dresses, leather or faux-leather for edgy evening looks. Step 4: Image shows a short, leather-effect dress with puff/bubble hem — visually evening-ready and statement-making. Step 5: Metadata confirms dress category and dark color. Step 6: A wearer could realistically wear this to a night-out/party. Step 7: Appropriate for the occasion with strong fit and style, minor deduction for color being dark brown rather than a more vivid party color => score 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User asked for a mini dress in wine/burgundy. Step 2: Product category = DRESSES — matches category. Step 3: Product color = DARK BROWN — does not match requested wine/burgundy. Step 4: Product fit = MIDI (name and image show midi/long length) — does not match requested mini. Step 5: No price constraints to check. Step 6: Overall semantic alignment fails on the two key constraints (color and fit). Step 7: Only one constraint matched (category) → score 2."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name = DRAPED VELVET MIDI DRESS, category = DRESSES, color = DARK BROWN, price present. Step 2: Query and occasion known. Step 3: Generated explanation statements: identifies name, color, category and links to party_night_out. Step 4: Claims are grounded in metadata (no hallucinations). Step 5: Explanation is brief and generic — few concrete attributes beyond repeating metadata. Step 6: It connects to the occasion only at a high level without specific justification (e.g., fabric or silhouette details). Step 7: No false claims but limited usefulness → score 3."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present = party_night_out. Step 2: Occasion = evening party/night out. Step 3: Expected styles = evening-ready, richer fabrics, dressy silhouettes. Step 4: Image shows velvet fabric, deep V, ruched bodice and long sleeves — visually dressy and suitable for evening. Step 5: Metadata (velvet, dark color) supports evening aesthetic. Step 6: A person could realistically wear this dress to a party/night out, though it's a midi rather than a mini and color is dark brown rather than wine. Step 7: Appropriate for the occasion with minor mismatches → score 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: Query requests a mini dress in wine/burgundy. Step2: Product category is DRESSES — matches category. Step3: Product color is BROWN (metadata) — does not match requested wine/burgundy. Step4: Fit: product name and image show a midi/long lace dress, not a mini — mismatch. Step5: No price constraints to check. Step6: Overall semantic alignment is low: correct category only; color and fit conflict with explicit constraints. Step7: Score 2 because it matches one constraint (category) but misses key ones (color and mini fit)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step1: Metadata: name LACE MIDI DRESS, category DRESSES, color BROWN, price present, no description. Step2: Query requests mini dress in wine/burgundy for party. Step3: Generated explanation: states 'LACE MIDI DRESS in BROWN belongs to DRESSES' and that it 'suits a refined yet striking evening look' for party_night_out. Step4: Claims about name, color, and category are directly supported by metadata; no fabricated attributes. Step5: Explanation is somewhat specific (mentions type and color) but short and subjective about suitability. Step6: It links the product to the occasion but does not address the user's mini or color preference conflicts. Step7: Score 4 for being grounded and reasonably useful but not fully comprehensive or tailored to the user's stated constraints."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target is party_night_out. Step2: Typical party-night attire can range from mini to elegant evening dresses depending on venue. Step3: Expected styles include eye-catching, evening-appropriate fabrics like lace. Step4: Image shows a long lace dress with sheer, decorative detailing — formal/elegant. Step5: Metadata (lace midi dress) confirms a midi/long evening style. Step6: A person could realistically wear this to a night-out or dressy party (especially formal or upscale venues), though it is not the mini style the user requested. Step7: Score 4: appropriate for many party-night contexts but not an ideal match for a casual club mini-dress look."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 2,
+              "reasoning": "Step 1: Intent = party/night-out mini dress in wine/burgundy. Step 2: All five items are dresses; metadata colors are aubergine, dark mink, dark brown, dark brown, brown. Images confirm styles: one clearly short aubergine mini (Product 1), one short dark-mink mini (Product 2), the rest are longer (jumpsuit-style mini? third is leather-effect short with bubble hem but appears dark brown and still short; fourth and fifth are midi/long). Step 3: Set partially covers intent — there is one clear wine/burgundy option (aubergine) and one or two short styles, but most items are brown/darker tones rather than true wine/burgundy. Step 4: Visual/style diversity is moderate (different fabrics: velvet, leather-effect, lace, structured minis) but colors are all in the brown/dark family. Step 5: Coherence with party occasion is mixed — several pieces are party-appropriate, but several are midi/long or more formal rather than a mini for a night out. Step 6: Glaring omissions: additional true wine/burgundy minis and more variety in mini silhouettes; no accessories or shoes. Step 7: Synthesis — set contains some relevant options but fewer than half clearly match the user's color and mini-length requirement. Conclusion: fewer than half of the items fit the explicit request."
+            }
+          }
+        },
+        "random": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step1: User requested a mini dress in wine/burgundy for a party. Step2: Product category is TROUSERS / described as a jumpsuit, not a dress. Step3: Product color is ECRU, not wine or burgundy. Step4: Fit requested 'mini' (mini dress) but product is a full-length jumpsuit/trousers. Step5: No price constraints to check. Step6: Name/description indicate a ski jumpsuit (water-resistant, windproof) and image shows a long one-piece — semantically misaligned. Conclusion: completely irrelevant to the query."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1-3: There is no generated explanation (empty). Step4: No claims to verify; absence of explanation provides no grounded information or helpful details. Step5-7: Because nothing was provided, it cannot support purchase decisions and contains no grounded attributes — effectively unusable."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step1: Occasion specified as party_night_out. Step2: Expected: party wear often includes dresses, stylish/formal/cocktail pieces. Step3: Product is a ski-style jumpsuit with utilitarian details and full-length trousers, shown in ecru/black — casual/technical aesthetic. Step4: Visually this is sporty and functional rather than party-appropriate. Step5: Metadata (ski jumpsuit, water-resistant) reinforces unsuitability. Step6: While it could work for an outdoor winter event with casual dress code, it is unlikely to be appropriate for a typical party night out."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step1: User requested a mini dress in wine/burgundy for a party. Step2: Product category is TROUSERS — does not match requested 'dresses'. Step3: Product color is BLACK — does not match wine/burgundy. Step4: Fit requested 'mini' (dress length) — product is full-length trousers, mismatch. Step5: No price constraints to check. Step6: Product name 'TOPSTITCHING TROUSERS' and image clearly show black trousers, semantically misaligned with query. Assignment: completely irrelevant (score 1)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Metadata available (name, category, color, price). Step2: User query and occasion reviewed. Step3: Generated explanation is empty. Step4: No claims to verify; absence of explanation offers no grounded information. Step5: No specific attributes or guidance provided. Step6: Does not connect product to query/occasion. Assignment: completely lacking/ungrounded (score 1)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step1: occasion_target is 'party_night_out'. Step2: Typical party attire ranges from dressy to casual depending on venue. Step3: Expected styles can include dresses, jumpsuits, tailored trousers. Step4: Image and metadata show black tailored trousers with a tie waist — moderately dressy and versatile. Step5: Black trousers can be styled for a night out with dressy top and heels. Step6: A person could realistically wear these to some party/night-out settings, though they are not a mini dress as the user wanted. Assignment: could work in some contexts (score 3)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: User asked for a mini dress in wine/burgundy for a party. Step 2: Product category is TROUSERS (wide-leg), not a dress. Step 3: Product color is BROWN, not wine/burgundy. Step 4: Fit requested is 'mini' (dress length); product is wide-leg trousers, mismatch. Step 5: No price constraint to check. Step 6: Product name/metadata and image show pleated wide-leg trousers, not aligned with query intent. Overall: completely irrelevant to the user's request."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1-3: No explanation text was provided. Step 4: No claims to verify. Step 5: No specific attributes or guidance given. Step 6: No connection to user query or occasion. Result: missing/uninformative explanation."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: Occasion specified: party_night_out. Step 2: Typical party attire can range from dressy to casual-chic. Step 3: The pictured item is wide-leg pleated trousers in a dark brown, which are semi-formal and can work for many night-out looks when styled appropriately. Step 4: The silhouette is relaxed but tailored; not a standout party mini dress but could be acceptable for a party depending on styling. Step 5: Metadata (trousers, brown) matches image. Step 6: A person could realistically wear these to a night out, though they don't match a 'mini dress' party look. Score reflects conditional appropriateness."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: Query requests a mini dress in wine/burgundy. Step 2: Product category is SWEATSHIRTS (CROPPED HOODIE) — does not match 'dresses'. Step 3: Product color is CHALK PINK, not wine/burgundy. Step 4: Fit requested 'mini' (dress) — product is a cropped hoodie, not a mini dress. Step 5: No price constraint to check. Step 6: Semantic intent (party mini dress) does not align with this casual sweatshirt. Conclusion: completely irrelevant."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1-3: Generated explanation is empty. Step 4: There are no claims to verify; nothing grounded in metadata. Step 5: No specific attributes or useful information provided. Step 6: Does not connect product to query or occasion. Conclusion: empty/uninformative and not helpful."
+              },
+              "occasion_appropriateness": {
+                "score": 1,
+                "reasoning": "Step 1: occasion_target is 'party_night_out'. Step 2: Expected items: partywear/mini dress in requested colors. Step 3: Typical party night outfits are more dressy or styled for evening. Step 4: Image shows a casual cropped hoodie with relaxed silhouette. Step 5: Metadata confirms casual sweatshirt, chalk pink. Step 6: Unlikely a person seeking a party mini dress would find this appropriate. Conclusion: clearly inappropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: User asked for a mini dress in wine/burgundy. Step 2: Product category is SKIRTS (not dresses) — mismatch. Step 3: Product color is BLACK, not wine/burgundy — mismatch. Step 4: Fit preference is mini (user wanted a mini dress); item is a skirt (length appears midi/longer than mini in image) — mismatch. Step 5: No price constraints to check. Step 6: Overall semantic alignment is poor: name and image show a black leather skirt, not a wine/burgundy mini dress. Step 7: Assigning score 1 (completely irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata available. Step 2: User query and occasion present. Step 3: Generated explanation is empty. Step 4: No claims to verify; absence of explanation is unhelpful. Step 5: No specific attributes or guidance provided. Step 6: Does not connect product to query or occasion. Step 7: Score 1 (completely unhelpful/generic due to missing explanation)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: Occasion_target present: party_night_out. Step 2: Occasion is a night-out/party. Step 3: Expected styles: dressy, edgy, possibly leather or statement pieces. Step 4: Image shows a black leather skirt with a sleek finish; silhouette is polished and party-appropriate. Step 5: Metadata (black leather skirt, price) confirms item type and color. Step 6: A person attending a party/night-out could realistically wear this skirt (paired with a top and heels). Step 7: Rated 4 (appropriate for the occasion) — not exemplary as it is a skirt not a dress, but fits the event."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 1,
+              "reasoning": "Step 1: User intent = party/night-out, specifically a mini dress in wine or burgundy. Step 2: Reviewed products: all items are trousers (3), a jumpsuit/one-piece ski suit (white/black), a chalk-pink cropped hoodie, and a black leather skirt. Images confirm none are a wine/burgundy mini dress. Step 3: Set fails to provide the requested category (mini dress) or color (wine/burgundy). Step 4: Visual/style diversity exists (pants, hoodie, leather skirt, ski-style jumpsuit) but none match the requested party dress aesthetic. Step 5: Overall formality is mixed and not focused on party/night-out mini dress styling. Step 6: Glaring omission: the exact item requested — a mini dress in wine/burgundy — is entirely absent. Step 7: Holistic judgment: set is irrelevant to the explicit request. Conclusion: score 1 — set completely misses the intent."
+            }
+          }
+        }
+      }
+    }
+  ]
+}

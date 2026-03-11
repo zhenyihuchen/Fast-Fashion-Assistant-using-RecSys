@@ -61,14 +61,15 @@ def main() -> None:
         filter_first=args.filter_first,
         use_faiss=not args.no_faiss,
         embedding_model=args.embedding_model,
+        return_metadata=True,
     )
 
     print("Parsed query:")
     print(parsed)
-    total = sum(len(cands) for cands in candidates_by_model.values())
+    total = sum(len(result.get("candidates", [])) for result in candidates_by_model.values())
     print(f"\nFound {total} candidates across {len(candidates_by_model)} model(s)")
-    for model_name, cands in candidates_by_model.items():
-        print(f"  - {model_name}: {len(cands)}")
+    for model_name, result in candidates_by_model.items():
+        print(f"  - {model_name}: {len(result.get('candidates', []))} [{result.get('match_stage', 'strict')}]")
 
     if total == 0:
         return
@@ -78,9 +79,12 @@ def main() -> None:
     df = df.set_index("row_id")
 
     rows_by_model: dict[str, list[dict]] = {}
-    for model_name, candidates in candidates_by_model.items():
+    for model_name, result in candidates_by_model.items():
+        candidates = result.get("candidates", [])
         if not candidates:
             continue
+        match_stage = result.get("match_stage", "strict")
+        match_message = result.get("match_message", "")
 
         paths = MODEL_PATHS[model_name]
         product_ids = np.load(paths["image_ids"], allow_pickle=True).astype(str)
@@ -117,6 +121,8 @@ def main() -> None:
                     "color": row.get("color", ""),
                     "product_category": row.get("product_category", ""),
                     "image_url": row.get("image_url", ""),
+                    "match_stage": match_stage,
+                    "match_message": match_message,
                 }
             )
 
