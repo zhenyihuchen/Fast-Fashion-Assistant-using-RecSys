@@ -11,9 +11,9 @@ For each query in the test set the script:
   4. Runs all evaluation rubrics (parser, item, set, cross-model)
   5. Saves per-query results + aggregate statistics to JSON + CSV
   
-python -m evaluation.run_eval --start 0 --end 30     # day 1 (queries 0-29)
-python -m evaluation.run_eval --start 30 --end 60    # day 2
-python -m evaluation.run_eval --start 60 --end 90    # day 3
+(done) python -m evaluation.run_eval --start 0 --end 30     # day 1 (queries 0-29)
+(done) python -m evaluation.run_eval --start 30 --end 60    # day 2
+(done) python -m evaluation.run_eval --start 60 --end 90    # day 3
 python -m evaluation.run_eval --start 90 --end 120   # day 4
 python -m evaluation.run_eval --start 120 --end 150  # day 5
 
