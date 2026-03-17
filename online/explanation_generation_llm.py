@@ -25,21 +25,6 @@ _client = OpenAI(
     max_retries=2,
 )
 
-# ── Z.AI (old, commented out) ────────────────────────────────────────────────
-# ZAI_API_KEY = os.getenv("ZAI_API_KEY")
-# # MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-# # MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-# # EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "llama-3.1-8b-instant")
-# # EXPLANATION_MODEL = os.getenv("GROQ_EXPLANATION_MODEL", "groq/compound-mini")
-# EXPLANATION_MODEL = os.getenv("ZAI_EXPLANATION_MODEL", "glm-4.5-flash")
-# _client = OpenAI(
-#     api_key=ZAI_API_KEY,
-#     base_url="https://api.z.ai/api/paas/v4/",
-#     timeout=60,
-#     max_retries=2,
-# )
-# ─────────────────────────────────────────────────────────────────────────────
-
 TIMEOUT_SECONDS = 60
 
 EXPLANATION_BATCH_SCHEMA = {

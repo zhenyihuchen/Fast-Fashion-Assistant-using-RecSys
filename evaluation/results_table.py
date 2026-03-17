@@ -106,6 +106,7 @@ def build_tier_table(data: dict) -> pd.DataFrame:
             rows.append({
                 "Tier": tier_label,
                 "N": n_queries,
+                "Evaluated": len(scores),
                 "Scope": "Parser",
                 "Rubric": rubric,
                 "Model": "—",
@@ -123,6 +124,7 @@ def build_tier_table(data: dict) -> pd.DataFrame:
                 rows.append({
                     "Tier": tier_label,
                     "N": n_queries,
+                    "Evaluated": len(scores),
                     "Scope": "Item",
                     "Rubric": rubric,
                     "Model": model_label,
@@ -139,6 +141,7 @@ def build_tier_table(data: dict) -> pd.DataFrame:
                 rows.append({
                     "Tier": tier_label,
                     "N": n_queries,
+                    "Evaluated": len(scores),
                     "Scope": "Set",
                     "Rubric": rubric,
                     "Model": model_label,
@@ -159,17 +162,17 @@ def build_tier_table(data: dict) -> pd.DataFrame:
         total_cm = clip_wins + fc_wins + ties
         if total_cm > 0:
             rows.append({
-                "Tier": tier_label, "N": n_queries, "Scope": "Cross-Model",
+                "Tier": tier_label, "N": n_queries, "Evaluated": total_cm, "Scope": "Cross-Model",
                 "Rubric": "clip_win_rate", "Model": "CLIP",
                 "Mean": round(clip_wins / total_cm * 100, 1), "Std": None,
             })
             rows.append({
-                "Tier": tier_label, "N": n_queries, "Scope": "Cross-Model",
+                "Tier": tier_label, "N": n_queries, "Evaluated": total_cm, "Scope": "Cross-Model",
                 "Rubric": "fashionclip_win_rate", "Model": "FashionCLIP",
                 "Mean": round(fc_wins / total_cm * 100, 1), "Std": None,
             })
             rows.append({
-                "Tier": tier_label, "N": n_queries, "Scope": "Cross-Model",
+                "Tier": tier_label, "N": n_queries, "Evaluated": total_cm, "Scope": "Cross-Model",
                 "Rubric": "tie_rate", "Model": "—",
                 "Mean": round(ties / total_cm * 100, 1), "Std": None,
             })
@@ -231,7 +234,7 @@ def print_tables(df_long: pd.DataFrame, df_compact: pd.DataFrame) -> None:
         print("\n" + "=" * 90)
         print("  PARSER SCORES (model-independent, 1-5 scale)")
         print("=" * 90)
-        print(parser_rows[["Tier", "Rubric", "Mean", "Std"]].to_string(index=False))
+        print(parser_rows[["Tier", "Rubric", "Evaluated", "Mean", "Std"]].to_string(index=False))
 
     # ── Cross-model ──
     cm_rows = df_long[df_long["Scope"] == "Cross-Model"]
@@ -240,7 +243,7 @@ def print_tables(df_long: pd.DataFrame, df_compact: pd.DataFrame) -> None:
         print("  CROSS-MODEL WIN RATES (%, CLIP vs FashionCLIP)")
         print("=" * 90)
         cm_pivot = cm_rows.pivot_table(
-            index="Tier", columns="Rubric", values="Mean", aggfunc="first",
+            index=["Tier", "Evaluated"], columns="Rubric", values="Mean", aggfunc="first",
         ).reset_index()
         cm_pivot.columns.name = None
         print(cm_pivot.to_string(index=False))
