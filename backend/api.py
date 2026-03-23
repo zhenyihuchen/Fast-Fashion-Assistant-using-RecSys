@@ -33,6 +33,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from groq import Groq
+from openai import OpenAI
 from pydantic import BaseModel
 
 from online.candidate_retrieval import MODEL_PATHS, PARQUET_PATH, retrieve_candidates
@@ -60,6 +61,9 @@ app.add_middleware(
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_TRANSCRIBE_MODEL = os.getenv("OPENAI_TRANSCRIBE_MODEL", "gpt-4o-mini-transcribe")
+_openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 # Cache the catalog in memory so it isn't re-read on every request.
 _catalog_cache: pd.DataFrame | None = None
@@ -396,14 +400,13 @@ async def search(req: SearchRequest):
 
 @app.post("/api/transcribe")
 async def transcribe(audio: UploadFile = File(...)):
-    if not GROQ_API_KEY:
-        raise HTTPException(status_code=503, detail="GROQ_API_KEY not configured")
+    if _openai_client is None:
+        raise HTTPException(status_code=503, detail="OPENAI_API_KEY not configured")
     content = await audio.read()
     filename = audio.filename or "recording.webm"
-    client = Groq(api_key=GROQ_API_KEY)
-    result = client.audio.transcriptions.create(
+    result = _openai_client.audio.transcriptions.create(
         file=(filename, io.BytesIO(content), audio.content_type or "audio/webm"),
-        model="whisper-large-v3-turbo",
+        model=OPENAI_TRANSCRIBE_MODEL,
     )
     return {"text": result.text}
 
