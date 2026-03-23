@@ -58,9 +58,10 @@ _fclip_cache: FashionCLIP | None = None
 _fclip_loader_patched = False
 
 MATCH_STAGE_MESSAGES = {
-    "strict": "Exact or near-exact matches for your requested constraints.",
-    "relaxed_color": "No exact color matches found. Showing similar items in the requested category.",
-    "category_only": "No exact matches found. Showing similar items from the requested category.",
+    "category_only": "Showing results filtered by product category before semantic retrieval.",
+    "color_only": "Showing results filtered by color before semantic retrieval.",
+    "price_only": "Showing results filtered by price before semantic retrieval.",
+    "no_filter": "Showing semantically similar results without metadata pre-filtering.",
 }
 
 
@@ -241,48 +242,31 @@ def _filter_rows(
     return filtered
 
 
-def _build_filter_stages(parsed: dict) -> list[tuple[str, dict[str, bool]]]:
+def _build_filter_stage(parsed: dict) -> tuple[str, dict[str, bool]]:
     constraints = _get_constraint_values(parsed)
     has_categories = bool(constraints["categories"])
     has_colors = bool(constraints["colors"])
     has_price = constraints["price_min"] is not None or constraints["price_max"] is not None
 
-    stages: list[tuple[str, dict[str, bool]]] = [
-        (
-            "strict",
-            {
-                "use_categories": has_categories,
-                "use_colors": has_colors,
-                "use_price": has_price,
-            },
-        ),
-        (
-            "relaxed_color",
-            {
-                "use_categories": has_categories,
-                "use_colors": False,
-                "use_price": has_price,
-            },
-        ),
-        (
+    if has_categories:
+        return (
             "category_only",
-            {
-                "use_categories": has_categories,
-                "use_colors": False,
-                "use_price": False,
-            },
-        ),
-    ]
-
-    deduped: list[tuple[str, dict[str, bool]]] = []
-    seen: set[tuple[bool, bool, bool]] = set()
-    for stage_name, flags in stages:
-        key = (flags["use_categories"], flags["use_colors"], flags["use_price"])
-        if key in seen:
-            continue
-        seen.add(key)
-        deduped.append((stage_name, flags))
-    return deduped
+            {"use_categories": True, "use_colors": False, "use_price": False},
+        )
+    if has_colors:
+        return (
+            "color_only",
+            {"use_categories": False, "use_colors": True, "use_price": False},
+        )
+    if has_price:
+        return (
+            "price_only",
+            {"use_categories": False, "use_colors": False, "use_price": True},
+        )
+    return (
+        "no_filter",
+        {"use_categories": False, "use_colors": False, "use_price": False},
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -368,27 +352,26 @@ def _retrieve_for_model(
         text_emb = np.load(paths["text_embeddings"]).astype("float32", copy=False)
 
     if filter_first:
-        for match_stage, stage_flags in _build_filter_stages(parsed):
-            filtered = _filter_rows(df, parsed, **stage_flags)
-            allowed_ids = set(filtered["row_id"].astype(str))
-            mask = np.array([pid in allowed_ids for pid in product_ids])
-            if not mask.any():
-                continue
-            results = _search_embeddings(q_vec, embeddings[mask], product_ids[mask], topk)
-            if use_text_embeddings and text_ids is not None and text_emb is not None:
-                results = _rerank_with_text(results, q_vec, text_ids, text_emb, image_weight, text_weight)
-            if results:
-                return results, match_stage
-        return [], "strict"
+        match_stage, stage_flags = _build_filter_stage(parsed)
+        filtered = _filter_rows(df, parsed, **stage_flags)
+        allowed_ids = set(filtered["row_id"].astype(str))
+        mask = np.array([pid in allowed_ids for pid in product_ids])
+        if not mask.any():
+            return [], match_stage
+        results = _search_embeddings(q_vec, embeddings[mask], product_ids[mask], topk)
+        if use_text_embeddings and text_ids is not None and text_emb is not None:
+            results = _rerank_with_text(results, q_vec, text_ids, text_emb, image_weight, text_weight)
+        return results, match_stage
 
     # search-first, filter-after
     results = _search_embeddings(q_vec, embeddings, product_ids, topk, paths["faiss_index"])
     if use_text_embeddings and text_ids is not None and text_emb is not None:
         results = _rerank_with_text(results, q_vec, text_ids, text_emb, image_weight, text_weight)
     if not parsed:
-        return results, "strict"
-    allowed_ids = set(_filter_rows(df, parsed)["row_id"].astype(str))
-    return [(pid, score) for pid, score in results if pid in allowed_ids], "strict"
+        return results, "no_filter"
+    match_stage, stage_flags = _build_filter_stage(parsed)
+    allowed_ids = set(_filter_rows(df, parsed, **stage_flags)["row_id"].astype(str))
+    return [(pid, score) for pid, score in results if pid in allowed_ids], match_stage
 
 
 # ---------------------------------------------------------------------------
