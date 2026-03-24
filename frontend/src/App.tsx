@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { search } from "./api/client";
+import { generateSessionTitle, search } from "./api/client";
 import Sidebar from "./components/Sidebar";
 import ChatMessage from "./components/ChatMessage";
 import ChatInput from "./components/ChatInput";
@@ -15,6 +15,7 @@ function uid() {
 
 const INTRO_TEXT =
   "Hey, I'm Zara's virtual shopping assistant. I can help you find your next purchase faster than traditional searching. What do you want to buy today, and for what occasion?";
+const STORAGE_KEY = "fashion-assistant-sessions";
 
 function makeIntroMsg(): ChatMsg {
   return { id: uid(), role: "assistant", type: "text", content: INTRO_TEXT };
@@ -30,23 +31,83 @@ function makeSession(label: string): Session {
   };
 }
 
+function conversationText(messages: ChatMsg[]): string {
+  return messages
+    .flatMap((msg) => {
+      switch (msg.type) {
+        case "text":
+          return msg.content ? [`${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`] : [];
+        case "reco":
+          return msg.summary ? [`Assistant: ${msg.summary}`] : [];
+        case "occasion_prompt":
+          return ["Assistant: Please clarify the occasion you are shopping for."];
+        case "no_results":
+          return ["Assistant: No matching results were found for this request."];
+        default:
+          return [];
+      }
+    })
+    .join("\n");
+}
+
+function loadStoredState(): { sessions: Session[]; currentId: string } {
+  const fallbackSessions = [makeSession("Session 1")];
+  const fallback = { sessions: fallbackSessions, currentId: fallbackSessions[0].id };
+
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return fallback;
+    }
+    const parsed = JSON.parse(raw) as {
+      sessions?: Session[];
+      currentId?: string;
+    };
+    const sessions = Array.isArray(parsed.sessions) ? parsed.sessions : [];
+    if (sessions.length === 0) {
+      return fallback;
+    }
+    const currentId = sessions.some((session) => session.id === parsed.currentId)
+      ? (parsed.currentId as string)
+      : sessions[0].id;
+    return { sessions, currentId };
+  } catch {
+    return fallback;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // App
 // ---------------------------------------------------------------------------
 
 export default function App() {
-  const [sessions, setSessions] = useState<Session[]>(() => [makeSession("Session 1")]);
-  const [currentId, setCurrentId] = useState<string>(() => sessions[0].id);
+  const [sessions, setSessions] = useState<Session[]>(() => loadStoredState().sessions);
+  const [currentId, setCurrentId] = useState<string>(() => loadStoredState().currentId);
   const [loading, setLoading] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const current = sessions.find((s) => s.id === currentId)!;
+  const titleRequestRef = useRef<Record<string, number>>({});
+  const current =
+    sessions.find((s) => s.id === currentId) ??
+    sessions[0] ??
+    makeSession("Session 1");
 
   // Auto-scroll on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [current.messages.length]);
+
+  // Persist sessions and selection locally so they survive refreshes.
+  useEffect(() => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ sessions, currentId })
+    );
+  }, [sessions, currentId]);
 
   // ---------------------------------------------------------------------------
   // Session helpers
@@ -75,6 +136,25 @@ export default function App() {
         ...s,
         messages: [...s.messages.slice(0, -1), msg],
       }));
+    },
+    [updateSession]
+  );
+
+  const refreshSessionTitle = useCallback(
+    async (sessionId: string, messages: ChatMsg[]) => {
+      const text = conversationText(messages);
+      if (!text.trim()) return;
+
+      const requestId = (titleRequestRef.current[sessionId] ?? 0) + 1;
+      titleRequestRef.current[sessionId] = requestId;
+
+      try {
+        const title = await generateSessionTitle(text);
+        if (titleRequestRef.current[sessionId] !== requestId) return;
+        updateSession(sessionId, (s) => ({ ...s, label: title || s.label }));
+      } catch {
+        // Keep the existing label if summarization fails.
+      }
     },
     [updateSession]
   );
@@ -114,12 +194,19 @@ export default function App() {
               break;
 
             case "needs_occasion":
-              replaceLastMsg(sessionId, {
-                id: uid(),
-                role: "assistant",
-                type: "occasion_prompt",
-                parsed: event.parsed,
-              });
+              {
+                const nextMsg: ChatMsg = {
+                  id: uid(),
+                  role: "assistant",
+                  type: "occasion_prompt",
+                  parsed: event.parsed,
+                };
+                replaceLastMsg(sessionId, nextMsg);
+                const existing = sessions.find((s) => s.id === sessionId);
+                if (existing) {
+                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
+                }
+              }
               updateSession(sessionId, (s) => ({
                 ...s,
                 awaitingOccasion: true,
@@ -133,21 +220,31 @@ export default function App() {
               );
 
               if (hasResults) {
-                replaceLastMsg(sessionId, {
+                const nextMsg: ChatMsg = {
                   id: uid(),
                   role: "assistant",
                   type: "reco",
                   summary: event.summary,
                   parsed: event.parsed,
                   rowsByModel: event.rows_by_model,
-                });
+                };
+                replaceLastMsg(sessionId, nextMsg);
+                const existing = sessions.find((s) => s.id === sessionId);
+                if (existing) {
+                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
+                }
               } else {
-                replaceLastMsg(sessionId, {
+                const nextMsg: ChatMsg = {
                   id: uid(),
                   role: "assistant",
                   type: "no_results",
                   parsed: event.parsed,
-                });
+                };
+                replaceLastMsg(sessionId, nextMsg);
+                const existing = sessions.find((s) => s.id === sessionId);
+                if (existing) {
+                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
+                }
               }
               // Reset occasion state
               updateSession(sessionId, (s) => ({
@@ -159,12 +256,19 @@ export default function App() {
             }
 
             case "error":
-              replaceLastMsg(sessionId, {
-                id: uid(),
-                role: "assistant",
-                type: "text",
-                content: `Something went wrong: ${event.message}`,
-              });
+              {
+                const nextMsg: ChatMsg = {
+                  id: uid(),
+                  role: "assistant",
+                  type: "text",
+                  content: `Something went wrong: ${event.message}`,
+                };
+                replaceLastMsg(sessionId, nextMsg);
+                const existing = sessions.find((s) => s.id === sessionId);
+                if (existing) {
+                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
+                }
+              }
               break;
 
             case "done":
@@ -182,7 +286,7 @@ export default function App() {
         setLoading(false);
       }
     },
-    [pushMsg, replaceLastMsg, updateSession]
+    [pushMsg, refreshSessionTitle, replaceLastMsg, sessions, updateSession]
   );
 
   // ---------------------------------------------------------------------------
@@ -194,7 +298,10 @@ export default function App() {
       if (loading) return;
 
       // Add user message
-      pushMsg(currentId, { id: uid(), role: "user", type: "text", content: text });
+      const userMsg: ChatMsg = { id: uid(), role: "user", type: "text", content: text };
+      const nextMessages = [...current.messages, userMsg];
+      pushMsg(currentId, userMsg);
+      void refreshSessionTitle(currentId, nextMessages);
 
       // Build effective query
       let effectiveQuery = text;
@@ -210,7 +317,7 @@ export default function App() {
 
       runSearch(currentId, effectiveQuery);
     },
-    [loading, currentId, current, pushMsg, updateSession, runSearch]
+    [loading, currentId, current, pushMsg, refreshSessionTitle, updateSession, runSearch]
   );
 
   // ---------------------------------------------------------------------------

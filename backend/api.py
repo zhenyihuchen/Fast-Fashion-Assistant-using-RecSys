@@ -35,6 +35,7 @@ from fastapi.responses import StreamingResponse
 from groq import Groq
 from openai import OpenAI
 from pydantic import BaseModel
+from transformers import pipeline
 
 from online.candidate_retrieval import MODEL_PATHS, PARQUET_PATH, retrieve_candidates
 from online.explanation_generation_llm import generate_explanations
@@ -64,6 +65,8 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_TRANSCRIBE_MODEL = os.getenv("OPENAI_TRANSCRIBE_MODEL", "gpt-4o-mini-transcribe")
 _openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+SESSION_TITLE_MODEL = os.getenv("SESSION_TITLE_MODEL", "lidiya/bart-large-xsum-samsum")
+_session_title_summarizer = None
 
 # Cache the catalog in memory so it isn't re-read on every request.
 _catalog_cache: pd.DataFrame | None = None
@@ -151,6 +154,29 @@ def _build_summary(rows: list[dict], parsed: dict) -> str:
         return resp.choices[0].message.content.strip()
     except Exception:
         return "Here are your top picks:"
+
+
+def _get_session_title_summarizer():
+    global _session_title_summarizer
+    if _session_title_summarizer is None:
+        _session_title_summarizer = pipeline("summarization", model=SESSION_TITLE_MODEL)
+    return _session_title_summarizer
+
+
+def _normalize_title(text: str) -> str:
+    title = " ".join(text.strip().split()).rstrip(".")
+    return title[:80] or "New chat"
+
+
+def _summarize_session_title(conversation: str) -> str:
+    conversation = conversation.strip()
+    if not conversation:
+        return "New chat"
+
+    summarizer = _get_session_title_summarizer()
+    result = summarizer(conversation, truncation=True)
+    summary_text = result[0].get("summary_text", "") if result else ""
+    return _normalize_title(summary_text)
 
 
 def _run_pipeline_sync(query: str) -> dict:
@@ -385,6 +411,10 @@ class SearchRequest(BaseModel):
     query: str
 
 
+class SessionTitleRequest(BaseModel):
+    conversation: str
+
+
 @app.post("/api/search")
 async def search(req: SearchRequest):
     return StreamingResponse(
@@ -396,6 +426,14 @@ async def search(req: SearchRequest):
             "Connection": "keep-alive",
         },
     )
+
+
+@app.post("/api/session-title")
+async def session_title(req: SessionTitleRequest):
+    try:
+        return {"title": _summarize_session_title(req.conversation)}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Session title generation failed: {exc}")
 
 
 @app.post("/api/transcribe")

@@ -89,3 +89,19 @@ export async function* search(query: string): AsyncGenerator<SearchEvent> {
     }
   }
 }
+
+
+export async function generateSessionTitle(conversation: string): Promise<string> {
+  const response = await fetch(`${BASE}/api/session-title`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ conversation }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return typeof data.title === "string" && data.title.trim() ? data.title.trim() : "New chat";
+}

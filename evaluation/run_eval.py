@@ -95,8 +95,16 @@ def _random_products(n: int = 5) -> list[dict]:
 
 # ── Pipeline ─────────────────────────────────────────────────────────────────
 
-def run_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
+def run_pipeline(
+    query: str,
+    disable_occasion: bool = False,
+) -> tuple[dict, dict[str, list[dict]]]:
     """Run the full recommendation pipeline for one query.
+
+    Args:
+        query: The user query string.
+        disable_occasion: If True, skip occasion scoring and rank purely by
+            relevance (α=1.0, β=0.0) even when the parser detects an occasion.
 
     Returns:
         (parsed, rows_by_model)
@@ -104,7 +112,11 @@ def run_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
     """
     parsed = parse_query_llm(query)
     occ = parsed.get("occasion") or {}
-    has_occasion = occ.get("mode") == "on" and bool(occ.get("target"))
+    has_occasion = (
+        not disable_occasion
+        and occ.get("mode") == "on"
+        and bool(occ.get("target"))
+    )
 
     candidates_by_model = retrieve_candidates(
         query,
@@ -286,6 +298,7 @@ def run(
     start: int = 0,
     end: int | None = None,
     ids_file: Path | None = None,
+    disable_occasion: bool = False,
 ) -> None:
     all_queries = json.loads(queries_path.read_text(encoding="utf-8"))
     if ids_file is not None:
@@ -320,7 +333,7 @@ def run(
 
         try:
             t0 = time.monotonic()
-            parsed, rows_by_model = run_pipeline(query_text)
+            parsed, rows_by_model = run_pipeline(query_text, disable_occasion=disable_occasion)
             pipeline_s = time.monotonic() - t0
 
             # Add random baseline (no pipeline needed)
@@ -424,5 +437,16 @@ if __name__ == "__main__":
         default=None,
         help="Path to a text file containing one query id per line; overrides --start/--end slicing",
     )
+    parser.add_argument(
+        "--no-occasion",
+        action="store_true",
+        default=False,
+        help="Disable occasion scoring; rank purely by relevance (alpha=1.0, beta=0.0)",
+    )
     args = parser.parse_args()
-    run(args.queries, args.out, start=args.start, end=args.end, ids_file=args.ids_file)
+    run(
+        args.queries, args.out,
+        start=args.start, end=args.end,
+        ids_file=args.ids_file,
+        disable_occasion=args.no_occasion,
+    )

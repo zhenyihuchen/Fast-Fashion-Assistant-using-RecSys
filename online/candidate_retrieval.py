@@ -381,7 +381,7 @@ def _retrieve_for_model(
 def retrieve_candidates(
     query: str,
     parsed: dict,
-    topk: int = 200,
+    topk: int = 30,
     filter_first: bool = True,
     use_faiss: bool = True,          # kept for backward compat; FAISS is always used
     use_text_embeddings: bool = False,

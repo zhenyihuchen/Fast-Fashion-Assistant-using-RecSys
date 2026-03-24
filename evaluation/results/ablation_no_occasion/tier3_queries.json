@@ -1,0 +1,543 @@
+[
+  {
+    "id": "q101",
+    "query": "I need something elegant for my friend's wedding, maybe a burgundy dress, nothing too tight",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q102",
+    "query": "looking for a wedding guest outfit, preferably a midi dress in dusty pink under 100 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q103",
+    "query": "I'm going to a wedding next month and need a green skirt, something elegant",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q104",
+    "query": "can you help me find a cream coat for a spring wedding? budget around 130 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q105",
+    "query": "wedding coming up, I want a maxi dress in navy blue",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q106",
+    "query": "going out this Saturday night, I want a short black dress under 50 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q107",
+    "query": "I need something for a party, maybe a red top, something that stands out",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q108",
+    "query": "clubbing this weekend, looking for a silver mini skirt",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q109",
+    "query": "party outfit, I want a mini dress in wine or burgundy",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q110",
+    "query": "night out with friends, need skinny black jeans under 45 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q111",
+    "query": "I need professional trousers for the office, slim fit, dark navy",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q112",
+    "query": "looking for a work shirt in white or cream, nothing too casual",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q113",
+    "query": "office dress, something smart in grey, midi length",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q114",
+    "query": "I need a blazer for work, preferably in black, under 80 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q115",
+    "query": "smart work top in beige, something I can wear with trousers",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q116",
+    "query": "I have a gala dinner and need a long black dress, something really elegant",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q117",
+    "query": "formal event next week, looking for a dark navy coat under 150 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q118",
+    "query": "awards ceremony coming up, I need a maxi dress in silver or dark green",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q119",
+    "query": "black tie event, I want something in burgundy, maybe a midi dress",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q120",
+    "query": "just need something comfortable for weekends, maybe oversized jeans in blue",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q121",
+    "query": "casual outfit for running errands, I want loose brown trousers under 40 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q122",
+    "query": "everyday wear, looking for a relaxed beige cardigan",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q123",
+    "query": "I want comfortable blue jeans for daily use, straight leg, max 50 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q124",
+    "query": "going on a date tonight, I want a red dress, something feminine and short",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q125",
+    "query": "date night outfit, looking for a slim black skirt",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q126",
+    "query": "dinner date this Friday, I need an elegant green dress under 80 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q127",
+    "query": "first date, want something pretty in pink, maybe a midi dress",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q128",
+    "query": "I need a warm coat for winter, something in camel, not too boxy",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q129",
+    "query": "looking for a heavy winter jacket in dark grey, oversized, under 120 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q130",
+    "query": "cold weather coat, I want something in dark green or khaki",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q131",
+    "query": "winter is coming and I need a long warm coat in brown, max 150 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q132",
+    "query": "weekend brunch, I want something polished but relaxed, slim trousers in beige",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q133",
+    "query": "smart casual dinner with friends, looking for a navy shirt",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q134",
+    "query": "I need a smart but comfortable outfit, cream cardigan under 60 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q135",
+    "query": "casual Friday at work, I want a nice top in ecru, nothing too formal",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q136",
+    "query": "Christmas dinner outfit, I want something festive in dark green or burgundy",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "color"
+    ]
+  },
+  {
+    "id": "q137",
+    "query": "looking for a dress for Navidad dinner, red, elegant but not over the top",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q138",
+    "query": "family Christmas dinner, need a nice top in dark red under 50 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q139",
+    "query": "Navidad celebration, want a midi skirt in wine",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q140",
+    "query": "New Year's Eve outfit, I want something glamorous, a silver dress",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q141",
+    "query": "looking for a NYE party dress, short, in black, under 70 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit",
+      "price"
+    ]
+  },
+  {
+    "id": "q142",
+    "query": "Nochevieja outfit, I want a mini dress, something bold in red",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q143",
+    "query": "ringing in the new year, need a stunning dark navy maxi dress",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "fit"
+    ]
+  },
+  {
+    "id": "q144",
+    "query": "Halloween party outfit, I want something dark and edgy, a black dress",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q145",
+    "query": "looking for a Halloween look, maybe a purple top, something dramatic",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q146",
+    "query": "need something spooky for Halloween night, a dark red skirt under 40 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  },
+  {
+    "id": "q147",
+    "query": "going to Oktoberfest, want something in warm autumn colors, a brown or burnt orange dress",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q148",
+    "query": "Oktoberfest outfit, I need a dress in cream or beige, something festive",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q149",
+    "query": "beer festival coming up, looking for a fun skirt in mustard or olive green",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color"
+    ]
+  },
+  {
+    "id": "q150",
+    "query": "Oktoberfest party, want a cozy cardigan in brown or camel, under 50 euros",
+    "tier": 3,
+    "tags": [
+      "occasion",
+      "category",
+      "color",
+      "price"
+    ]
+  }
+]
