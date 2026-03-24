@@ -10,8 +10,7 @@ interface Props {
 export default function ProductCard({ product, rank }: Props) {
   const [imgError, setImgError] = useState(false);
 
-  const scoreBar = Math.min(1, Math.max(0, product.final_score));
-  const scorePercent = (scoreBar * 100).toFixed(0);
+  // const scorePercent = ((product.final_display / 10) * 100).toFixed(0);
 
   return (
     <article className="group flex flex-col bg-white border border-ink-100 rounded-xl overflow-hidden hover:shadow-md hover:border-ink-300 transition-all duration-200 animate-fade-in">
@@ -54,11 +53,11 @@ export default function ProductCard({ product, rank }: Props) {
         </div>
 
         {/* Score bar */}
-        <div>
+        {/* <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] uppercase tracking-widest text-ink-400">Match score</span>
             <span className="text-[11px] font-semibold text-ink-700">
-              {product.final_score.toFixed(4)}
+              {product.final_display.toFixed(1)}/10
             </span>
           </div>
           <div className="w-full h-0.5 bg-ink-100 rounded-full overflow-hidden">
@@ -67,16 +66,15 @@ export default function ProductCard({ product, rank }: Props) {
               style={{ width: `${scorePercent}%` }}
             />
           </div>
-          {/* Sub-scores */}
           <div className="flex gap-3 mt-1.5">
             <span className="text-[10px] text-ink-400">
-              Relevance&nbsp;<span className="text-ink-600">{product.relevance_score.toFixed(3)}</span>
+              Relevance&nbsp;<span className="text-ink-600">{product.relevance_display.toFixed(1)}/10</span>
             </span>
             <span className="text-[10px] text-ink-400">
-              Occasion&nbsp;<span className="text-ink-600">{product.occasion_score.toFixed(4)}</span>
+              Occasion&nbsp;<span className="text-ink-600">{product.occasion_display.toFixed(1)}/10</span>
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* Explanation */}
         {product.explanation && (

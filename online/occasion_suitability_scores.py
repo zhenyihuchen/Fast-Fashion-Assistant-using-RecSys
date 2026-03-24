@@ -77,8 +77,4 @@ def compute_occasion_scores(
     # cosine similarity to each prompt, then mean across prompts
     sims = cand_embeddings @ prompt_embeddings.T
     mean_scores = sims.mean(axis=1)
-    # softmax over candidates to get relative suitability within this set
-    max_score = float(np.max(mean_scores))
-    exp_scores = np.exp(mean_scores - max_score)
-    probs = exp_scores / np.sum(exp_scores)
-    return {row_id: float(score) for row_id, score in zip(cand_ids, probs)}
+    return {row_id: float(score) for row_id, score in zip(cand_ids, mean_scores)}

@@ -28,6 +28,9 @@ export interface ProductRow {
   relevance_score: number;
   occasion_score: number;
   final_score: number;
+  relevance_display: number;
+  occasion_display: number;
+  final_display: number;
   product_name: string;
   product_description: string;
   product_url: string;

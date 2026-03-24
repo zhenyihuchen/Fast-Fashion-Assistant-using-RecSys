@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { generateSessionTitle, search } from "./api/client";
+import { search } from "./api/client";
 import Sidebar from "./components/Sidebar";
 import ChatMessage from "./components/ChatMessage";
 import ChatInput from "./components/ChatInput";
@@ -29,25 +29,6 @@ function makeSession(label: string): Session {
     pendingQuery: null,
     awaitingOccasion: false,
   };
-}
-
-function conversationText(messages: ChatMsg[]): string {
-  return messages
-    .flatMap((msg) => {
-      switch (msg.type) {
-        case "text":
-          return msg.content ? [`${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`] : [];
-        case "reco":
-          return msg.summary ? [`Assistant: ${msg.summary}`] : [];
-        case "occasion_prompt":
-          return ["Assistant: Please clarify the occasion you are shopping for."];
-        case "no_results":
-          return ["Assistant: No matching results were found for this request."];
-        default:
-          return [];
-      }
-    })
-    .join("\n");
 }
 
 function loadStoredState(): { sessions: Session[]; currentId: string } {
@@ -90,7 +71,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
-  const titleRequestRef = useRef<Record<string, number>>({});
   const current =
     sessions.find((s) => s.id === currentId) ??
     sessions[0] ??
@@ -140,25 +120,6 @@ export default function App() {
     [updateSession]
   );
 
-  const refreshSessionTitle = useCallback(
-    async (sessionId: string, messages: ChatMsg[]) => {
-      const text = conversationText(messages);
-      if (!text.trim()) return;
-
-      const requestId = (titleRequestRef.current[sessionId] ?? 0) + 1;
-      titleRequestRef.current[sessionId] = requestId;
-
-      try {
-        const title = await generateSessionTitle(text);
-        if (titleRequestRef.current[sessionId] !== requestId) return;
-        updateSession(sessionId, (s) => ({ ...s, label: title || s.label }));
-      } catch {
-        // Keep the existing label if summarization fails.
-      }
-    },
-    [updateSession]
-  );
-
   // ---------------------------------------------------------------------------
   // Pipeline
   // ---------------------------------------------------------------------------
@@ -194,19 +155,12 @@ export default function App() {
               break;
 
             case "needs_occasion":
-              {
-                const nextMsg: ChatMsg = {
-                  id: uid(),
-                  role: "assistant",
-                  type: "occasion_prompt",
-                  parsed: event.parsed,
-                };
-                replaceLastMsg(sessionId, nextMsg);
-                const existing = sessions.find((s) => s.id === sessionId);
-                if (existing) {
-                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
-                }
-              }
+              replaceLastMsg(sessionId, {
+                id: uid(),
+                role: "assistant",
+                type: "occasion_prompt",
+                parsed: event.parsed,
+              });
               updateSession(sessionId, (s) => ({
                 ...s,
                 awaitingOccasion: true,
@@ -220,31 +174,21 @@ export default function App() {
               );
 
               if (hasResults) {
-                const nextMsg: ChatMsg = {
+                replaceLastMsg(sessionId, {
                   id: uid(),
                   role: "assistant",
                   type: "reco",
                   summary: event.summary,
                   parsed: event.parsed,
                   rowsByModel: event.rows_by_model,
-                };
-                replaceLastMsg(sessionId, nextMsg);
-                const existing = sessions.find((s) => s.id === sessionId);
-                if (existing) {
-                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
-                }
+                });
               } else {
-                const nextMsg: ChatMsg = {
+                replaceLastMsg(sessionId, {
                   id: uid(),
                   role: "assistant",
                   type: "no_results",
                   parsed: event.parsed,
-                };
-                replaceLastMsg(sessionId, nextMsg);
-                const existing = sessions.find((s) => s.id === sessionId);
-                if (existing) {
-                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
-                }
+                });
               }
               // Reset occasion state
               updateSession(sessionId, (s) => ({
@@ -256,19 +200,12 @@ export default function App() {
             }
 
             case "error":
-              {
-                const nextMsg: ChatMsg = {
-                  id: uid(),
-                  role: "assistant",
-                  type: "text",
-                  content: `Something went wrong: ${event.message}`,
-                };
-                replaceLastMsg(sessionId, nextMsg);
-                const existing = sessions.find((s) => s.id === sessionId);
-                if (existing) {
-                  void refreshSessionTitle(sessionId, [...existing.messages.slice(0, -1), nextMsg]);
-                }
-              }
+              replaceLastMsg(sessionId, {
+                id: uid(),
+                role: "assistant",
+                type: "text",
+                content: `Something went wrong: ${event.message}`,
+              });
               break;
 
             case "done":
@@ -286,7 +223,7 @@ export default function App() {
         setLoading(false);
       }
     },
-    [pushMsg, refreshSessionTitle, replaceLastMsg, sessions, updateSession]
+    [pushMsg, replaceLastMsg, updateSession]
   );
 
   // ---------------------------------------------------------------------------
@@ -298,10 +235,7 @@ export default function App() {
       if (loading) return;
 
       // Add user message
-      const userMsg: ChatMsg = { id: uid(), role: "user", type: "text", content: text };
-      const nextMessages = [...current.messages, userMsg];
-      pushMsg(currentId, userMsg);
-      void refreshSessionTitle(currentId, nextMessages);
+      pushMsg(currentId, { id: uid(), role: "user", type: "text", content: text });
 
       // Build effective query
       let effectiveQuery = text;
@@ -317,7 +251,7 @@ export default function App() {
 
       runSearch(currentId, effectiveQuery);
     },
-    [loading, currentId, current, pushMsg, refreshSessionTitle, updateSession, runSearch]
+    [loading, currentId, current, pushMsg, updateSession, runSearch]
   );
 
   // ---------------------------------------------------------------------------
