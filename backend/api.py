@@ -110,6 +110,27 @@ def _has_occasion(parsed: dict) -> bool:
     return occasion.get("mode") == "on" and bool(occasion.get("target"))
 
 
+def _scale_1_to_10(values: list[float]) -> list[float]:
+    """Min-max scale a list of values to the [1, 10] range."""
+    lo, hi = min(values), max(values)
+    if hi == lo:
+        return [5.5] * len(values)
+    return [round(1 + 9 * (v - lo) / (hi - lo), 1) for v in values]
+
+
+def _add_display_scores(rows: list[dict]) -> None:
+    """Add 1-10 display scores to the top-5 rows (in-place)."""
+    if not rows:
+        return
+    rel = _scale_1_to_10([r["relevance_score"] for r in rows])
+    occ = _scale_1_to_10([r["occasion_score"] for r in rows])
+    fin = _scale_1_to_10([r["final_score"] for r in rows])
+    for r, rv, ov, fv in zip(rows, rel, occ, fin):
+        r["relevance_display"] = rv
+        r["occasion_display"] = ov
+        r["final_display"] = fv
+
+
 def _build_summary(rows: list[dict], parsed: dict) -> str:
     """Ask Groq for a short friendly summary of the top picks."""
     if not GROQ_API_KEY:
@@ -264,6 +285,7 @@ def _run_pipeline_sync(query: str) -> dict:
             row["explanation"] = explanations.get(str(row["row_id"]), "")
 
         rows_by_model[model_name] = rows[:5]
+        _add_display_scores(rows_by_model[model_name])
 
     all_rows = [r for rows in rows_by_model.values() for r in rows]
     summary = _build_summary(all_rows, parsed_safe) if all_rows else ""
@@ -386,6 +408,7 @@ async def _stream_pipeline(query: str) -> AsyncGenerator[str, None]:
                 row["explanation"] = explanations.get(str(row["row_id"]), "")
 
             rows_by_model[model_name] = rows[:5]
+            _add_display_scores(rows_by_model[model_name])
 
         # Step 6: Summarise
         yield _sse("progress", {"step": 6, "total": 6, "message": "Generating summary…"})

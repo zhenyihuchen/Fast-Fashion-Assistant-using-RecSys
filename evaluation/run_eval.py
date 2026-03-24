@@ -98,6 +98,8 @@ def _random_products(n: int = 5) -> list[dict]:
 def run_pipeline(
     query: str,
     disable_occasion: bool = False,
+    alpha: float = 0.6,
+    beta: float = 0.4,
 ) -> tuple[dict, dict[str, list[dict]]]:
     """Run the full recommendation pipeline for one query.
 
@@ -105,6 +107,8 @@ def run_pipeline(
         query: The user query string.
         disable_occasion: If True, skip occasion scoring and rank purely by
             relevance (α=1.0, β=0.0) even when the parser detects an occasion.
+        alpha: Weight for relevance score in final ranking.
+        beta: Weight for occasion score in final ranking.
 
     Returns:
         (parsed, rows_by_model)
@@ -153,7 +157,7 @@ def run_pipeline(
                 model_name=model_name,
                 occasion_embeddings_path=MODEL_OCCASION_EMBEDDINGS_PATHS.get(model_name),
             )
-            ranked = rank_candidates(candidates, occasion_scores)
+            ranked = rank_candidates(candidates, occasion_scores, alpha=alpha, beta=beta)
         else:
             # No occasion: skip occasion scoring, rank purely by retrieval relevance
             occasion_scores = {}
@@ -299,6 +303,8 @@ def run(
     end: int | None = None,
     ids_file: Path | None = None,
     disable_occasion: bool = False,
+    alpha: float = 0.6,
+    beta: float = 0.4,
 ) -> None:
     all_queries = json.loads(queries_path.read_text(encoding="utf-8"))
     if ids_file is not None:
@@ -333,7 +339,7 @@ def run(
 
         try:
             t0 = time.monotonic()
-            parsed, rows_by_model = run_pipeline(query_text, disable_occasion=disable_occasion)
+            parsed, rows_by_model = run_pipeline(query_text, disable_occasion=disable_occasion, alpha=alpha, beta=beta)
             pipeline_s = time.monotonic() - t0
 
             # Add random baseline (no pipeline needed)
@@ -443,10 +449,13 @@ if __name__ == "__main__":
         default=False,
         help="Disable occasion scoring; rank purely by relevance (alpha=1.0, beta=0.0)",
     )
+    parser.add_argument("--alpha", type=float, default=0.6, help="Relevance weight (default 0.6)")
+    parser.add_argument("--beta", type=float, default=0.4, help="Occasion weight (default 0.4)")
     args = parser.parse_args()
     run(
         args.queries, args.out,
         start=args.start, end=args.end,
         ids_file=args.ids_file,
         disable_occasion=args.no_occasion,
+        alpha=args.alpha, beta=args.beta,
     )
