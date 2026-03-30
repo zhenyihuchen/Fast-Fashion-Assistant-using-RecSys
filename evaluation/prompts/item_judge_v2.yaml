@@ -1,0 +1,77 @@
+# Item-level judge prompts
+# Each top-level key is a rubric name.
+# To A/B test, duplicate this file (e.g. item_judge_v2.yaml) and tweak the rubrics.
+
+system: "You are an expert evaluator for a fashion recommendation system."
+
+item_relevance:
+  criteria: |
+    Evaluate whether the recommended fashion product is relevant to the user's
+    search query. Adapted from the RAG metric 'Context Relevance': checks if the
+    retrieved item aligns with what the user was looking for.
+  steps: |
+    Step 1: Read the user query and identify what the user is looking for:
+            item type, color, fit, price range.
+    Step 2: Check if the product category matches what the user requested.
+    Step 3: Check if the product color aligns with any color specified in the query.
+    Step 4: Check if the product fit or style matches any fit preference mentioned.
+    Step 5: Check if the price is within any stated price range.
+    Step 6: Consider the overall semantic alignment between the query intent and
+            the product name and description. Also examine the attached image.
+    Step 7: Assign a score from 1 to 5.
+  scale:
+    1: "completely irrelevant — wrong category, color, and style"
+    2: "mostly irrelevant — matches at most one constraint"
+    3: "partially relevant — matches some constraints but misses key ones"
+    4: "mostly relevant — matches most constraints with one minor misalignment"
+    5: "highly relevant — matches all stated constraints and overall intent"
+
+occasion_appropriateness:
+  criteria: |
+    Evaluate whether the recommended product is visually and contextually appropriate
+    for the stated occasion, using both the attached product image and its metadata.
+    If no occasion is specified in the evidence, output null for this dimension.
+  steps: |
+    Step 1: Check the evidence for an occasion_target. If absent or null, skip and
+            return null score with reasoning "No occasion specified".
+    Step 2: Identify the stated occasion (e.g. wedding, job interview, date night,
+            festival, New Year's Eve).
+    Step 3: Consider what clothing styles, formality levels, and aesthetics are
+            typical and expected for this occasion.
+    Step 4: Examine the attached product image — assess its visual style, formality
+            level, silhouette, and overall aesthetic.
+    Step 5: Review the product metadata (category, name, color) to further understand
+            the item beyond what the image shows.
+    Step 6: Determine whether a person attending this occasion would realistically
+            and comfortably wear this item.
+    Step 7: Assign a score from 1 to 5.
+  scale:
+    1: "clearly inappropriate — e.g. swimwear for a job interview"
+    2: "unlikely to be appropriate — wrong formality level or aesthetic"
+    3: "could work in some contexts — borderline, depends on interpretation"
+    4: "appropriate for the occasion — fits expected style and formality"
+    5: "clearly and ideally suited — exemplary, stands out as a great choice"
+
+explanation_quality:
+  criteria: |
+    Evaluate whether the generated product explanation is both grounded in the
+    actual product metadata (no hallucinated attributes) and genuinely useful for
+    a shopper making a purchase decision. Adapted from the RAG metric 'Groundedness'.
+  steps: |
+    Step 1: Read the product metadata: name, category, color, price, and description.
+    Step 2: Read the user query and the stated occasion (if any).
+    Step 3: Read the generated explanation.
+    Step 4: For each claim in the explanation, verify it can be directly confirmed
+            from the metadata — flag any attributes NOT in the metadata as hallucinations.
+    Step 5: Assess whether the explanation is specific — does it mention concrete
+            product attributes, or is it generic praise that could apply to any item?
+    Step 6: Assess whether the explanation connects the product to the user's query
+            and/or occasion with clear, logical reasoning.
+    Step 7: Penalise both hallucinated claims and generic filler statements.
+    Step 8: Assign a score from 1 to 5.
+  scale:
+    1: "hallucinated or completely generic — could describe any product"
+    2: "multiple issues: hallucinations AND/OR very generic statements"
+    3: "mostly grounded and somewhat useful — one or two minor issues"
+    4: "well-grounded and specific, clearly connects product to query/occasion"
+    5: "fully grounded, specific, and genuinely helpful for the purchase decision"

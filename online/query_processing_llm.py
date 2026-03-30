@@ -414,6 +414,12 @@ def parse_query_llm(query: str) -> dict[str, Any]:
     content = resp["content"]
     result = _parse_llm_json(content)
     result["normalized"] = normalized
+
+    # Enforce consistency: if a target was detected, mode must be "on"
+    occ = result.get("occasion") or {}
+    if isinstance(occ, dict) and occ.get("target") and occ.get("mode") == "off":
+        occ["mode"] = "on"
+
     return result
 
 
