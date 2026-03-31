@@ -5,11 +5,12 @@ interface Props {
   sessions: Session[];
   currentId: string;
   onSelect: (id: string) => void;
+  onDelete: (id: string) => void;
   onNew: () => void;
   onClear: () => void;
 }
 
-export default function Sidebar({ sessions, currentId, onSelect, onNew, onClear }: Props) {
+export default function Sidebar({ sessions, currentId, onSelect, onDelete, onNew, onClear }: Props) {
   return (
     <aside className="flex flex-col h-full w-60 bg-ink-900 text-white shrink-0">
       {/* Brand */}
@@ -22,18 +23,34 @@ export default function Sidebar({ sessions, currentId, onSelect, onNew, onClear 
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
         <p className="px-3 mb-2 text-[10px] tracking-widest uppercase text-ink-400">Sessions</p>
         {sessions.map((s) => (
-          <button
+          <div
             key={s.id}
-            onClick={() => onSelect(s.id)}
             className={[
-              "w-full text-left px-3 py-2 rounded text-sm transition-colors",
-              s.id === currentId
-                ? "bg-white/10 text-white font-medium"
-                : "text-ink-400 hover:text-white hover:bg-white/5",
+              "group flex items-center gap-2 rounded transition-colors",
+              s.id === currentId ? "bg-white/10" : "hover:bg-white/5",
             ].join(" ")}
           >
-            {s.label}
-          </button>
+            <button
+              onClick={() => onSelect(s.id)}
+              className={[
+                "flex-1 min-w-0 text-left px-3 py-2 rounded text-sm transition-colors truncate",
+                s.id === currentId
+                  ? "text-white font-medium"
+                  : "text-ink-400 group-hover:text-white",
+              ].join(" ")}
+              title={s.label}
+            >
+              {s.label}
+            </button>
+            <button
+              onClick={() => onDelete(s.id)}
+              className="shrink-0 mr-2 text-ink-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label={`Delete ${s.label}`}
+              title="Delete session"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
         ))}
       </div>
 

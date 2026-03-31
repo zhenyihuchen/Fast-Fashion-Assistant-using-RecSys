@@ -63,6 +63,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_TRANSCRIBE_MODEL = os.getenv("OPENAI_TRANSCRIBE_MODEL", "gpt-4o-mini-transcribe")
+OPENAI_SESSION_TITLE_MODEL = os.getenv("OPENAI_SESSION_TITLE_MODEL", "gpt-5-nano")
 _openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 # Cache the catalog in memory so it isn't re-read on every request.
@@ -159,6 +160,35 @@ def _build_summary(rows: list[dict], parsed: dict) -> str:
         return resp.choices[0].message.content.strip()
     except Exception:
         return "Here are your top picks:"
+
+
+def _fallback_session_title(message: str) -> str:
+    cleaned = " ".join(message.strip().split())
+    return (cleaned[:60].rstrip(" .,;:!?") or "New chat")
+
+
+def _generate_session_title(first_user_message: str) -> str:
+    if _openai_client is None:
+        return _fallback_session_title(first_user_message)
+
+    response = _openai_client.responses.create(
+        model=OPENAI_SESSION_TITLE_MODEL,
+        instructions=(
+            "Generate a short session title from the user's first shopping message. "
+            "Return only the title text. Keep it under 8 words. "
+            "Do not use quotes, punctuation at the end, or generic prefixes like Session or Chat."
+        ),
+        input=[
+            {
+                "role": "user",
+                "content": [{"type": "input_text", "text": first_user_message}],
+            }
+        ],
+        reasoning={"effort": "low"},
+        text={"verbosity": "low"},
+        timeout=30,
+    )
+    return _fallback_session_title(response.output_text)
 
 
 
@@ -397,6 +427,10 @@ class SearchRequest(BaseModel):
     query: str
 
 
+class SessionTitleRequest(BaseModel):
+    first_message: str
+
+
 @app.post("/api/search")
 async def search(req: SearchRequest):
     return StreamingResponse(
@@ -408,6 +442,16 @@ async def search(req: SearchRequest):
             "Connection": "keep-alive",
         },
     )
+
+
+@app.post("/api/session-title")
+async def session_title(req: SessionTitleRequest):
+    if not req.first_message.strip():
+        return {"title": "New chat"}
+    try:
+        return {"title": _generate_session_title(req.first_message)}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Session title generation failed: {exc}")
 
 
 @app.post("/api/transcribe")

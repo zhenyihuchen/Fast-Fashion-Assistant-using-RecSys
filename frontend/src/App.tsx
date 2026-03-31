@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { search } from "./api/client";
+import { generateSessionTitle, search } from "./api/client";
 import Sidebar from "./components/Sidebar";
 import ChatMessage from "./components/ChatMessage";
 import ChatInput from "./components/ChatInput";
@@ -16,6 +16,7 @@ function uid() {
 const INTRO_TEXT =
   "Hey, I'm Zara's virtual shopping assistant. I can help you find your next purchase faster than traditional searching. What do you want to buy today, and for what occasion?";
 const STORAGE_KEY = "fashion-assistant-sessions";
+const DEFAULT_SESSION_LABEL = "New Chat";
 
 function makeIntroMsg(): ChatMsg {
   return { id: uid(), role: "assistant", type: "text", content: INTRO_TEXT };
@@ -31,8 +32,20 @@ function makeSession(label: string): Session {
   };
 }
 
+function isGenericSessionLabel(label: string): boolean {
+  return label === DEFAULT_SESSION_LABEL || /^Session \d+$/.test(label.trim());
+}
+
+function firstUserMessage(messages: ChatMsg[]): string | null {
+  const first = messages.find(
+    (msg): msg is Extract<ChatMsg, { type: "text" }> =>
+      msg.type === "text" && msg.role === "user" && Boolean(msg.content.trim())
+  );
+  return first?.content.trim() || null;
+}
+
 function loadStoredState(): { sessions: Session[]; currentId: string } {
-  const fallbackSessions = [makeSession("Session 1")];
+  const fallbackSessions = [makeSession(DEFAULT_SESSION_LABEL)];
   const fallback = { sessions: fallbackSessions, currentId: fallbackSessions[0].id };
 
   if (typeof window === "undefined") {
@@ -48,7 +61,12 @@ function loadStoredState(): { sessions: Session[]; currentId: string } {
       sessions?: Session[];
       currentId?: string;
     };
-    const sessions = Array.isArray(parsed.sessions) ? parsed.sessions : [];
+    const sessions = Array.isArray(parsed.sessions)
+      ? parsed.sessions.map((session) => ({
+          ...session,
+          label: /^Session \d+$/.test(session.label) ? DEFAULT_SESSION_LABEL : session.label,
+        }))
+      : [];
     if (sessions.length === 0) {
       return fallback;
     }
@@ -71,10 +89,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const retitledSessionsRef = useRef<Record<string, boolean>>({});
   const current =
     sessions.find((s) => s.id === currentId) ??
     sessions[0] ??
-    makeSession("Session 1");
+    makeSession(DEFAULT_SESSION_LABEL);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -119,6 +138,29 @@ export default function App() {
     },
     [updateSession]
   );
+
+  const refreshSessionTitle = useCallback(
+    async (sessionId: string, firstMessage: string) => {
+      try {
+        const title = await generateSessionTitle(firstMessage);
+        updateSession(sessionId, (s) => ({ ...s, label: title || s.label }));
+      } catch {
+        // Keep the default label if title generation fails.
+      }
+    },
+    [updateSession]
+  );
+
+  useEffect(() => {
+    for (const session of sessions) {
+      if (retitledSessionsRef.current[session.id]) continue;
+      if (!isGenericSessionLabel(session.label)) continue;
+      const firstMessage = firstUserMessage(session.messages);
+      if (!firstMessage) continue;
+      retitledSessionsRef.current[session.id] = true;
+      void refreshSessionTitle(session.id, firstMessage);
+    }
+  }, [sessions, refreshSessionTitle]);
 
   // ---------------------------------------------------------------------------
   // Pipeline
@@ -234,8 +276,15 @@ export default function App() {
     (text: string) => {
       if (loading) return;
 
+      const hasUserMessage = current.messages.some(
+        (msg) => msg.role === "user" && msg.type === "text" && Boolean(msg.content.trim())
+      );
+
       // Add user message
       pushMsg(currentId, { id: uid(), role: "user", type: "text", content: text });
+      if (!hasUserMessage) {
+        void refreshSessionTitle(currentId, text);
+      }
 
       // Build effective query
       let effectiveQuery = text;
@@ -251,7 +300,7 @@ export default function App() {
 
       runSearch(currentId, effectiveQuery);
     },
-    [loading, currentId, current, pushMsg, updateSession, runSearch]
+    [loading, currentId, current, pushMsg, refreshSessionTitle, updateSession, runSearch]
   );
 
   // ---------------------------------------------------------------------------
@@ -259,19 +308,42 @@ export default function App() {
   // ---------------------------------------------------------------------------
 
   const handleNewSession = () => {
-    const label = `Session ${sessions.length + 1}`;
+    const label = DEFAULT_SESSION_LABEL;
     const s = makeSession(label);
     setSessions((prev) => [...prev, s]);
     setCurrentId(s.id);
   };
 
+  const handleDeleteSession = useCallback(
+    (sessionId: string) => {
+      setSessions((prev) => {
+        const remaining = prev.filter((session) => session.id !== sessionId);
+        if (remaining.length === 0) {
+          const next = makeSession(DEFAULT_SESSION_LABEL);
+          setCurrentId(next.id);
+          return [next];
+        }
+        if (sessionId === currentId) {
+          const currentIndex = prev.findIndex((session) => session.id === sessionId);
+          const nextActive = remaining[Math.max(0, Math.min(currentIndex, remaining.length - 1))];
+          setCurrentId(nextActive.id);
+        }
+        return remaining;
+      });
+      delete retitledSessionsRef.current[sessionId];
+    },
+    [currentId]
+  );
+
   const handleClear = () => {
     updateSession(currentId, (s) => ({
       ...s,
+      label: DEFAULT_SESSION_LABEL,
       messages: [makeIntroMsg()],
       pendingQuery: null,
       awaitingOccasion: false,
     }));
+    delete retitledSessionsRef.current[currentId];
   };
 
   const placeholder = current.awaitingOccasion
@@ -288,6 +360,7 @@ export default function App() {
         sessions={sessions}
         currentId={currentId}
         onSelect={setCurrentId}
+        onDelete={handleDeleteSession}
         onNew={handleNewSession}
         onClear={handleClear}
       />
