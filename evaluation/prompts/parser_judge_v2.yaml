@@ -1,0 +1,59 @@
+# Parser-level judge prompts — V2 (loosened scales for better score spread)
+
+system: "You are an expert evaluator for a fashion recommendation system."
+
+parser_completeness:
+  criteria: |
+    Evaluate whether the query parser extracted ALL constraints that the user
+    explicitly mentioned in their natural-language query.
+  steps: |
+    Step 1: Read the user's query carefully.
+    Step 2: Identify every constraint the user explicitly stated: item categories,
+            colors, fit preferences, price limits, and occasion.
+    Step 3: Compare these with the parsed output fields (categories, colors, fit,
+            price_min, price_max, occasion_mode, occasion_target).
+    Step 4: Note any constraint mentioned by the user that was NOT extracted.
+    Step 5: Assign a score from 1 to 5.
+  scale:
+    1: "missed most constraints — 3 or more explicitly stated constraints (category, color, fit, price, occasion) were not extracted at all; the parsed output is mostly empty or wrong"
+    2: "missed several constraints — 2 explicitly stated constraints were not extracted; the parser captured some information but has significant gaps"
+    3: "missed one constraint — exactly one explicitly stated constraint was not extracted (e.g. user said 'under 50 euros' but price_max is null); everything else was captured correctly"
+    4: "nearly complete — all explicitly stated constraints were extracted, with at most one minor ambiguous gap (e.g. user said 'relaxed fit' and parser mapped it to a slightly different but reasonable fit term)"
+    5: "perfectly complete — every constraint the user explicitly mentioned was captured in the correct field with the correct value"
+
+parser_no_hallucination:
+  criteria: |
+    Evaluate whether the query parser avoided extracting constraints that the
+    user did NOT explicitly mention or clearly imply in their query.
+  steps: |
+    Step 1: Read the user's query carefully.
+    Step 2: Read the parsed output: categories, colors, fit, price range, occasion.
+    Step 3: For each extracted constraint, verify it was explicitly stated or
+            clearly implied by the user — not just a plausible guess.
+    Step 4: Identify any constraints in the parsed output NOT mentioned in the query.
+    Step 5: Assign a score from 1 to 5.
+  scale:
+    1: "many hallucinated constraints — 3 or more constraints in the parsed output were never mentioned or implied by the user; the parser is inventing information"
+    2: "several hallucinated constraints — 2 constraints were invented (e.g. parser added a color and a fit preference the user never mentioned)"
+    3: "one hallucinated constraint — exactly one constraint appears in the output that the user did not mention (e.g. parser added 'slim' fit when the user said nothing about fit)"
+    4: "no clear hallucinations — all extracted constraints trace back to the user's query, though one may be a borderline over-inference (e.g. inferring 'casual' fit from context when not explicitly stated)"
+    5: "perfectly clean — every constraint in the parsed output was explicitly stated or clearly and directly implied by the user's query; nothing was invented"
+
+parser_occasion_detection:
+  criteria: |
+    Evaluate whether the parser correctly identified whether an occasion was
+    mentioned in the query and mapped it to the correct occasion label.
+  steps: |
+    Step 1: Read the user's query.
+    Step 2: Determine whether an occasion is clearly mentioned.
+    Step 3: Check the parsed output's occasion field: mode ('on'/'off') and target label.
+    Step 4: If NO occasion was mentioned: mode should be 'off' — penalise a false positive.
+    Step 5: If an occasion WAS mentioned: mode should be 'on' and target should match
+            the correct occasion type — penalise if wrong or missing.
+    Step 6: Assign a score from 1 to 5.
+  scale:
+    1: "completely wrong — the parser's decision is the opposite of what it should be (e.g. user clearly mentions a wedding but mode='off', or user mentions no occasion but parser sets mode='on' with a fabricated target)"
+    2: "wrong direction — a clear false positive (parser detects an occasion that was never mentioned) or false negative (parser misses an obviously stated occasion like 'for my job interview')"
+    3: "detected presence correctly but wrong label — the parser correctly identified that an occasion exists (mode='on') but mapped it to the wrong occasion type (e.g. 'party_night_out' when user said 'job interview')"
+    4: "correct mode and close label — the parser got the mode right and the occasion label is close or reasonable (e.g. 'formal_event' instead of 'wedding_guest', or minor naming differences)"
+    5: "perfectly correct — right mode and exact occasion label matching what the user described"

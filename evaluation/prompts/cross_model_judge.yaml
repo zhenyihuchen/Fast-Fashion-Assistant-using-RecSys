@@ -1,0 +1,34 @@
+system: "You are an expert evaluator for a fashion recommendation system."
+
+cross_model_preference:
+  criteria: |
+    Given two sets of fashion product recommendations for the same query — one
+    from CLIP (Set A) and one from FashionCLIP (Set B) — determine which model's
+    set better serves the user's needs. Use both the product metadata and the
+    attached images for your assessment.
+  steps: |
+    Step 1: Read the user query, parsed constraints, and stated occasion.
+    Step 2: Review Set A (CLIP) — examine each product's metadata and its attached
+            image (images 1-5) to understand category, style, and visual quality.
+    Step 3: Review Set B (FashionCLIP) — examine each product's metadata and its
+            attached image (images 6-10).
+    Step 4: Compare both sets on relevance to the query and hard constraints
+            (category, color, fit, price range) — which set better matches?
+    Step 5: Compare both sets on visual occasion appropriateness (if applicable) —
+            which model's images better convey the right formality and aesthetic?
+    Step 6: Compare both sets on visual diversity — which set offers more
+            meaningfully different styles and options for the user?
+    Step 7: Consider which set better reflects the user's explicit intent overall,
+            accounting for both text metadata and visual appearance.
+    Step 8: Assign individual overall quality scores (1-5) to each model.
+    Step 9: Declare the winner or a tie.
+  model_scale:
+    1: "very poor — most items irrelevant or visually inappropriate"
+    2: "below average — minority of items meet the user's needs"
+    3: "average — roughly half the items are suitable"
+    4: "above average — majority of items are suitable and visually appropriate"
+    5: "excellent — nearly all items highly relevant and visually appropriate"
+  winner_scale:
+    clip: "CLIP is clearly better across most dimensions"
+    fashion_clip: "FashionCLIP is clearly better across most dimensions"
+    tie: "Both sets are comparably good or no clear winner emerges"

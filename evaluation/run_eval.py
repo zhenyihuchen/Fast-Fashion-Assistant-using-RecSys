@@ -98,6 +98,7 @@ def _random_products(n: int = 5) -> list[dict]:
 def run_pipeline(
     query: str,
     disable_occasion: bool = False,
+    no_pipeline: bool = False,
     alpha: float = 0.6,
     beta: float = 0.4,
 ) -> tuple[dict, dict[str, list[dict]]]:
@@ -107,6 +108,9 @@ def run_pipeline(
         query: The user query string.
         disable_occasion: If True, skip occasion scoring and rank purely by
             relevance (α=1.0, β=0.0) even when the parser detects an occasion.
+        no_pipeline: If True, skip query parsing, metadata filtering, occasion
+            scoring, and explanation generation. Returns raw embedding similarity
+            results only (baseline for ablation).
         alpha: Weight for relevance score in final ranking.
         beta: Weight for occasion score in final ranking.
 
@@ -114,6 +118,9 @@ def run_pipeline(
         (parsed, rows_by_model)
         where rows_by_model = {"clip": [...], "fashion_clip": [...]}
     """
+    if no_pipeline:
+        return _run_no_pipeline(query)
+
     parsed = parse_query_llm(query)
     occ = parsed.get("occasion") or {}
     has_occasion = (
@@ -199,6 +206,65 @@ def run_pipeline(
         )
         for row in rows:
             row["explanation"] = explanations.get(str(row["row_id"]), "")
+
+        rows_by_model[model_name] = rows[:5]
+
+    return parsed, rows_by_model
+
+
+def _run_no_pipeline(query: str) -> tuple[dict, dict[str, list[dict]]]:
+    """Baseline: raw embedding similarity only — no filtering, no occasion
+    scoring, no explanations.  The query is still parsed so the judge can
+    evaluate occasion appropriateness against the detected occasion."""
+    parsed = parse_query_llm(query)
+
+    candidates_by_model = retrieve_candidates(
+        query,
+        parsed={},           # empty → no constraint filtering
+        topk=30,
+        filter_first=False,  # no metadata pre-filtering
+        use_faiss=True,
+        embedding_model="both",
+        return_metadata=True,
+    )
+    if not any(result.get("candidates") for result in candidates_by_model.values()):
+        return parsed, {}
+
+    df = _get_catalog()
+    rows_by_model: dict[str, list[dict]] = {}
+
+    for model_name, result in candidates_by_model.items():
+        candidates = result.get("candidates", [])
+        if not candidates:
+            continue
+
+        # Rank by raw similarity only (alpha=1, beta=0, no occasion scores)
+        ranked = rank_candidates(candidates, {}, alpha=1.0, beta=0.0)
+
+        rows: list[dict] = []
+        for row_id, relevance, occ_score, final_score in ranked:
+            if row_id not in df.index:
+                continue
+            row = df.loc[row_id]
+            rows.append({
+                "row_id": row_id,
+                "relevance_score": float(relevance),
+                "occasion_score": 0.0,
+                "final_score": float(final_score),
+                "product_name": str(row.get("product_name", "") or ""),
+                "product_description": str(row.get("product_description", "") or ""),
+                "product_url": str(row.get("product_url", "") or ""),
+                "price": str(row.get("price", "") or ""),
+                "color": str(row.get("color", "") or ""),
+                "product_category": str(row.get("product_category", "") or ""),
+                "image_url": str(row.get("image_url", "") or ""),
+                "local_image_path": str(
+                    IMAGES_DIR / (str(row.get("reference_number", "") or "").replace("/", "_") + ".jpg")
+                ),
+                "match_stage": "no_pipeline",
+                "match_message": "Raw embedding similarity — no filtering or reranking",
+                "explanation": "",
+            })
 
         rows_by_model[model_name] = rows[:5]
 
@@ -303,6 +369,7 @@ def run(
     end: int | None = None,
     ids_file: Path | None = None,
     disable_occasion: bool = False,
+    no_pipeline: bool = False,
     alpha: float = 0.6,
     beta: float = 0.4,
 ) -> None:
@@ -339,7 +406,13 @@ def run(
 
         try:
             t0 = time.monotonic()
-            parsed, rows_by_model = run_pipeline(query_text, disable_occasion=disable_occasion, alpha=alpha, beta=beta)
+            parsed, rows_by_model = run_pipeline(
+                query_text,
+                disable_occasion=disable_occasion,
+                no_pipeline=no_pipeline,
+                alpha=alpha,
+                beta=beta,
+            )
             pipeline_s = time.monotonic() - t0
 
             # Add random baseline (no pipeline needed)
@@ -449,6 +522,12 @@ if __name__ == "__main__":
         default=False,
         help="Disable occasion scoring; rank purely by relevance (alpha=1.0, beta=0.0)",
     )
+    parser.add_argument(
+        "--no-pipeline",
+        action="store_true",
+        default=False,
+        help="Baseline: raw embedding similarity only — no parsing, filtering, occasion, or explanations",
+    )
     parser.add_argument("--alpha", type=float, default=0.6, help="Relevance weight (default 0.6)")
     parser.add_argument("--beta", type=float, default=0.4, help="Occasion weight (default 0.4)")
     args = parser.parse_args()
@@ -457,5 +536,6 @@ if __name__ == "__main__":
         start=args.start, end=args.end,
         ids_file=args.ids_file,
         disable_occasion=args.no_occasion,
+        no_pipeline=args.no_pipeline,
         alpha=args.alpha, beta=args.beta,
     )

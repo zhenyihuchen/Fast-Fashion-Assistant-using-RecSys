@@ -230,6 +230,7 @@ def build_focused_comparison(occ_pq: list[dict], no_occ_pq: list[dict]) -> pd.Da
     return pivot[cols]
 
 
+
 def print_and_save(
     df_full: pd.DataFrame,
     df_focused: pd.DataFrame,

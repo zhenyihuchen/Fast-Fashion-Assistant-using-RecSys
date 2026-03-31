@@ -1,0 +1,7 @@
+Model,Rubric,Relevance Only,Relevance + Occasion,Δ
+CLIP,item_relevance,0.8705,0.7713,-0.0992
+CLIP,occasion_appropriateness,0.9365,0.9711,0.0346
+FashionCLIP,item_relevance,0.9124,0.8834,-0.029
+FashionCLIP,occasion_appropriateness,0.9729,0.9728,-0.0001
+Random,item_relevance,0.9785,0.8882,-0.0903
+Random,occasion_appropriateness,0.9616,0.8625,-0.0991

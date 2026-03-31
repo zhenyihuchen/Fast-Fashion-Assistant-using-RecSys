@@ -1,0 +1,57 @@
+system: "You are an expert evaluator for a fashion recommendation system."
+
+parser_completeness:
+  criteria: |
+    Evaluate whether the query parser extracted ALL constraints that the user
+    explicitly mentioned in their natural-language query.
+  steps: |
+    Step 1: Read the user's query carefully.
+    Step 2: Identify every constraint the user explicitly stated: item categories,
+            colors, fit preferences, price limits, and occasion.
+    Step 3: Compare these with the parsed output fields (categories, colors, fit,
+            price_min, price_max, occasion_mode, occasion_target).
+    Step 4: Note any constraint mentioned by the user that was NOT extracted.
+    Step 5: Assign a score from 1 to 5.
+  scale:
+    1: "missed most constraints (3 or more missed)"
+    2: "missed several constraints (2 missed)"
+    3: "missed exactly one constraint"
+    4: "extracted nearly all — at most a minor ambiguous gap"
+    5: "perfectly complete — every stated constraint was captured"
+
+parser_no_hallucination:
+  criteria: |
+    Evaluate whether the query parser avoided extracting constraints that the
+    user did NOT explicitly mention or clearly imply in their query.
+  steps: |
+    Step 1: Read the user's query carefully.
+    Step 2: Read the parsed output: categories, colors, fit, price range, occasion.
+    Step 3: For each extracted constraint, verify it was explicitly stated or
+            clearly implied by the user — not just a plausible guess.
+    Step 4: Identify any constraints in the parsed output NOT mentioned in the query.
+    Step 5: Assign a score from 1 to 5.
+  scale:
+    1: "many hallucinated constraints (3 or more invented)"
+    2: "several hallucinated constraints (2 invented)"
+    3: "exactly one hallucinated constraint"
+    4: "no hallucinations, but one constraint is a borderline over-inference"
+    5: "perfectly clean — no invented or over-inferred constraints"
+
+parser_occasion_detection:
+  criteria: |
+    Evaluate whether the parser correctly identified whether an occasion was
+    mentioned in the query and mapped it to the correct occasion label.
+  steps: |
+    Step 1: Read the user's query.
+    Step 2: Determine whether an occasion is clearly mentioned.
+    Step 3: Check the parsed output's occasion field: mode ('on'/'off') and target label.
+    Step 4: If NO occasion was mentioned: mode should be 'off' — penalise a false positive.
+    Step 5: If an occasion WAS mentioned: mode should be 'on' and target should match
+            the correct occasion type — penalise if wrong or missing.
+    Step 6: Assign a score from 1 to 5.
+  scale:
+    1: "completely wrong (e.g. occasion present but mode='off', or opposite error)"
+    2: "wrong direction — clear false positive or false negative"
+    3: "detected presence correctly but mapped to wrong occasion label"
+    4: "correct mode and close label match, minor wording/capitalisation difference"
+    5: "perfectly correct — right mode and exact occasion label"

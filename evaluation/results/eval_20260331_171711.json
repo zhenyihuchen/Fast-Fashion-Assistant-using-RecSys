@@ -1,0 +1,1849 @@
+{
+  "run_timestamp": "20260331_171711",
+  "queries_file": "/Users/fani/Fast-Fashion-Assistant-using-RecSys/evaluation/test_queries.json",
+  "total_queries": 2,
+  "aggregate": {
+    "clip": {
+      "item_relevance": {
+        "mean": 3.05,
+        "std": 0.6048,
+        "n": 20
+      },
+      "occasion_appropriateness": {
+        "mean": 3.25,
+        "std": 0.7864,
+        "n": 20
+      },
+      "explanation_quality": {
+        "mean": 2.5,
+        "std": 0.8272,
+        "n": 20
+      },
+      "set_answer_relevance": {
+        "mean": 2.5,
+        "std": 0.7071,
+        "n": 2
+      }
+    },
+    "fashion_clip": {
+      "item_relevance": {
+        "mean": 3.25,
+        "std": 0.5501,
+        "n": 20
+      },
+      "occasion_appropriateness": {
+        "mean": 3.7,
+        "std": 0.4702,
+        "n": 20
+      },
+      "explanation_quality": {
+        "mean": 3.4,
+        "std": 0.6806,
+        "n": 20
+      },
+      "set_answer_relevance": {
+        "mean": 2.5,
+        "std": 0.7071,
+        "n": 2
+      }
+    },
+    "random": {
+      "item_relevance": {
+        "mean": 1.7,
+        "std": 0.5712,
+        "n": 20
+      },
+      "occasion_appropriateness": {
+        "mean": 2.4,
+        "std": 0.9403,
+        "n": 20
+      },
+      "explanation_quality": {
+        "mean": 1,
+        "std": 0.0,
+        "n": 20
+      },
+      "set_answer_relevance": {
+        "mean": 1.5,
+        "std": 0.7071,
+        "n": 2
+      }
+    },
+    "parser": {
+      "parser_completeness": {
+        "mean": 3.5,
+        "std": 0.7071,
+        "n": 2
+      },
+      "parser_no_hallucination": {
+        "mean": 5,
+        "std": 0.0,
+        "n": 2
+      },
+      "parser_occasion_detection": {
+        "mean": 5,
+        "std": 0.0,
+        "n": 2
+      }
+    },
+    "cross_model": {
+      "clip_wins": 0,
+      "fashionclip_wins": 2,
+      "ties": 0,
+      "total": 2
+    }
+  },
+  "per_query": [
+    {
+      "id": "q101",
+      "query": "I need something elegant for my friend's wedding, maybe a burgundy dress, nothing too tight",
+      "tier": 3,
+      "tags": [
+        "occasion",
+        "category",
+        "color",
+        "fit"
+      ],
+      "parsed": {
+        "normalized": "i need something elegant for my friend's wedding, maybe a burgundy dress, nothing too tight",
+        "constraints": {
+          "categories": [
+            "dresses"
+          ],
+          "colors": [
+            "burgundy"
+          ],
+          "price_min": null,
+          "price_max": null,
+          "fit": [
+            "loose"
+          ]
+        },
+        "occasion": {
+          "mode": "on",
+          "target": "wedding_guest"
+        },
+        "confidence": {
+          "overall": 0.8,
+          "occasion": 0.8
+        }
+      },
+      "rows_by_model": {
+        "clip": [
+          {
+            "product_name": "TRENCH COAT MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BISCUIT",
+            "price": "35.95 EUR",
+            "explanation": "The BISCUIT colored DRESSES item is suited for a wedding guest occasion. Its style aligns with celebratory daytime dressing as suggested by the top prompt, and it fits the dresses query.",
+            "image_url": "https://static.zara.net/assets/public/7ae4/32e0/2a48428182ef/7ef4e6974249/03067310726-e2/03067310726-e2.jpg?ts=1769101967539&w=4800",
+            "product_url": "https://www.zara.com/es/en/trench-coat-midi-dress-p03067310.html",
+            "final_score": 0.285701596736908,
+            "relevance_score": 0.30215126276016235,
+            "occasion_score": 0.26102709770202637
+          },
+          {
+            "product_name": "SHORT DRESS WITH PLEATS AND POCKETS",
+            "product_category": "DRESSES",
+            "color": "DARK MINK",
+            "price": "35.95 EUR",
+            "explanation": "DARK MINK dress offers a polished option for a wedding guest, with ceremony-guest silhouettes in mind per the top prompt, aligning with the dresses keyword.",
+            "image_url": "https://static.zara.net/assets/public/0ec6/8a96/583943f38df2/e65b3ba73a60/03067322742-e1/03067322742-e1.jpg?ts=1764586468033&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-pleats-and-pockets-p03067322.html",
+            "final_score": 0.28499322533607485,
+            "relevance_score": 0.30113956332206726,
+            "occasion_score": 0.2607737183570862
+          },
+          {
+            "product_name": "VELVET STRAPPY DRESS",
+            "product_category": "DRESSES",
+            "color": "BLACK",
+            "price": "79.95 EUR",
+            "explanation": "BLACK VELVET STRAPPY DRESS presents a wedding guest appeal, echoing ceremony guest silhouettes and a polished look from the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/2379/1acd/e01d4dc585f8/a0a3ddeb0546/05344102800-e1/05344102800-e1.jpg?ts=1764242277022&w=4800",
+            "product_url": "https://www.zara.com/es/en/velvet-strappy-dress-p05344102.html",
+            "final_score": 0.2809764087200165,
+            "relevance_score": 0.2931003272533417,
+            "occasion_score": 0.2627905309200287
+          },
+          {
+            "product_name": "NYLON MIDI DRESS WITH TIES",
+            "product_category": "DRESSES",
+            "color": "RED",
+            "price": "35.95 EUR",
+            "explanation": "RED NYLON MIDI DRESS provides a wedding guest piece, matching celebratory daytime dressing cues in the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/5c88/a9cf/ec8b450aaaeb/3b9572fe6a3b/04772308600-e1/04772308600-e1.jpg?ts=1768466813545&w=4800",
+            "product_url": "https://www.zara.com/es/en/nylon-midi-dress-with-ties-p04772308.html",
+            "final_score": 0.2806545853614807,
+            "relevance_score": 0.30088287591934204,
+            "occasion_score": 0.2503121495246887
+          },
+          {
+            "product_name": "SHORT POLYAMIDE BLEND DRESS",
+            "product_category": "DRESSES",
+            "color": "BLACK",
+            "price": "29.95 EUR",
+            "explanation": "BLACK SHORT POLYAMIDE BLEND DRESS suits a wedding guest event, framed by a semi-formal, refined presentation per the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/f176/06a6/49354d64b5f3/1d680f32bc18/01355015800-e1/01355015800-e1.jpg?ts=1768466232205&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-polyamide-blend-dress-p01355015.html",
+            "final_score": 0.2772798895835876,
+            "relevance_score": 0.2926258444786072,
+            "occasion_score": 0.25426095724105835
+          },
+          {
+            "product_name": "ASYMMETRIC MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BLACK",
+            "price": "39.95 EUR",
+            "explanation": "ASYMMETRIC MIDI DRESS in BLACK fits wedding guest expectations with balanced coverage and discreet ornament as described.",
+            "image_url": "https://static.zara.net/assets/public/43c3/3121/b26e4b4b87fd/0c5e1419a233/02321763800-e1/02321763800-e1.jpg?ts=1769098600266&w=4800",
+            "product_url": "https://www.zara.com/es/en/asymmetric-midi-dress-p02321763.html",
+            "final_score": 0.27694796919822695,
+            "relevance_score": 0.2877488434314728,
+            "occasion_score": 0.26074665784835815
+          },
+          {
+            "product_name": "SHORT BALLOON DRESS",
+            "product_category": "DRESSES",
+            "color": "AUBERGINE",
+            "price": "39.95 EUR",
+            "explanation": "AUBERGINE SHORT BALLOON DRESS aligns with wedding guest styling via daytime-appropriate fabrics in the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/3df6/23e2/25044fd580a9/6798f91eebd4/02268541610-e1/02268541610-e1.jpg?ts=1768305387155&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-balloon-dress-p02268541.html",
+            "final_score": 0.2755420088768005,
+            "relevance_score": 0.29109352827072144,
+            "occasion_score": 0.2522147297859192
+          },
+          {
+            "product_name": "MAXI HIGH NECK DRESS",
+            "product_category": "DRESSES",
+            "color": "ECRU",
+            "price": "22.95 EUR",
+            "explanation": "ECRU MAXI HIGH NECK DRESS offers balanced coverage and refined drape for a wedding guest look, as per the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/c138/18d8/4edc4dcb9d4f/8c317bfe8303/01198001712-e1/01198001712-e1.jpg?ts=1767887864165&w=4800",
+            "product_url": "https://www.zara.com/es/en/high-neck-maxi-dress-p01198001.html",
+            "final_score": 0.2752276599407196,
+            "relevance_score": 0.2878703773021698,
+            "occasion_score": 0.2562635838985443
+          },
+          {
+            "product_name": "HALTER MIDI DRESS WITH GODETS",
+            "product_category": "DRESSES",
+            "color": "WHITE",
+            "price": "35.95 EUR",
+            "explanation": "WHITE HALTER MIDI DRESS suits a wedding guest occasion with midi-length silhouette guidance from the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/ef90/99bb/3e5d476e8c67/8cfce134039c/04772307250-e1/04772307250-e1.jpg?ts=1768478037594&w=4800",
+            "product_url": "https://www.zara.com/es/en/mid-halter-godet-dress-p04772307.html",
+            "final_score": 0.2748527526855469,
+            "relevance_score": 0.28397297859191895,
+            "occasion_score": 0.26117241382598877
+          },
+          {
+            "product_name": "CHIFFON GODET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "39.95 EUR",
+            "explanation": "BROWN CHIFFON GODET MIDI DRESS presents balanced coverage and a softened drape suitable for wedding attendance.",
+            "image_url": "https://static.zara.net/assets/public/a8cb/0f82/1dc040ca91bd/43993231daa6/00881344700-e1/00881344700-e1.jpg?ts=1768900563892&w=4800",
+            "product_url": "https://www.zara.com/es/en/chiffon-godet-midi-dress-p00881344.html",
+            "final_score": 0.27391165494918823,
+            "relevance_score": 0.28365659713745117,
+            "occasion_score": 0.2592942416667938
+          }
+        ],
+        "fashion_clip": [
+          {
+            "product_name": "LACE MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "59.95 EUR",
+            "explanation": "Brown Lace Midi Dress is a DRESSES choice that suits a wedding guest look with a midi length and polished tailored lines. It aligns with the dresses keyword set and the wedding_guest occasion.",
+            "image_url": "https://static.zara.net/assets/public/1809/b754/c539440ca9fd/e5e1f9828c61/01067101700-e1/01067101700-e1.jpg?ts=1764837925189&w=4800",
+            "product_url": "https://www.zara.com/es/en/lace-midi-dress-p01067101.html",
+            "final_score": 0.2535220205783844,
+            "relevance_score": 0.2561090290546417,
+            "occasion_score": 0.2496415078639984
+          },
+          {
+            "product_name": "DRAPED VELVET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "DARK BROWN",
+            "price": "29.95 EUR",
+            "explanation": "Dark Brown Draped Velvet Midi Dress offers a wedding guest option with a midi silhouette and tailored line, matching the ceremony guest vibe in the dresses category.",
+            "image_url": "https://static.zara.net/assets/public/e238/09ce/b6fa461a9428/9c68b2750fd5/09801242716-e1/09801242716-e1.jpg?ts=1765294582699&w=4800",
+            "product_url": "https://www.zara.com/es/en/draped-velvet-midi-dress-p09801242.html",
+            "final_score": 0.240017369389534,
+            "relevance_score": 0.2416369467973709,
+            "occasion_score": 0.23758800327777863
+          },
+          {
+            "product_name": "MULTIPOSITION COLLAR VISCOSE BLEND DRESS",
+            "product_category": "DRESSES",
+            "color": "BLACK",
+            "price": "99.95 EUR",
+            "explanation": "Black Multiposition Collar Viscose Blend Dress fits as a wedding guest outfit with a versatile collar style for celebratory daytime dressing in the dresses category.",
+            "image_url": "https://static.zara.net/assets/public/3d82/d498/7a10404888d5/51f95affb8eb/01758116800-e2/01758116800-e2.jpg?ts=1769172474755&w=4800",
+            "product_url": "https://www.zara.com/es/en/multiposition-collar-viscose-blend-dress-p01758116.html",
+            "final_score": 0.23220378160476685,
+            "relevance_score": 0.21087545156478882,
+            "occasion_score": 0.2641962766647339
+          },
+          {
+            "product_name": "ZW COLLECTION SATIN LACE DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "49.95 EUR",
+            "explanation": "Brown Zw Collection Satin Lace Dress provides a wedding guest option in the dresses category, with a satin lace look suitable for celebratory daytime occasions.",
+            "image_url": "https://static.zara.net/assets/public/2ef0/e0aa/7a1c42c781de/5b4106ca2df2/05919040700-e1/05919040700-e1.jpg?ts=1764168641367&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-satin-lace-dress-p05919040.html",
+            "final_score": 0.22520590126514436,
+            "relevance_score": 0.2153262346982956,
+            "occasion_score": 0.24002540111541748
+          },
+          {
+            "product_name": "SHORT BALLOON DRESS",
+            "product_category": "DRESSES",
+            "color": "AUBERGINE",
+            "price": "39.95 EUR",
+            "explanation": "Aubergine Short Balloon Dress offers a wedding guest choice in dresses with a playful silhouette and the color noted, aligning with the day event vibe.",
+            "image_url": "https://static.zara.net/assets/public/3df6/23e2/25044fd580a9/6798f91eebd4/02268541610-e1/02268541610-e1.jpg?ts=1768305387155&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-balloon-dress-p02268541.html",
+            "final_score": 0.22463663220405578,
+            "relevance_score": 0.23466014862060547,
+            "occasion_score": 0.20960135757923126
+          },
+          {
+            "product_name": "CHIFFON GODET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "39.95 EUR",
+            "explanation": "Brown Chiffon GodeT Midi Dress presents a wedding guest option in the dresses category, with a midi length that fits ceremony silhouettes.",
+            "image_url": "https://static.zara.net/assets/public/a8cb/0f82/1dc040ca91bd/43993231daa6/00881344700-e1/00881344700-e1.jpg?ts=1768900563892&w=4800",
+            "product_url": "https://www.zara.com/es/en/chiffon-godet-midi-dress-p00881344.html",
+            "final_score": 0.22099425494670866,
+            "relevance_score": 0.21736617386341095,
+            "occasion_score": 0.22643637657165527
+          },
+          {
+            "product_name": "DRAPED LONG DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "22.95 EUR",
+            "explanation": "Brown Draped Long Dress is a wedding guest dress in the DRESSES category, featuring a midi-length vibe suitable for ceremony silhouettes.",
+            "image_url": "https://static.zara.net/assets/public/744f/e6f0/2d76472089a2/3e516f96ead3/03253317700-e1/03253317700-e1.jpg?ts=1768900423078&w=4800",
+            "product_url": "https://www.zara.com/es/en/draped-long-dress-p03253317.html",
+            "final_score": 0.21238629817962645,
+            "relevance_score": 0.20559725165367126,
+            "occasion_score": 0.22256986796855927
+          },
+          {
+            "product_name": "SHORT DRESS WITH PLEATS AND POCKETS",
+            "product_category": "DRESSES",
+            "color": "DARK MINK",
+            "price": "35.95 EUR",
+            "explanation": "Dark Mink Short Dress with pleats and pockets offers a wedding guest look in dresses, with a compact silhouette that suits the occasion.",
+            "image_url": "https://static.zara.net/assets/public/0ec6/8a96/583943f38df2/e65b3ba73a60/03067322742-e1/03067322742-e1.jpg?ts=1764586468033&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-pleats-and-pockets-p03067322.html",
+            "final_score": 0.21027380228042603,
+            "relevance_score": 0.21644088625907898,
+            "occasion_score": 0.2010231763124466
+          },
+          {
+            "product_name": "NYLON MIDI DRESS WITH TIES",
+            "product_category": "DRESSES",
+            "color": "RED",
+            "price": "35.95 EUR",
+            "explanation": "Red Nylon Midi Dress provides a wedding guest option in the dresses category, with a midi length that fits ceremony silhouettes.",
+            "image_url": "https://static.zara.net/assets/public/5c88/a9cf/ec8b450aaaeb/3b9572fe6a3b/04772308600-e1/04772308600-e1.jpg?ts=1768466813545&w=4800",
+            "product_url": "https://www.zara.com/es/en/nylon-midi-dress-with-ties-p04772308.html",
+            "final_score": 0.2084091931581497,
+            "relevance_score": 0.20069171488285065,
+            "occasion_score": 0.21998541057109833
+          },
+          {
+            "product_name": "SOSHIOTSUKI X ZARA SATIN BELTED DRESS",
+            "product_category": "DRESSES",
+            "color": "PINK",
+            "price": "129.00 EUR",
+            "explanation": "Pink Soshiotsuki X Zara Satin Belted Dress is a wedding guest dress in the dresses category, offering a satin finish for daytime celebration styling.",
+            "image_url": "https://static.zara.net/assets/public/56ca/98a3/d29d41199906/3ee918dcf7f1/09751710620-e1/09751710620-e1.jpg?ts=1764230743599&w=4800",
+            "product_url": "https://www.zara.com/es/en/satin-dress-with-belt-soshiotsuki-x-zara-p09751710.html",
+            "final_score": 0.2058704376220703,
+            "relevance_score": 0.1724179983139038,
+            "occasion_score": 0.25604909658432007
+          }
+        ],
+        "random": [
+          {
+            "product_name": "FLAP SHOULDER BAG",
+            "product_category": "BAGS",
+            "color": "BURGUNDY RED",
+            "price": "22.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/578b/3e59/c7354ee68fb6/8183245a2ca6/16565510624-000-e3/16565510624-000-e3.jpg?ts=1763393204396&w=4800",
+            "product_url": "https://www.zara.com/es/en/flap-shoulder-bag-p16565610.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "CORDUROY MINI SKIRT",
+            "product_category": "SKIRTS",
+            "color": "NAVY BLUE",
+            "price": "22.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/cccd/7e56/54824434938e/e5c975820b34/01255408401-e1/01255408401-e1.jpg?ts=1765989742436&w=4800",
+            "product_url": "https://www.zara.com/es/en/corduroy-mini-skirt-p01255408.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "SOFT LONG SLEEVE TOP",
+            "product_category": "T-SHIRTS",
+            "color": "BROWN MARL",
+            "price": "19.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/7502/2e55/58a24da98773/3e0c8251bad8/00858469724-e1/00858469724-e1.jpg?ts=1763464993134&w=4800",
+            "product_url": "https://www.zara.com/es/en/soft-long-sleeve-top-p00858469.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "SOSHIOTSUKI X ZARA SATIN BELTED DRESS",
+            "product_category": "DRESSES",
+            "color": "PINK",
+            "price": "129.00 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/56ca/98a3/d29d41199906/3ee918dcf7f1/09751710620-e1/09751710620-e1.jpg?ts=1764230743599&w=4800",
+            "product_url": "https://www.zara.com/es/en/satin-dress-with-belt-soshiotsuki-x-zara-p09751710.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "METALLIC THREAD KNIT DRESS WITH FRINGING",
+            "product_category": "DRESSES",
+            "color": "BLUE / GREY",
+            "price": "49.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/4c4c/c0a6/290c4beeb4c1/e83f7ec67f3f/01579103485-e1/01579103485-e1.jpg?ts=1768993249195&w=4800",
+            "product_url": "https://www.zara.com/es/en/knit-metallic-thread-fringed-dress-p01579103.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "POPLIN BLOUSE WITH RUFFLES",
+            "product_category": "SHIRTS",
+            "color": "BLUE/WHITE",
+            "price": "25.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/3d0e/fe73/d4d94a6fb2af/4d35aaa1ded0/02011882044-e1/02011882044-e1.jpg?ts=1767602792166&w=4800",
+            "product_url": "https://www.zara.com/es/en/poplin-blouse-with-ruffles-p02011255.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "STRAIGHT TROUSERS WITH BELT",
+            "product_category": "TROUSERS",
+            "color": "NAVY BLUE",
+            "price": "29.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/5801/a330/c7194bb48662/272de6f0e72f/08741268401-e1/08741268401-e1.jpg?ts=1768325029622&w=4800",
+            "product_url": "https://www.zara.com/es/en/straight-trousers-with-belt-p08741268.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "OVERSIZE TRENCH COAT ZW COLLECTION",
+            "product_category": "COATS",
+            "color": "DARK BROWN",
+            "price": "69.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/a238/ec60/929847e5a00b/000c9f7d9a42/03811044716-e1/03811044716-e1.jpg?ts=1768565792955&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-oversize-trench-coat-p03811044.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "BARREL CORDUROY TROUSERS",
+            "product_category": "TROUSERS",
+            "color": "LIGHT CAMEL",
+            "price": "29.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/4eac/6d89/a3834382abf7/84c6b24a2fe9/02133621743-e1/02133621743-e1.jpg?ts=1769087108710&w=4800",
+            "product_url": "https://www.zara.com/es/en/corduroy-barrel-trousers-p02133621.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "POPLIN SHIRT SOSHIOTSUKI X ZARA",
+            "product_category": "SHIRTS",
+            "color": "PINK",
+            "price": "39.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/328f/7691/685e468d892c/666149eb7859/09738102620-e1/09738102620-e1.jpg?ts=1764152132893&w=4800",
+            "product_url": "https://www.zara.com/es/en/poplin-shirt-soshiotsuki-x-zara-p09738102.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          }
+        ]
+      },
+      "eval": {
+        "parser": {
+          "parser_completeness": {
+            "score": 3,
+            "reasoning": "Query explicitly mentions: occasion (friend's wedding), style ('elegant'), category (dress), color (burgundy), and fit preference ('nothing too tight' → loose). Parsed output captured occasion, category, color, and fit but omitted the 'elegant' style constraint — exactly one missed constraint."
+          },
+          "parser_no_hallucination": {
+            "score": 5,
+            "reasoning": "Parsed fields (dresses, burgundy, loose, occasion wedding_guest) all directly follow from the query. No extra categories, colors, price limits, or unrelated constraints were introduced."
+          },
+          "parser_occasion_detection": {
+            "score": 5,
+            "reasoning": "The query clearly mentions a friend's wedding. Parser set occasion_mode='on' and mapped to 'wedding_guest', which correctly represents the user's intent to find attire for a wedding guest."
+          }
+        },
+        "cross_model": {
+          "winner": "fashion_clip",
+          "clip_score": 2,
+          "fashionclip_score": 4,
+          "reasoning": "Step 1: Query asks for an elegant wedding-guest dress, preferably burgundy and nothing too tight (loose fit). Step 2: Set A (CLIP) items: mostly neutral/black/biscuit/red with one aubergine short balloon dress (item 7). Several pieces are short or body-skimming (strappy velvet, short polyamide mini) that conflict with \"nothing too tight\" and wedding-guest elegance; a few midi/maxi options exist but many are dark black or bright red rather than burgundy. Visuals: mix of formal and casual — some too tight or too short for the stated fit/occasion. Step 3: Set B (FashionCLIP) items: stronger presence of richer, dressy fabrics and silhouettes (lace, chiffon, satin, velvet, draped long/midi dresses) and multiple darker burgundy/ brown/aubergine tones. Several long/midi, more formal options that read as wedding-appropriate and include aubergine/brown shades close to burgundy. Fit: more relaxed and draped options (chiffon, satin, lace overlays) that better match \"nothing too tight.\" Step 4: Relevance to hard constraints: CLIP mostly fails the color (few burgundy/aubergine) and loose-fit constraints because many picks are fitted or short; FashionCLIP contains more burgundy-like/aubergine and loose/draped formal silhouettes. Step 5: Occasion appropriateness: FashionCLIP conveys more formal/elegant options (lace, satin, long draped pieces) appropriate for a wedding guest; CLIP is mixed and includes some inappropriate tight/party minis. Step 6: Visual diversity: FashionCLIP offers a wider set of formal fabrics and lengths (lace, velvet, satin, chiffon; midi and long), giving meaningful choices; CLIP is less varied and leans toward darker/basic colors and fitted minis. Step 7: Overall intent match: FashionCLIP better reflects the user intent (elegant, burgundy/aubergine options, non-tight silhouettes). Step 8 scores justification: CLIP = 2 (below average — minority meet needs); FashionCLIP = 4 (above average — majority are suitable and visually appropriate). Step 9: Winner: fashion_clip."
+        },
+        "clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit. Step 2: Product category is DRESSES — matches. Step 3: Product color is BISCUIT (beige), does not match requested burgundy — mismatch. Step 4: Product silhouette in image is A-line/midi and appears loose rather than tight — matches fit preference. Step 5: No price constraints in query. Step 6: Overall semantic alignment: category and fit align but color requirement is unmet, so partially relevant. Step 7: Score 3."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name, category DRESSES, color BISCUIT, price present. Step 2: Query asks for burgundy, loose, wedding guest. Step 3: Explanation: states BISCUIT colored DRESSES item is suited for a wedding guest, aligns with celebratory daytime dressing, and fits the dresses query. Step 4: Claims about color and category are grounded in metadata; claim it suits a wedding guest is a reasonable subjective judgment (not contradicted by metadata). Step 5: Explanation is short and somewhat generic — it doesn't address mismatch with burgundy request or mention fit specifics. Step 6: It connects to the occasion at a high level but omits key constraint (color) and lacks concrete attributes. Step 7: No clear hallucinations but explanation is generic and incomplete, so score 3."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Stated occasion = wedding guest. Step 3: Expected: elegant, modest, semi-formal to formal daytime or evening attire. Step 4: Image shows a midi, structured yet flowing dress with modest neckline and midi length — visually elegant and appropriate for many wedding guest contexts. Step 5: Metadata name 'TRENCH COAT MIDI DRESS' and color BISCUIT suggest a neutral, sophisticated piece. Step 6: A person attending a wedding (especially daytime or less formal evening) could realistically wear this. Step 7: Minor caveat: color is neutral rather than the requested burgundy, but the item itself is appropriate, so score 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: Query asks for an elegant wedding-guest dress, burgundy, loose fit. Step 2: Product category is DRESSES — matches. Step 3: Product color is DARK MINK (brown), not burgundy — mismatch. Step 4: User requested 'nothing too tight' / loose fit; the pictured dress appears fitted at the waist and is short — does not match fit preference. Step 5: No price constraint to check. Step 6: Overall semantic alignment is weak: correct category but wrong color and fit. Step 7: Score 2 (mostly irrelevant — matches at most one constraint)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata shows name, category DRESSES, color DARK MINK, price. Step 2: Query requests elegant burgundy loose dress for wedding guest. Step 3: Generated explanation: 'DARK MINK dress offers a polished option for a wedding guest, with ceremony-guest silhouettes in mind per the top prompt, aligning with the dresses keyword.' Step 4: Claims that can be confirmed: color DARK MINK and category DRESSES — grounded. Step 5: The phrase 'polished option' is a subjective inference but reasonable from the image; 'ceremony-guest silhouettes in mind per the top prompt' references the prompt rather than metadata (mildly extraneous). Step 6: The explanation is concise and links to the user's occasion but does not address mismatches (color/fit). Step 7: Minor issue: it omits that the color is not burgundy and does not address fit preference. Overall mostly grounded and useful. Score 4."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: wedding guest typically requires elegant, semi-formal to formal attire. Step 3: Expected styles include mid- to long-length dresses or polished short dresses depending on formality. Step 4: The image shows a short, structured dress with puff sleeves and tailored seams; it reads polished but is relatively short and fitted. Step 5: Metadata (DRESSES, DARK MINK) supports a dress suitable for semi-formal looks but not explicitly formal. Step 6: A person could wear this to some weddings (casual or semi-formal), but it may be borderline for more formal ceremonies and the color is darker/less festive than burgundy. Step 7: Score 3 (could work in some contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query asks for a dress, burgundy color, loose fit, elegant for a wedding. Step 2: Product category = DRESSES — matches. Step 3: Product color = BLACK — does not match requested burgundy. Step 4: Fit: product is a strappy velvet dress with a fitted bodice and looser skirt; user requested 'nothing too tight' / loose — partially matches (looser lower half) but top appears fitted. Step 5: No price constraint to check. Step 6: Overall semantic alignment: item is an elegant dress but color and partial fit mismatch the explicit color and fit constraints. Step 7: Score 3 = partially relevant."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata includes name (VELVET STRAPPY DRESS), category (DRESSES), color (BLACK), price. Step 2: Query and occasion noted. Step 3: Generated explanation: 'BLACK VELVET STRAPPY DRESS presents a wedding guest appeal, echoing ceremony guest silhouettes and a polished look from the top prompt.' Step 4: Claims about color and material are grounded in metadata (black, velvet). Step 5: The statement about 'wedding guest appeal' and 'echoing ceremony guest silhouettes' is generic and not supported by specific features (fit, coverage) beyond inferred style — mild inference but not a clear hallucination. Step 6: Explanation is brief and does not connect concretely to the user's burgundy or loose-fit preferences. Step 7: Penalize for being generic and not addressing key user constraints. Score 3 = mostly grounded but somewhat generic and not sufficiently specific."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Occasion requires elegant, semi-formal to formal guest attire. Step 3: Typical styles: dresses with polished fabrics and appropriate coverage. Step 4: Image shows a velvet strappy maxi with a fitted bodice and flowing skirt — visually formal and elegant, though strappy neckline may be more suited to evening or less conservative ceremonies. Step 5: Metadata: VELVET STRAPPY DRESS, BLACK supports a formal aesthetic. Step 6: A guest could realistically wear this to many weddings (especially evening/formal ones), but it may be less appropriate for conservative/daytime ceremonies. Step 7: Score 4 = appropriate for the occasion with minor caveats."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit for a wedding guest. Step 2: Product category = DRESSES — matches. Step 3: Product color = RED — does not match requested burgundy (color mismatch). Step 4: Fit = loose, tiered midi with ties visible in image — matches loose fit preference. Step 5: No price constraints given, product price present but not constrained. Step 6: Overall semantic alignment: item is a loose midi dress appropriate for a guest role but color is brighter red rather than burgundy, and styling appears more casual than the 'elegant' tone in the query. Step 7: Score = 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata contains name 'NYLON MIDI DRESS WITH TIES', category DRESSES, color RED, price. Step 2: Query and occasion noted. Step 3: Explanation states: 'RED NYLON MIDI DRESS provides a wedding guest piece, matching celebratory daytime dressing cues...' Step 4: Claims about color, fabric (nylon) and midi length are present in metadata — grounded. Step 5: The claim about matching daytime celebratory cues is an interpretive recommendation (not in metadata) but reasonable and not a factual hallucination. Step 6: Explanation is specific but brief; it connects to the occasion in a general way. Step 7: Score = 4 (well-grounded and specific, minor subjective inference)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Occasion expects elegant, semi-formal to formal guest attire depending on wedding. Step 3: Typical wedding guest styles are dressy fabrics, refined silhouettes or formal midi/ maxi dresses. Step 4: Image shows a casual nylon tiered midi, sleeveless, bright red — visually casual and daytime-leaning. Step 5: Metadata confirms 'NYLON MIDI DRESS' in red. Step 6: This could work for a casual daytime wedding but is borderline for an 'elegant' wedding guest look the user requested. Step 7: Score = 3 (could work in some contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit for a wedding guest. Step 2: Product category = DRESSES — matches category. Step 3: Product color = BLACK — does not match requested burgundy. Step 4: Product style/fit (short, bodycon, fitted with cups and thin straps) contradicts requested loose fit. Step 5: No price constraints to check. Step 6: Overall semantic alignment is weak: category matches but color and fit — key constraints — do not. Step 7: Score 2 because it matches at most one constraint (category) and misses key ones (color, fit)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name, category, color, price present; description empty. Step 2: Query asks for elegant burgundy loose dress for wedding guest. Step 3: Explanation: 'BLACK SHORT POLYAMIDE BLEND DRESS suits a wedding guest event, framed by a semi-formal, refined presentation per the top prompt.' Step 4: Claims: color and short polyamide blend are grounded in metadata; claim that it 'suits a wedding guest event' and is 'semi-formal, refined' is not supported by metadata and contradicts the visual (lingerie-like, fitted, short) — hallucinated suitability. Step 5: Explanation is generic and provides no specific reasoning about fit, length, or how it meets the user's burgundy/loose requirements. Step 6: Penalize for unsupported suitability claim and lack of connection to user constraints. Step 7: Score 2 for multiple issues (hallucinated suitability and generic statement)."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Typical wedding-guest attire is semi-formal/modest dresses in appropriate colors and length. Step 3: The pictured item is a very short, fitted, lingerie-style black dress with thin straps — low formality and revealing. Step 4: Metadata (short polyamide blend dress, black) supports the visual assessment. Step 5: This item would be unlikely appropriate for many weddings (could be acceptable only for very informal or nightlife-reception contexts). Step 6: Score 2 because it is unlikely to be appropriate for a wedding guest in most typical contexts."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query asks for a dress, burgundy color, loose fit for a wedding guest. Step 2: Product category is DRESSES — matches. Step 3: Product color is BLACK — does not match requested burgundy. Step 4: User requested 'nothing too tight' / loose fit; the pictured asymmetric midi appears to have a relaxed, not bodycon silhouette, so fit partially matches. Step 5: No price constraints given; price present but irrelevant. Step 6: Overall semantic alignment: item is a dress suitable for an elegant event but fails the color constraint. Step 7: Score 3 because it matches category and fit partially but misses the key color preference."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name, category, color, price present; description empty. Step 2: Query and occasion noted. Step 3: Generated explanation: 'fits wedding guest expectations with balanced coverage and discreet ornament as described.' Step 4: Claims: 'balanced coverage' is an interpretation of the image (mildly supported), but 'discreet ornament as described' is unsupported — there is no description or metadata mentioning ornament. Step 5: Explanation is brief and largely generic. Step 6: It attempts to connect to the occasion but cites an attribute not in metadata. Step 7: Penalize for unsupported/hallucinated claim and generic phrasing. Assigned score 2."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is 'wedding_guest'. Step 2: Identified occasion: wedding guest. Step 3: Expected: elegant, modest/formal or semi-formal dress. Step 4: Image shows a midi-length, asymmetric, modest black dress with a flattering silhouette and modest coverage. Step 5: Metadata confirms category DRESSES and color BLACK. Step 6: A black asymmetric midi would be realistic and comfortable for many wedding-guest contexts (though color choice may depend on cultural/host preferences). Step 7: Score 4 — appropriate for the occasion though not exemplary (color or style preferences could vary)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit, elegant for a wedding guest. Step 2: Product category is DRESSES — matches. Step 3: Product color is listed as AUBERGINE, which semantically matches burgundy — good match. Step 4: Fit: user asked for 'nothing too tight' / loose; the dress has a relaxed, balloon skirt and short sleeves but the bodice appears more fitted — partial fit match. Step 5: No price constraints to check. Step 6: Overall alignment: name 'SHORT BALLOON DRESS' and image show a short, slightly playful silhouette that is reasonably aligned with the color and dress category but may be less formal/elegant and somewhat fitted at the top. Step 7: Score 4 (mostly relevant with one minor misalignment)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name 'SHORT BALLOON DRESS', category DRESSES, color AUBERGINE, price 39.95 EUR, no description. Step 2: Query and occasion noted. Step 3: Generated explanation: 'AUBERGINE SHORT BALLOON DRESS aligns with wedding guest styling via daytime-appropriate fabrics in the top prompt.' Step 4: Verification: the explanation correctly references the product name and color (grounded). Step 5: The claim about 'daytime-appropriate fabrics' is not supported by any metadata or image details — hallucination. Step 6: The explanation is brief and not specific about fit, length, or formality connection to the user's request. Step 7: Penalize the unsupported fabric claim and lack of useful detail. Step 8: Score 2 (multiple issues: one hallucinated claim and generally not specific/useful)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Occasion requires elegant, semi-formal to formal guest-appropriate attire. Step 3: Typical wedding-guest styles are polished, modest lengths or clearly formal silhouettes. Step 4: Image shows a short balloon-hem dress with a casual/playful silhouette and short sleeves; overall more casual and youthful than traditionally elegant. Step 5: Metadata confirms short balloon dress in aubergine. Step 6: This could work for a daytime or casual wedding but is borderline for more formal ceremonies — may not meet 'elegant' expectation. Step 7: Score 3 (could work in some contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit for a wedding guest. Step 2: Product category is DRESSES — matches. Step 3: Product color is ECRU — does NOT match requested burgundy. Step 4: Fit appears loose/maxi which matches the 'nothing too tight' preference. Step 5: No price range specified so price not constraining. Step 6: Overall semantic alignment: category and fit align but color is a key mismatch. Step 7: Partial relevance due to correct category and fit but wrong color."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name, category, color, price; no description. Step 2: Query and occasion present. Step 3: Explanation: 'ECRU MAXI HIGH NECK DRESS offers balanced coverage and refined drape for a wedding guest look.' Step 4: Claim of ECRU, maxi, high neck is grounded in metadata/name/color. Claims of 'balanced coverage' and 'refined drape' are not in metadata but are reasonable visual inferences from the image (not hallucinated attributes but not explicit in metadata). Step 5: Explanation is somewhat specific (mentions color, style), not purely generic. Step 6: It links the item to the wedding-guest intent, but it fails to address the user's explicit burgundy preference. Step 7: Overall mostly grounded and somewhat useful, with minor issues (omits color mismatch)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Typical wedding-guest attire is semi-formal to formal dresses in non-bride colors. Step 3: The dress is maxi, high-neck, loose — visually modest and appropriately formal. Step 4: The ECRU (off-white/beige) color is visible and may be inappropriate at some weddings because it resembles bridal tones. Step 5: Metadata confirms category and ECRU color. Step 6: A guest could wear this at some weddings (more casual or non-traditional), but the pale/ecru shade makes it borderline. Step 7: Score reflects that it could work in some contexts but may be inappropriate at many ceremonies."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests an elegant dress for a wedding, burgundy color, nothing too tight (loose fit). Step 2: Product category = DRESSES — matches. Step 3: Product color = WHITE — does NOT match requested burgundy. Step 4: Fit/style: halter midi with godets appears flared/loose at skirt and not very tight — aligns with 'nothing too tight'. Step 5: No price constraints to check. Step 6: Overall semantic alignment: product is an elegant midi dress (matches intent) but fails the key color constraint. Therefore partially relevant."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name, category, color = WHITE, price present; description empty. Step 2: Query and occasion present. Step 3: Generated explanation: 'WHITE HALTER MIDI DRESS suits a wedding guest occasion with midi-length silhouette guidance from the top prompt.' Step 4: Claims: color and item type are grounded in metadata; the assertion that it 'suits a wedding guest occasion' is an evaluative claim not supported by metadata and conflicts with typical guidance about avoiding white for guests (hallucinated/unsupported). 'Midi-length silhouette guidance from the top prompt' references the user prompt rather than product attributes and is not a concrete product feature explanation. Step 5: Explanation is brief and generic, lacks specific helpful details (fabric, fit specifics). Step 6: Contains unsupported recommendation for wedding wear and offers little useful, grounded information. Penalised accordingly."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step 1: occasion_target = wedding_guest (present). Step 2: Expected: guest should wear elegant, non-bridal colors and appropriate formality. Step 3: The dress is midi, formal enough in silhouette. Step 4: Image and metadata show a white halter midi — white is typically reserved for the bride and can be inappropriate for a wedding guest. Step 5: Category/name confirm white halter midi. Step 6: A guest would likely avoid white; while style/formality fit a wedding, color makes it unlikely to be appropriate. Score reflects wrong color for the occasion."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: User requested an elegant dress for a wedding, preferably burgundy and not tight (loose fit). Step 2: Product category is DRESSES — matches. Step 3: Product color is BROWN, not the requested burgundy — mismatch. Step 4: Fit appears loose/flowing (chiffon godet midi) matching the 'nothing too tight' constraint. Step 5: No price constraint to check. Step 6: Overall semantic alignment: style and category fit the request but color is a key mismatch. Step 7: Assigned score 3 (partially relevant: matches category and fit but misses the requested color)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name 'CHIFFON GODET MIDI DRESS', category DRESSES, color BROWN, price present; description empty. Step 2: User query asks for elegant wedding dress, burgundy, loose. Step 3: Generated explanation: 'BROWN CHIFFON GODET MIDI DRESS presents balanced coverage and a softened drape suitable for wedding attendance.' Step 4: Claims checked: color and name are present in metadata (grounded). 'Balanced coverage' and 'softened drape' are observational but visible in the product image (not contradicted by metadata) — mild inference, not a factual hallucination. Step 5: Explanation is concise and mentions specific attributes (color, fabric type implied by name, suitability). Step 6: It connects product to the occasion. Step 7: No fabricated metadata; explanation could be slightly more detailed for shopper decisions. Assigned score 4."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Stated occasion is wedding guest. Step 3: Typical expectation: elegant, modest, semi-formal to formal dress. Step 4: Image shows a midi-length chiffon dress with soft drape and modest coverage — visually appropriate for many wedding settings. Step 5: Metadata (chiffon godet midi dress, brown) supports a semi-formal aesthetic. Step 6: A person attending a wedding could realistically wear this item. Step 7: Assigned score 4 (appropriate for the occasion, slight caveat: brown is less traditional than jewel tones but still acceptable)."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 3,
+              "reasoning": "Step 1: Intent — user wants an elegant wedding-guest dress, preferably burgundy and not too tight. Step 2: Product review — all items are dresses (good category match). Colors include biscuit, dark mink (brown), black (multiple), red, aubergine (product 7), ecru, brown — one aubergine is closest to burgundy but true burgundy is absent. Images show a mix of silhouettes: several loose, flowy midi/maxi styles (elegant and wedding-appropriate), but several short, bodycon or very fitted minis (not aligned with 'nothing too tight'). Step 3: Coverage — the set covers formal-to-casual dress lengths and price range but lacks a clear burgundy option and includes many black/short fitted pieces. Step 4: Visual diversity — moderate diversity in cut and length (maxis, midis, shorts) but repeated colors (black/brown tones) reduce variety. Step 5: Coherence for occasion — some dresses (flowy midis/maxis, chiffon/velvet) are appropriate for a wedding; fitted minis and casual cotton pieces feel less suitable. Step 6: Omissions — no true burgundy dress, and too many tight/mini options despite the user asking for looser fits. Step 7: Synthesis — set is partially relevant: correct category and some elegant choices, but misses the strong color preference and includes several inappropriate tight minis. Overall judgement: majority of items are dresses and some fit the wedding-guest need, but notable gaps (burgundy, looser fits) keep this from being a strong match."
+            }
+          }
+        },
+        "fashion_clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit, elegant for a wedding. Step 2: Product category = DRESSES — matches. Step 3: Product color metadata = BROWN which does not match requested BURGUNDY (image appears wine-toned but metadata says brown). Step 4: Fit: user wanted loose; the lace silhouette appears relatively relaxed (not bodycon) so fit roughly aligns. Step 5: No price constraint to check. Step 6: Overall intent (elegant wedding guest dress) aligns with product name (LACE MIDI DRESS) and image. Step 7: Given the color metadata mismatch but otherwise strong alignment, score 4."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name=LACE MIDI DRESS, category=DRESSES, color=BROWN, price=59.95 EUR. Step 2: Query and occasion noted. Step 3: Explanation text judged. Step 4: Claims checked: calls it brown (correct), lace (correct from name), midi length (correct from name). Step 5: Explanation includes an unsupported claim about 'polished tailored lines' which is not in metadata (mild interpretation). Step 6: It links the item to the dresses keyword and wedding_guest occasion (reasonable). Step 7: No major hallucinations but contains minor descriptive embellishment; grounded and useful overall — score 4."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Expected: elegant, semi-formal to formal dress. Step 3: Typical styles: midi/maxi lace, refined fabrics, modest yet dressy. Step 4: Image shows a long lace dress with sleeves and an elegant silhouette suitable for a wedding. Step 5: Metadata (LACE MIDI DRESS) supports a wedding-appropriate item. Step 6: A guest could realistically wear this to a wedding. Step 7: Minor concerns: color labeled brown rather than burgundy and length appears closer to maxi than midi, but overall appropriate — score 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User wants an elegant wedding guest dress, burgundy, nothing too tight (loose). Step 2: Product category = DRESSES — matches. Step 3: Product color = DARK BROWN — does not match requested burgundy. Step 4: User fit = loose; product is ruched/draped and appears more fitted at the waist/hip — does not match fit preference. Step 5: No price constraint to check. Step 6: Overall semantic alignment: category and occasion align but key constraints (color and loose fit) are unmet. Step 7: Score = 2 (mostly irrelevant — matches only category/occasion but misses color and fit)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name, category, color, price provided. Step 2: User query and occasion noted. Step 3: Generated explanation: states dark brown draped velvet midi dress is a wedding guest option with a midi silhouette and tailored line. Step 4: Verification: claims about color (dark brown), fabric (velvet/draped), midi silhouette and dresses category are supported by metadata/image; 'tailored line' is an interpretation but plausible from the image. No concrete hallucinations. Step 5: Specificity: mentions concrete attributes (color, fabric, silhouette). Step 6: Connects product to occasion. Step 7: Minor issue: does not address user's burgundy color or loose-fit preference. Step 8: Score = 4 (well-grounded and specific, but could better address user's explicit constraints)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Expected: elegant, semi-formal to formal dresses. Step 3: Typical styles: midi/long, refined fabrics. Step 4: Image shows a velvet midi dress with long sleeves and draped details — visually formal and appropriate. Step 5: Metadata supports: 'DRAPED VELVET MIDI DRESS', category DRESSES, color DARK BROWN. Step 6: A guest could realistically wear this to a wedding; slight concern if the wearer strictly wants a loose fit but overall formality and aesthetic fit the occasion. Step 7: Score = 4 (appropriate for the occasion)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit for a wedding guest. Step 2: Product category = DRESSES — matches. Step 3: Product color = BLACK — does not match requested burgundy. Step 4: Fit/style: name and image show a draped, ruched, relatively loose silhouette (not tight) — matches fit preference. Step 5: No price constraints to check. Step 6: Overall semantic alignment: item is an elegant dress and aligns with occasion and fit but fails the explicit color constraint. Step 7: Given matches on category and fit but misses key color requirement, score = 3."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name includes 'Multiposition Collar' and 'Viscose Blend', category DRESSES, color BLACK, price present. Step 2: Query and occasion present. Step 3: Generated explanation: 'Black Multiposition Collar Viscose Blend Dress fits as a wedding guest outfit with a versatile collar style for celebratory daytime dressing in the dresses category.' Step 4: Claims check: color, collar style, viscose blend and category all appear in metadata — no hallucinations. Step 5: Explanation is concise but somewhat generic; mentions concrete attributes (color, collar) so useful. Step 6: It connects product to the wedding_guest intent, though it asserts daytime suitability without explicit metadata but reasonable. Step 7: No major hallucinations, reasonably specific and helpful — score = 4."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Occasion typical: semi-formal to formal dresses, elegant but not provocative. Step 3: Expected styles: tasteful, modest evening or daytime gowns. Step 4: Image shows a long, draped, long-sleeve dress with a cowl/multiposition collar and ruched detailing — visually formal and elegant. Step 5: Metadata confirms dress category and black color; price reasonable. Step 6: A guest could realistically wear this to a wedding (especially evening); some cultures avoid black at weddings but generally appropriate. Step 7: Appropriate for the occasion with minor contextual caveat, score = 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query asks for an elegant dress for a wedding guest, burgundy color, loose fit (not too tight). Step 2: Product category is DRESSES — matches. Step 3: Product color is BROWN, not burgundy — color mismatch. Step 4: Fit: pictured slip dress is not bodycon and can read as relatively loose compared to tight styles, partially matching 'nothing too tight' but straps and cut could be more fitted at bust — partial match. Step 5: No price constraints to check. Step 6: Semantic intent: user wants elegant wedding-appropriate burgundy loose dress; product is elegant but wrong color, so partially aligned. Step 7: Score 3 (matches some constraints — category and somewhat fit/style — but misses key color constraint)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name 'ZW COLLECTION SATIN LACE DRESS', category DRESSES, color BROWN, price present. Step 2: Query requests burgundy loose wedding guest dress; occasion wedding_guest. Step 3: Generated explanation: 'Brown Zw Collection Satin Lace Dress provides a wedding guest option in the dresses category, with a satin lace look suitable for celebratory daytime occasions.' Step 4: Verifiable claims: name, color, satin lace are supported by metadata. Step 5: Unsupported/subjective claim: suitability for 'celebratory daytime occasions' is an opinion not in metadata (minor hallucination). Step 6: Explanation is brief and only moderately specific — it connects product to wedding-guest intent but fails to address the user's explicit burgundy request and fit preference. Step 7: Penalise for missing connection to user's color/fits and for the subjective suitability claim. Score 3 (mostly grounded but somewhat generic and missing key user constraints)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Occasion requires semi-formal to formal, elegant, tasteful attire. Step 3: Typical styles: midi/long dresses, satin/lace acceptable. Step 4: Image shows a satin slip dress with lace trim — elegant, modest length, spaghetti straps may be acceptable for many weddings (layering possible). Step 5: Metadata: 'SATIN LACE DRESS', category DRESSES, color BROWN, supports visual read. Step 6: A guest could realistically wear this to many weddings, especially evening or less formal ceremonies; may be less ideal for very formal black-tie or if strict color expectations exist. Step 7: Score 4 (appropriate for the occasion in most contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit, elegant for wedding. Step 2: Product category = DRESSES — matches. Step 3: Color = AUBERGINE, visually a deep burgundy — matches color constraint. Step 4: Fit/style: product is a short balloon dress with a fitted waist and voluminous skirt; user wanted 'nothing too tight' and 'loose' — partial mismatch. Step 5: No price constraints to check. Step 6: Overall semantic alignment: category and color align but the short, playful balloon silhouette may not meet the requested loose/elegant fit. Step 7: Score justified as partially relevant."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name SHORT BALLOON DRESS, category DRESSES, color AUBERGINE, price 39.95 EUR. Step 2: Query and occasion noted. Step 3: Explanation claims color and playful silhouette and suitability for a day event. Step 4: Claims are grounded: color and name match metadata; 'playful silhouette' is supported by 'balloon' in the name and visible styling. No fabricated facts (no fabric details or false attributes). Step 5: Explanation is specific but brief. Step 6: It connects product to the wedding-guest intent, though it assumes 'day event' without explicit metadata. Step 7: Minor issue: slight inference about day-event suitability but overall well grounded and useful."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Occasion expects semi-formal to formal guest attire. Step 3: Typical wedding guest styles are elegant, not overly casual or too-short clubwear. Step 4: Image shows a short aubergine balloon dress with a playful, casual silhouette. Step 5: Metadata (SHORT BALLOON DRESS, AUBERGINE) supports this reading. Step 6: Appropriateness: could work for a daytime or casual wedding but is borderline for more formal ceremonies. Step 7: Assigned a mid score for borderline suitability."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit for a wedding. Step 2: Product category = DRESSES — matches. Step 3: Product color = BROWN — does not match requested burgundy. Step 4: Fit/style: name and image show a flowy, midi, not-too-tight silhouette consistent with 'loose' — matches. Step 5: No price constraint to check. Step 6: Semantic alignment: good match on category and fit but fails the specific color preference. Step 7: Score 3 (partially relevant: matches some constraints but misses key one - color)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata confirms name (CHIFFON GODET MIDI DRESS), category (DRESSES), color (BROWN), price present. Step 2: Query and occasion considered. Step 3: Generated explanation: 'Brown Chiffon GodeT Midi Dress presents a wedding guest option in the dresses category, with a midi length that fits ceremony silhouettes.' Step 4: Claims are grounded: material (chiffon) and midi length are in the name, color and category match metadata. No hallucinated attributes. Step 5: Explanation is brief and specific about category, color, and length but lacks mention of fit. Step 6: It connects to wedding guest use reasonably. Step 7: Score 4 (well-grounded and specific, could be slightly more detailed about fit and formality)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target = wedding_guest present. Step 2: Occasion = wedding guest. Step 3: Expected: semi-formal to formal dresses, modest and elegant silhouettes. Step 4: Image shows a chiffon midi with flowing skirt and modest neckline, appropriate fabric and length for many wedding settings. Step 5: Metadata: CHIFFON GODET MIDI DRESS, DRESSES, BROWN — supports assessment. Step 6: A guest could realistically wear this to a wedding (may be more casual/formal depending on event). Step 7: Score 4 (appropriate for the occasion, minor caveat about formality depending on wedding)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: User requested a dress, burgundy color, loose fit for a wedding. Step 2: Product category is DRESSES — matches. Step 3: Product color is BROWN — does not match requested burgundy. Step 4: User wanted 'nothing too tight' / loose fit; the product is described as 'DRAPED' and the image shows a relaxed top with ruching at the skirt (partially loose but may be more fitted around hips) — partial match. Step 5: No price constraints. Step 6: Overall semantic alignment: item is a dress and relatively elegant, but color mismatch is a key constraint missed. Step 7: Score 3 (partially relevant: matches category and somewhat fit/style but misses the requested color)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name DRAPED LONG DRESS, category DRESSES, color BROWN, price 22.95 EUR, description empty. Step 2: Query and occasion present. Step 3: Generated explanation: 'Brown Draped Long Dress is a wedding guest dress in the DRESSES category, featuring a midi-length vibe suitable for ceremony silhouettes.' Step 4: Claims check: category and color are in metadata (grounded). Calling it a 'wedding guest dress' is an inference (reasonable but not stated). Claim of 'midi-length vibe' contradicts metadata name 'LONG DRESS' and the image which appears long/maxi — small hallucination/incorrect detail. Step 5: Explanation is somewhat specific (mentions draped, length) but length claim is inaccurate. Step 6: It connects to the occasion but with a minor incorrect length claim. Step 7: Score 3 (mostly grounded and somewhat useful but contains a minor incorrect/unsupported length assertion)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: wedding guest attire typically calls for modest, elegant dresses in appropriate colors. Step 3: Expected styles: midi/maxi or dressier silhouettes. Step 4: Image shows a long, draped, modest silhouette with simple, elegant lines and ruching details — medium formality appropriate for many weddings. Step 5: Metadata: 'DRAPED LONG DRESS', color BROWN supports a subdued, wedding-appropriate option. Step 6: A person could realistically wear this to a wedding as a guest, though brown is less traditional than burgundy. Step 7: Score 4 (appropriate for the occasion)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests an elegant dress for a wedding, preferably burgundy and not too tight (loose fit). Step 2: Product category = DRESSES — matches. Step 3: Product color = DARK MINK — does not match requested burgundy. Step 4: Fit/style: product appears to be a short, slightly fitted/structured silhouette (and user wanted loose) — mismatch. Step 5: No price constraints to check. Step 6: Overall semantic alignment: item is a dress and could be elegant, but color and fit deviate from explicit constraints. Step 7: Score = 3 (partially relevant: correct category but misses key color and fit preferences)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name 'SHORT DRESS WITH PLEATS AND POCKETS', category DRESSES, color DARK MINK, price present. Step 2: Query and occasion noted. Step 3: Generated explanation: 'Dark Mink Short Dress with pleats and pockets offers a wedding guest look in dresses, with a compact silhouette that suits the occasion.' Step 4: Claims checked: color, pleats, pockets, and short/compact silhouette are present in metadata/image — no clear hallucinations. Step 5: Specificity: explanation is brief and mostly descriptive but generic (doesn't address fit preference or burgundy request). Step 6: Connection to user's query/occasion is weak — asserts it 'suits the occasion' without addressing user's constraints. Step 7: Penalize for lack of detail and not acknowledging mismatches. Score = 3 (mostly grounded and somewhat useful, but limited and missing key user concerns)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Occasion = wedding guest (typically semi-formal to formal attire). Step 3: Expected styles = elegant, not too casual; length and formality depend on wedding. Step 4: Image shows a short, structured dress with puff sleeves and welt pockets — relatively polished but short and somewhat body-skimming. Step 5: Metadata supports visible details (name mentions pleats and pockets; color dark mink). Step 6: Appropriateness: could work for a less formal or daytime wedding or if styled up, but may be borderline for formal evening weddings and the short, fitted look contradicts the user's 'nothing too tight' preference. Step 7: Score = 3 (could work in some contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit. Step 2: Product category is DRESSES — matches. Step 3: Product color is RED; user requested burgundy — similar but not the same (color mismatch). Step 4: Fit: image and name indicate a loose, tiered midi — matches 'nothing too tight'. Step 5: No price constraint given. Step 6: Semantic alignment: name 'NYLON MIDI DRESS WITH TIES' and image show a loose midi dress appropriate for a wedding guest in style though color is brighter than requested. Step 7: Minor misalignment on color, otherwise matches — score 4."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name includes 'Nylon Midi Dress', category DRESSES, color RED, price present. Step 2: Query and occasion reviewed. Step 3: Generated explanation: 'Red Nylon Midi Dress provides a wedding guest option in the dresses category, with a midi length that fits ceremony silhouettes.' Step 4: Claims about color, material/length are grounded in metadata/name; calling it a 'wedding guest option' and that it 'fits ceremony silhouettes' are interpretive but not factual errors. Step 5: Explanation is brief and somewhat generic; mentions midi length but gives no fit/shade/formality detail. Step 6: It connects to the wedding intent but lacks specifics (shade mismatch to burgundy, formality). Step 7: No clear hallucinations but limited useful detail — score 3."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Occasion is a wedding guest outfit. Step 3: Typical wedding-guest styles range from semi-formal to formal; elegance and subdued tones often expected. Step 4: Image shows a sleeveless, loose, tiered midi in bright red — casual to semi-formal in appearance. Step 5: Metadata supports midi length and red color. Step 6: This could work for a casual or daytime wedding but may be too casual/bright for a formal evening wedding. Step 7: Borderline appropriateness depending on wedding formality — score 3."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a dress, burgundy color, loose fit for a wedding. Step 2: Product category = DRESSES — matches. Step 3: Product color = PINK — does not match requested burgundy. Step 4: Fit/style: belted, loose silhouette suggested by image and name — matches the 'nothing too tight' constraint. Step 5: No price range given so not applicable. Step 6: Overall semantic alignment: item is a dress and loosely styled which fits intent, but color mismatch is a key constraint. Step 7: Score = 3 (partially relevant — matches category and fit but misses requested color)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name contains 'SATIN BELTED DRESS', category DRESSES, color PINK, price present. Step 2: Query and occasion noted. Step 3: Generated explanation: 'Pink Soshiotsuki X Zara Satin Belted Dress is a wedding guest dress in the dresses category, offering a satin finish for daytime celebration styling.' Step 4: Claims checked: color (PINK) and satin finish (from name) and category (DRESSES) are grounded in metadata; labeling it a 'wedding guest dress' is a recommendation rather than a factual attribute but not a fabricated product attribute. Step 5: Explanation is concise and mentions specific attributes (color, satin finish, category) rather than generic praise. Step 6: It connects the item to the occasion (wedding guest) but does not address the user's burgundy preference or fit request. Step 7: Minor issue: omission of mismatch with user's color/f fit specifics. Score = 4 (well-grounded and specific, but could better address user's constraints)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Occasion = wedding guest. Step 3: Typical expectation = elegant, semi-formal to formal dress. Step 4: Image shows a satin-finish, long belted dress with modest silhouette — visually appropriate for a wedding. Step 5: Metadata: satin belted dress, color pink, supports the image assessment. Step 6: A guest could realistically wear this to a wedding, especially daytime or semi-formal events. Step 7: Score = 4 (appropriate for the occasion; not necessarily exemplary because color is lighter than requested burgundy)."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 3,
+              "reasoning": "Step 1: Intent = wedding guest; prefers elegant, possibly burgundy, and not too tight. Step 2: All items are dresses (good), mostly darker browns/black/reds/pinks; images show several long/formal styles (lace, velvet, satin) and several shorter or more fitted pieces. Step 3: Coverage — the set supplies many formal evening-appropriate long dresses (good for a wedding) but also several tighter or short styles that contradict the 'nothing too tight' request. Step 4: Visual diversity — there is some variety in fabric and silhouette (lace, velvet, satin, slip, balloon/short, draped), but many share a muted dark brown palette so color variety is limited. Step 5: Coherence with occasion — overall mostly appropriate (long satin/lace/velvet work well), though a few casual/very fitted or short options reduce overall coherence. Step 6: Omissions — true burgundy is largely absent (only an aubergine/maybe red item), and more relaxed, less bodycon silhouettes in burgundy are missing. Step 7: Synthesis — majority of items are dresses and several are elegant; notable gaps in requested burgundy color and non-tight fits. Overall the set moderately addresses the intent but has clear gaps."
+            }
+          }
+        },
+        "random": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: Query requests an elegant burgundy dress, loose fit, for a wedding guest. Step 2: Product category is BAGS, not dresses (mismatch). Step 3: Product color is 'BURGUNDY RED', which matches the requested color. Step 4: Fit preference ('loose') applies to clothing and cannot be satisfied by a bag. Step 5: No price constraints to check. Step 6: Semantic intent is to find a dress; a bag is an accessory and does not meet the primary item type. Step 7: Only color constraint is met, so score 2 (mostly irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata present (name, category, color, price). Step 2: User query and occasion present. Step 3: Provided explanation is empty. Step 4: No claims to verify; absence of explanation prevents grounding. Step 5: No specific attributes or useful purchase guidance given. Step 6: No connection made between product and user's query or occasion. Step 7: Score 1 (no explanation / effectively unusable)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is 'wedding_guest'. Step 2: Appropriate wedding-guest attire typically includes formal to semi-formal dresses and complementary accessories. Step 3: Typical expectations allow for small, elegant handbags or clutches in coordinated colors. Step 4: Image shows a small, structured burgundy shoulder bag with a glossy finish — visually dressy and suitable as an accessory. Step 5: Metadata confirms category BAGS, name 'FLAP SHOULDER BAG', color 'BURGUNDY RED'. Step 6: A guest could realistically wear this bag to a wedding as an accessory. Step 7: Score 4 (appropriate accessory for the occasion, not the primary requested item)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: User requested an elegant, loose-fitting burgundy dress for a wedding guest. Step 2: Product category is 'SKIRTS' (mismatch with requested 'dresses'). Step 3: Product color is NAVY BLUE (not burgundy). Step 4: User wanted 'nothing too tight' / loose fit; product is a mini skirt (likely not loose). Step 5: No price constraint to check. Step 6: Semantic intent (elegant dress) does not align with a casual corduroy mini skirt. Conclusion: completely irrelevant."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata present. Step 2: User query and occasion available. Step 3: Generated explanation is empty. Step 4: No claims to verify; absence of explanation is unhelpful. Step 5: No specific attributes highlighted. Step 6: Does not connect product to query or occasion. Conclusion: missing/hallucinated content — not useful."
+              },
+              "occasion_appropriateness": {
+                "score": 1,
+                "reasoning": "Step 1: Occasion specified: wedding_guest. Step 2: Expected styles: formal/semi-formal dresses or dressy separates. Step 3: Product is a navy corduroy mini skirt—casual fabric, very short silhouette. Step 4: Visually and contextually this is too casual and revealing for a typical wedding guest outfit. Step 5: Metadata (category SKIRTS, navy color) confirms casual item. Step 6: Unlikely a comfortable or appropriate choice for the occasion. Conclusion: clearly inappropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User wants an elegant burgundy, loose dress for a wedding guest. Step 2: Product category is T-SHIRTS (not dresses) so category mismatch. Step 3: Product color is BROWN MARL, not burgundy. Step 4: Fit appears loose/relaxed which matches the \"nothing too tight\" request. Step 5: No price constraints to check. Step 6: Overall semantic alignment is poor — a casual long-sleeve top does not match an elegant wedding dress request. Step 7: Matches at most one constraint (fit), so score 2."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata provided (name, category, color, price). Step 2: User query and occasion present. Step 3: Generated explanation is empty. Step 4: No claims to verify; absence of explanation is unhelpful. Step 5: No specific grounded content. Step 6: No connection to user query or occasion. Step 7: Empty/uninformative explanation => score 1."
+              },
+              "occasion_appropriateness": {
+                "score": 1,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Expected items are dresses or formal/semi-formal attire. Step 3: Typical wedding-guest style is more formal than a casual T-shirt/top. Step 4: Image shows a casual, boxy long-sleeve top in brown marl. Step 5: Metadata confirms category T-SHIRTS and casual name. Step 6: This item would be clearly inappropriate for a wedding guest seeking an elegant outfit. Step 7: Score 1."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: Query requests a dress, burgundy color, loose fit. Step2: Product category = DRESSES matches. Step3: Product color = PINK does not match requested BURGUNDY. Step4: Product appears loose / belted (not tight) which matches fit preference. Step5: No price constraints to check. Step6: Name and image indicate a satin belted, relaxed-fit dress — semantically aligns with 'elegant' and 'nothing too tight' but not color. Step7: Partial match (category and fit match; color mismatch) => score 3."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Metadata available (name, category, color, price). Step2: Query and occasion present. Step3: Generated explanation is empty. Step4: No claims to verify; no grounded content. Step5: No specific attributes or useful details provided. Step6: No connection to user's query or occasion. Step7: Empty/missing explanation => score 1."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target = wedding_guest. Step2: Occasion = wedding guest. Step3: Weddings typically call for elegant, modest, semi-formal to formal dresses. Step4: Image shows a long satin belted dress with a modest silhouette and soft sheen, appropriate formality. Step5: Metadata confirms dress category and satin style. Step6: A guest could realistically wear this to a wedding (color is soft pink rather than burgundy). Step7: Appropriate for the occasion with minor deviation from requested color => score 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User wants a dress, burgundy color, loose fit, elegant for a wedding. Step 2: Product category = DRESSES — matches category. Step 3: Product color = BLUE / GREY (image shows dark grey/black) — does not match requested burgundy. Step 4: Fit: user wanted 'nothing too tight' / loose; product appears semi-fitted on top with a looser fringed skirt — partial match at best. Step 5: No price constraints. Step 6: Overall semantic alignment: style is decorative/fringed and could be elegant, but color and partially fitted top conflict with explicit burgundy and loose-fit requests. Step 7: Assign score = 2 (mostly irrelevant — matches category and partially style but fails the key color and fit constraint)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata reviewed. Step 2: User query and occasion reviewed. Step 3: Generated explanation is empty. Step 4: No claims to verify; absence of explanation provides no grounded information. Step 5: No specific attributes or useful purchase guidance are present. Step 6: No connection made to the user's query or occasion. Step 7: Assign score = 1 (no explanation / completely unhelpful)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Expected styles: elegant, semi-formal to formal guest attire. Step 3: Formality: wedding guest usually requires modest, polished look. Step 4: Image shows a long-sleeve knit dress with a sheer top and a heavily fringed skirt — festive and potentially suitable for an evening or cocktail-style wedding, but the sheer top may be too revealing for some ceremonies. Step 5: Metadata: DRESSES, BLUE/GREY, price low — supports a casual-to-semi-formal interpretation. Step 6: Realistic wear: could work for some weddings (evening/cocktail) but is borderline for traditional/formal or conservative ceremonies. Step 7: Assign score = 3 (could work in some contexts, borderline)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: Query requests a dress, burgundy color, loose fit. Step2: Product category is SHIRTS (does not match dresses). Step3: Product color is BLUE/WHITE (does not match burgundy). Step4: Fit: blouse appears loose, which matches the 'nothing too tight' / loose preference. Step5: No price range specified so price not considered. Step6: Overall semantic alignment is poor — different category and color, only fit aligns. Step7: Score 2 because it matches at most one constraint (fit) and is otherwise mostly irrelevant."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Product metadata given. Step2: User query and occasion noted. Step3: Generated explanation is empty. Step4: No claims to verify; no hallucinations but also no content. Step5: No specific attributes or helpful details provided. Step6: No connection made to the user's query or occasion. Step7: Score 1 because the explanation is missing and therefore unhelpful for purchase decisions."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step1: occasion_target is wedding_guest. Step2: Occasion requires relatively elegant, semi-formal attire for a guest. Step3: Typical expectations: dress or coordinated separates in suitable colors and dressy fabrics. Step4: The image shows a casual poplin ruffled blouse in light blue with a relaxed silhouette — moderately dressy but more casual than an elegant wedding guest dress. Step5: Metadata confirms shirt category and blue/white color, low price suggesting casual item. Step6: A person could wear this to a wedding if styled as part of a dressy outfit (skirt or tailored trousers) and if the wedding is informal; it is borderline for a wedding where more formal or a burgundy dress was requested. Step7: Score 3 — could work in some contexts but is not an ideal or clearly appropriate choice for an elegant wedding-guest look."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: User requested a dress (burgundy, loose) for a wedding. Step2: Product category is TROUSERS — does not match requested dresses. Step3: Product color NAVY BLUE — does not match requested burgundy. Step4: Fit: product is straight trousers (relatively loose legs) so only fit partially aligns with 'nothing too tight'. Step5: No price constraints to check. Step6: Overall semantic alignment is poor: trousers vs dress and wrong color. Step7: Score 2 because it matches at most one constraint (fit) but misses key category and color."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1-3: There is no generated explanation text to evaluate (explanation field is empty). Step4: No claims exist to verify against metadata. Step5-7: Because no explanation is provided, it offers no grounded information or purchase guidance. Score 1."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step1: occasion_target is wedding_guest. Step2: Typical wedding-guest attire ranges from semi-formal to formal dresses or tailored suits. Step3: Expected styles: elegant, dressy pieces. Step4: Image shows navy straight trousers with a slim belt — tailored and potentially dressy. Step5: Metadata confirms TROUSERS, NAVY BLUE, affordable price. Step6: A person could realistically wear these trousers to a wedding if paired with a dressy top and accessories, but they are not a canonical 'wedding dress' choice. Step7: Score 3 — could work in some contexts but is borderline depending on formality and the user's preference for a burgundy dress."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step1: User requested an elegant burgundy dress, loose fit. Step2: Product category is COATS, not dresses. Step3: Color is DARK BROWN, not burgundy. Step4: Fit is oversize (loose) which matches fit preference, but Step5: no price constraints to check. Step6: Overall semantic alignment fails — item is outerwear, not the requested dress. Conclusion: completely irrelevant to the core request."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: product metadata available. Step2: user query and occasion present. Step3: generated explanation is empty. Step4: no claims to verify; Step5: provides no specific attributes or useful shopping guidance. Step6: does not connect product to query/occasion. Conclusion: unhelpful and not grounded."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step1: occasion_target is wedding_guest. Step2: wedding guest typically expects dressy/formal attire. Step3: appropriate outerwear for a wedding can be a tailored coat/trench. Step4: image shows an oversize dark brown trench, moderately formal but more casual than a dressy tailored coat. Step5: metadata confirms coat category and dark brown color. Step6: As an outer layer over a wedding outfit it could work in some contexts (colder weather), but it is not an ideal primary wedding guest garment. Conclusion: could work in some contexts."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step1: User requested an elegant burgundy dress, loose fit. Step2: Product category is TROUSERS (does not match 'dresses'). Step3: Product color is LIGHT CAMEL (not burgundy). Step4: Fit requested 'loose' — trousers are wide-legged but fit preference was for a dress; semantic mismatch. Step5: No price constraint to check; product price present but irrelevant. Step6: Overall intent (elegant wedding guest dress) does not align with a casual corduroy trouser. Step7: Assigned score 1 (completely irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Metadata reviewed (name, category, color, price present). Step2: Query and occasion reviewed. Step3: Generated explanation is empty. Step4: No claims to verify; absence of content means no grounding. Step5: No specific attributes or useful shopping guidance provided. Step6: No connection made to user's query or occasion. Step7: Assigned score 1 (completely unhelpful/missing explanation)."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step1: occasion_target present: wedding_guest. Step2: Occasion = wedding guest. Step3: Typical expectation = elegant, dressy attire. Step4: Image shows light camel corduroy wide-leg trousers — casual texture and color, low formality. Step5: Metadata confirms TROUSERS, LIGHT CAMEL. Step6: While trousers can be worn to some weddings, this specific casual corduroy piece is unlikely to meet the user's request for an elegant outfit. Step7: Assigned score 2 (unlikely appropriate)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: User requested an elegant wedding-guest item, preferably a burgundy dress, loose fit. Step 2: Product category is SHIRTS not dresses — mismatch. Step 3: Product color is pink, not burgundy — mismatch. Step 4: Fit preference is loose; the shirt may be loose but the user wanted a dress — key style mismatch. Step 5: No price constraints to check. Step 6: Overall semantic alignment fails: item name and image show a pink poplin shirt, not an elegant burgundy loose dress. Step 7: Score 1 (completely irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Metadata available: name, category, color, price; description empty. Step 2: User query and occasion noted. Step 3: Generated explanation is empty. Step 4: No claims to verify; therefore no grounded content. Step 5: No specific attributes or useful shopping guidance provided. Step 6: No connection to user query or occasion. Step 7: Score 1 (completely missing/hallucinated content — here simply absent)."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Expected: elegant, semi-formal to formal attire (dresses, suits). Step 3: Typical styles are dresses or dressy separates. Step 4: Image shows a casual/light pink poplin shirt with a button-down collar — low formality. Step 5: Metadata confirms SHIRTS, PINK. Step 6: A single pink poplin shirt is unlikely to be appropriate as the main garment for a wedding guest (could only work as part of a layered outfit but still not ideal). Step 7: Score 2 (unlikely to be appropriate)."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 2,
+              "reasoning": "Step 1: User intent = elegant wedding-guest outfit, preferably a burgundy dress, loose (not too tight).\nStep 2: Reviewed metadata and images: items include one burgundy flap shoulder bag (accessory), two dresses (pink satin belted dress — elegant but pink and wrap/robe style; metallic thread knit dress with fringe — party/edgy, not burgundy or classic wedding-guest), plus casual skirts, tops, trousers, shirts, trench coat and belts in mostly neutral/casual fabrics (corduroy, knit, poplin).\nStep 3: Collective coverage: the set contains some potentially dressy pieces (pink satin dress, fringed dress) and a burgundy accessory, but no true burgundy dress or clear, elegant, non‑tight dress option matching the stated color and fit preference.\nStep 4: Visual/style diversity: moderate — ranges from satin dress to fringe party dress to casual corduroy and shirts; items are stylistically inconsistent for a single wedding look.\nStep 5: Coherence with occasion: mixed — a couple of pieces could work for a wedding, but many items are casual or workwear and not suited to an elegant guest outfit.\nStep 6: Glaring omissions: no burgundy dress, no clear elegant (flowing, non-tight) dress in the requested color; lacks coordinated dress-focused options (heels, matching jewelry) beyond the bag.\nStep 7: Synthesis: the recommendations are only partially relevant — there is a burgundy accessory and two dresses, but the set fails to provide the requested burgundy, loose-fitting elegant dress and is filled with casual items irrelevant to a wedding look.\nStep 8: Judgment: score 2 (partially relevant — fewer than half the items fit the wedding-guest/elegant intent)."
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "q102",
+      "query": "looking for a wedding guest outfit, preferably a midi dress in dusty pink under 100 euros",
+      "tier": 3,
+      "tags": [
+        "occasion",
+        "category",
+        "color",
+        "fit",
+        "price"
+      ],
+      "parsed": {
+        "normalized": "looking for a wedding guest outfit, preferably a midi dress in dusty pink under 100 euros",
+        "constraints": {
+          "categories": [
+            "dresses"
+          ],
+          "colors": [
+            "pink"
+          ],
+          "price_min": null,
+          "price_max": 100,
+          "fit": [
+            "midi"
+          ]
+        },
+        "occasion": {
+          "mode": "on",
+          "target": "wedding_guest"
+        },
+        "confidence": {
+          "overall": 0.8,
+          "occasion": 0.8
+        }
+      },
+      "rows_by_model": {
+        "clip": [
+          {
+            "product_name": "SOSHIOTSUKI X ZARA SATIN BELTED DRESS",
+            "product_category": "DRESSES",
+            "color": "PINK",
+            "price": "129.00 EUR",
+            "explanation": "The SOSHIOTSUKI X ZARA SATIN BELTED DRESS in pink is a dress from the DRESSES category, good for a wedding guest look. Its pink color aligns with the query keywords for dresses, pink, midi and suits celebratory daytime dressing.",
+            "image_url": "https://static.zara.net/assets/public/56ca/98a3/d29d41199906/3ee918dcf7f1/09751710620-e1/09751710620-e1.jpg?ts=1764230743599&w=4800",
+            "product_url": "https://www.zara.com/es/en/satin-dress-with-belt-soshiotsuki-x-zara-p09751710.html",
+            "final_score": 0.28523035645484923,
+            "relevance_score": 0.3010425269603729,
+            "occasion_score": 0.2615121006965637
+          },
+          {
+            "product_name": "SHORT DRESS WITH CONTRAST LACE",
+            "product_category": "DRESSES",
+            "color": "758",
+            "price": "35.95 EUR",
+            "explanation": "SHORT DRESS WITH CONTRAST LACE in 758 (color) is a dress option for a wedding guest. It fits the dresses, pink, midi keywords and provides a mid-length silhouette suitable for wedding attendance.",
+            "image_url": "https://static.zara.net/assets/public/0a9b/e106/fa10476cac7b/bb560bee1a7b/07200305758-e1/07200305758-e1.jpg?ts=1768900419735&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-contrast-lace-p07200305.html",
+            "final_score": 0.2818206429481506,
+            "relevance_score": 0.3035111427307129,
+            "occasion_score": 0.24928489327430725
+          },
+          {
+            "product_name": "TRENCH COAT MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BISCUIT",
+            "price": "35.95 EUR",
+            "explanation": "TRench COAT MIDI DRESS in BISCUIT offers a mid-length dress option for a wedding guest, matching the dresses, pink, midi query.",
+            "image_url": "https://static.zara.net/assets/public/7ae4/32e0/2a48428182ef/7ef4e6974249/03067310726-e2/03067310726-e2.jpg?ts=1769101967539&w=4800",
+            "product_url": "https://www.zara.com/es/en/trench-coat-midi-dress-p03067310.html",
+            "final_score": 0.28120256662368776,
+            "relevance_score": 0.29465287923812866,
+            "occasion_score": 0.26102709770202637
+          },
+          {
+            "product_name": "SOFT FABRIC DRESS WITH KNOT",
+            "product_category": "DRESSES",
+            "color": "SAND / MARL",
+            "price": "25.95 EUR",
+            "explanation": "SOFT FABRIC DRESS WITH KNOT in SAND / MARL is a dress choice for a wedding guest, aligning with the dresses, pink, midi keywords and feminine knot detail.",
+            "image_url": "https://static.zara.net/assets/public/98de/9d49/ccce4a73b928/30120731be0a/00264154081-e1/00264154081-e1.jpg?ts=1768987634441&w=4800",
+            "product_url": "https://www.zara.com/es/en/soft-fabric-dress-with-knot-p00264154.html",
+            "final_score": 0.2752511739730835,
+            "relevance_score": 0.28777551651000977,
+            "occasion_score": 0.2564646601676941
+          },
+          {
+            "product_name": "MAXI HIGH NECK DRESS",
+            "product_category": "DRESSES",
+            "color": "ECRU",
+            "price": "22.95 EUR",
+            "explanation": "MAXI HIGH NECK DRESS in ECRU provides a refined wedding guest option; balanced coverage and softened drape support the wedding attendance cue in the top prompt.",
+            "image_url": "https://static.zara.net/assets/public/c138/18d8/4edc4dcb9d4f/8c317bfe8303/01198001712-e1/01198001712-e1.jpg?ts=1767887864165&w=4800",
+            "product_url": "https://www.zara.com/es/en/high-neck-maxi-dress-p01198001.html",
+            "final_score": 0.27336597442626953,
+            "relevance_score": 0.2847675681114197,
+            "occasion_score": 0.2562635838985443
+          },
+          {
+            "product_name": "NYLON MIDI DRESS WITH TIES",
+            "product_category": "DRESSES",
+            "color": "RED",
+            "price": "35.95 EUR",
+            "explanation": "NYLON MIDI DRESS WITH TIES in RED is a mid-length dress for a wedding guest, aligning with the dresses, pink, midi keywords and a polished silhouette.",
+            "image_url": "https://static.zara.net/assets/public/5c88/a9cf/ec8b450aaaeb/3b9572fe6a3b/04772308600-e1/04772308600-e1.jpg?ts=1768466813545&w=4800",
+            "product_url": "https://www.zara.com/es/en/nylon-midi-dress-with-ties-p04772308.html",
+            "final_score": 0.2709115147590637,
+            "relevance_score": 0.2846444249153137,
+            "occasion_score": 0.2503121495246887
+          },
+          {
+            "product_name": "MIDI DRESS WITH BELT",
+            "product_category": "DRESSES",
+            "color": "LIGHT BROWN",
+            "price": "39.95 EUR",
+            "explanation": "MIDI DRESS WITH BELT in LIGHT BROWN offers a belted, midi-length option for a wedding guest, matching the dresses, pink, midi query.",
+            "image_url": "https://static.zara.net/assets/public/56ee/8699/4f4045689d70/cf57a738ca90/02756144730-e1/02756144730-e1.jpg?ts=1761144607990&w=4800",
+            "product_url": "https://www.zara.com/es/en/midi-dress-with-belt-p02756144.html",
+            "final_score": 0.2706900119781494,
+            "relevance_score": 0.2801816463470459,
+            "occasion_score": 0.2564525604248047
+          },
+          {
+            "product_name": "RUFFLED MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "CREAM",
+            "price": "49.95 EUR",
+            "explanation": "RUFFLED MIDI DRESS in CREAM is a dresses choice for a wedding guest, with a midi length that fits the query and adds soft detail.",
+            "image_url": "https://static.zara.net/assets/public/c14d/d250/8df3432da931/520b6cca2fe3/04772314733-e1/04772314733-e1.jpg?ts=1768900565092&w=4800",
+            "product_url": "https://www.zara.com/es/en/ruffled-midi-dress-p04772314.html",
+            "final_score": 0.27020956873893737,
+            "relevance_score": 0.2794235646724701,
+            "occasion_score": 0.2563885748386383
+          },
+          {
+            "product_name": "CHIFFON GODET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "39.95 EUR",
+            "explanation": "CHIFFON GODET MIDI DRESS in BROWN is a wedding guest dress option; its midi length aligns with the dresses, pink, midi keywords and balanced coverage.",
+            "image_url": "https://static.zara.net/assets/public/a8cb/0f82/1dc040ca91bd/43993231daa6/00881344700-e1/00881344700-e1.jpg?ts=1768900563892&w=4800",
+            "product_url": "https://www.zara.com/es/en/chiffon-godet-midi-dress-p00881344.html",
+            "final_score": 0.2698980331420898,
+            "relevance_score": 0.27696722745895386,
+            "occasion_score": 0.2592942416667938
+          },
+          {
+            "product_name": "SHORT DRESS WITH PLEATS AND POCKETS",
+            "product_category": "DRESSES",
+            "color": "DARK MINK",
+            "price": "35.95 EUR",
+            "explanation": "SHORT DRESS WITH PLEATS AND POCKETS in DARK MINK offers a practical midi-length option for a wedding guest, fitting the dresses, pink, midi query.",
+            "image_url": "https://static.zara.net/assets/public/0ec6/8a96/583943f38df2/e65b3ba73a60/03067322742-e1/03067322742-e1.jpg?ts=1764586468033&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-pleats-and-pockets-p03067322.html",
+            "final_score": 0.26987853050231936,
+            "relevance_score": 0.2759484052658081,
+            "occasion_score": 0.2607737183570862
+          }
+        ],
+        "fashion_clip": [
+          {
+            "product_name": "SOSHIOTSUKI X ZARA SATIN BELTED DRESS",
+            "product_category": "DRESSES",
+            "color": "PINK",
+            "price": "129.00 EUR",
+            "explanation": "Pink satin fabric and a DRESSES category suit a wedding guest look. The dress aligns with the wedding ambiance and the query keywords dresses, pink, midi.",
+            "image_url": "https://static.zara.net/assets/public/56ca/98a3/d29d41199906/3ee918dcf7f1/09751710620-e1/09751710620-e1.jpg?ts=1764230743599&w=4800",
+            "product_url": "https://www.zara.com/es/en/satin-dress-with-belt-soshiotsuki-x-zara-p09751710.html",
+            "final_score": 0.3054428160190582,
+            "relevance_score": 0.33837196230888367,
+            "occasion_score": 0.25604909658432007
+          },
+          {
+            "product_name": "RUFFLED MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "CREAM",
+            "price": "49.95 EUR",
+            "explanation": "Cream MIDI DRESS offers a polished silhouette for a wedding guest. It fits the ceremony mood referenced by the midi length and dressed-up lines.",
+            "image_url": "https://static.zara.net/assets/public/c14d/d250/8df3432da931/520b6cca2fe3/04772314733-e1/04772314733-e1.jpg?ts=1768900565092&w=4800",
+            "product_url": "https://www.zara.com/es/en/ruffled-midi-dress-p04772314.html",
+            "final_score": 0.27038295865058903,
+            "relevance_score": 0.29428577423095703,
+            "occasion_score": 0.23452873528003693
+          },
+          {
+            "product_name": "SOFT FABRIC DRESS WITH KNOT",
+            "product_category": "DRESSES",
+            "color": "SAND / MARL",
+            "price": "25.95 EUR",
+            "explanation": "Sand / Marl Soft Fabric Dress with a knot provides a relaxed yet dressy option for a wedding guest. The midi-inspired feel and the pink/midi keywords align with the occasion.",
+            "image_url": "https://static.zara.net/assets/public/98de/9d49/ccce4a73b928/30120731be0a/00264154081-e1/00264154081-e1.jpg?ts=1768987634441&w=4800",
+            "product_url": "https://www.zara.com/es/en/soft-fabric-dress-with-knot-p00264154.html",
+            "final_score": 0.2677094042301178,
+            "relevance_score": 0.290134072303772,
+            "occasion_score": 0.23407240211963654
+          },
+          {
+            "product_name": "TRENCH COAT MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BISCUIT",
+            "price": "35.95 EUR",
+            "explanation": "BISCUIT Trench Coat Midi Dress combines a midi length with tailored styling for a wedding guest setting. The category DRESSES and midi cue support a celebratory daytime look.",
+            "image_url": "https://static.zara.net/assets/public/7ae4/32e0/2a48428182ef/7ef4e6974249/03067310726-e2/03067310726-e2.jpg?ts=1769101967539&w=4800",
+            "product_url": "https://www.zara.com/es/en/trench-coat-midi-dress-p03067310.html",
+            "final_score": 0.26535665392875674,
+            "relevance_score": 0.279166042804718,
+            "occasion_score": 0.24464257061481476
+          },
+          {
+            "product_name": "LACE MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "59.95 EUR",
+            "explanation": "Brown Lace MIDI DRESS from the Lace collection offers a refined choice for a wedding guest. It matches the wedding-themed keywords and midi silhouette.",
+            "image_url": "https://static.zara.net/assets/public/1809/b754/c539440ca9fd/e5e1f9828c61/01067101700-e1/01067101700-e1.jpg?ts=1764837925189&w=4800",
+            "product_url": "https://www.zara.com/es/en/lace-midi-dress-p01067101.html",
+            "final_score": 0.2598982572555542,
+            "relevance_score": 0.26673609018325806,
+            "occasion_score": 0.2496415078639984
+          },
+          {
+            "product_name": "MIDI DRESS WITH BELT",
+            "product_category": "DRESSES",
+            "color": "LIGHT BROWN",
+            "price": "39.95 EUR",
+            "explanation": "Light Brown MIDI DRESS with a belt emphasizes a defined waist for a wedding guest. The belt detail and midi length fit the ceremony vibe.",
+            "image_url": "https://static.zara.net/assets/public/56ee/8699/4f4045689d70/cf57a738ca90/02756144730-e1/02756144730-e1.jpg?ts=1761144607990&w=4800",
+            "product_url": "https://www.zara.com/es/en/midi-dress-with-belt-p02756144.html",
+            "final_score": 0.25281174182891847,
+            "relevance_score": 0.2731072008609772,
+            "occasion_score": 0.22236855328083038
+          },
+          {
+            "product_name": "CHIFFON GODET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "39.95 EUR",
+            "explanation": "Chiffon GODET MIDI DRESS in BROWN provides a lightweight option with a midi length for a wedding guest. The chiffon-inspired prompt aligns with celebratory daytime dressing.",
+            "image_url": "https://static.zara.net/assets/public/a8cb/0f82/1dc040ca91bd/43993231daa6/00881344700-e1/00881344700-e1.jpg?ts=1768900563892&w=4800",
+            "product_url": "https://www.zara.com/es/en/chiffon-godet-midi-dress-p00881344.html",
+            "final_score": 0.2508822441101074,
+            "relevance_score": 0.2671794891357422,
+            "occasion_score": 0.22643637657165527
+          },
+          {
+            "product_name": "DRAPED VELVET MIDI DRESS",
+            "product_category": "DRESSES",
+            "color": "DARK BROWN",
+            "price": "29.95 EUR",
+            "explanation": "Draped Velvet MIDI DRESS in DARK BROWN offers a luxe option suitable for a wedding guest event. The velvet drape aligns with a formal feel and the midi silhouette.",
+            "image_url": "https://static.zara.net/assets/public/e238/09ce/b6fa461a9428/9c68b2750fd5/09801242716-e1/09801242716-e1.jpg?ts=1765294582699&w=4800",
+            "product_url": "https://www.zara.com/es/en/draped-velvet-midi-dress-p09801242.html",
+            "final_score": 0.24895718097686767,
+            "relevance_score": 0.2565366327762604,
+            "occasion_score": 0.23758800327777863
+          },
+          {
+            "product_name": "ZW COLLECTION SATIN LACE DRESS",
+            "product_category": "DRESSES",
+            "color": "BROWN",
+            "price": "49.95 EUR",
+            "explanation": "ZW COLLECTION Satin Lace Dress in BROWN delivers a satin-lace finish for a wedding guest. The satin blend note supports a celebratory daytime evening vibe and the pink/midi keywords.",
+            "image_url": "https://static.zara.net/assets/public/2ef0/e0aa/7a1c42c781de/5b4106ca2df2/05919040700-e1/05919040700-e1.jpg?ts=1764168641367&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-satin-lace-dress-p05919040.html",
+            "final_score": 0.24750608205795288,
+            "relevance_score": 0.2524932026863098,
+            "occasion_score": 0.24002540111541748
+          },
+          {
+            "product_name": "SHORT DRESS WITH CONTRAST LACE",
+            "product_category": "DRESSES",
+            "color": "758",
+            "price": "35.95 EUR",
+            "explanation": "Short Dress with Contrast Lace in a bold 758 hue adds a chic party-ready option for a wedding guest. The festive prompt supports a daytime celebration mood.",
+            "image_url": "https://static.zara.net/assets/public/0a9b/e106/fa10476cac7b/bb560bee1a7b/07200305758-e1/07200305758-e1.jpg?ts=1768900419735&w=4800",
+            "product_url": "https://www.zara.com/es/en/short-dress-with-contrast-lace-p07200305.html",
+            "final_score": 0.24253820776939392,
+            "relevance_score": 0.2714815139770508,
+            "occasion_score": 0.19912324845790863
+          }
+        ],
+        "random": [
+          {
+            "product_name": "ASYMMETRIC HOUNDSTOOTH HEM LACE TOP",
+            "product_category": "TOPS",
+            "color": "BLACK / ECRU",
+            "price": "25.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/3727/54f0/ad5d49e4bb7d/109538992c8a/02166681093-e1/02166681093-e1.jpg?ts=1768928497969&w=4800",
+            "product_url": "https://www.zara.com/es/en/asymmetric-houndstooth-hem-lace-top-p02166681.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "MINI BOWLING BAG",
+            "product_category": "BAGS",
+            "color": "BROWN",
+            "price": "29.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/68e7/0927/e2ba4bb0817d/21dd6ee3a1d9/16063710700-e1/16063710700-e1.jpg?ts=1768481682810&w=4800",
+            "product_url": "https://www.zara.com/es/en/mini-bowling-bag-p16063710.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "100% SUEDE LEATHER COAT ZW COLLECTION LIMITED EDITION",
+            "product_category": "COATS",
+            "color": "DARK BROWN",
+            "price": "149.00 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/3bae/e1ce/b416488787a9/55f864935568/02969062716-e1/02969062716-e1.jpg?ts=1758644569243&w=4800",
+            "product_url": "https://www.zara.com/es/en/100-suede-leather-coat-zw-collection-limited-edition-p02969062.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "WIDE WAIST LEGGINGS",
+            "product_category": "TROUSERS",
+            "color": "BLACK",
+            "price": "19.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/4e6f/b92b/79864a828716/7fc94a8349e5/04387457800-e1/04387457800-e1.jpg?ts=1755171016910&w=4800",
+            "product_url": "https://www.zara.com/es/en/wide-waist-leggings-p04387457.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "COLOUR BLOCK KNIT CARDIGAN",
+            "product_category": "CARDIGANS",
+            "color": "ONLY ONE",
+            "price": "25.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/0013/6836/b5d244518a80/c261b107b057/05536195050-e1/05536195050-e1.jpg?ts=1758012076659&w=4800",
+            "product_url": "https://www.zara.com/es/en/colour-block-cardigan-p05536195.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "ZW COLLECTION PUFF SLEEVE SHIRT",
+            "product_category": "SHIRTS",
+            "color": "WHITE",
+            "price": "29.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/2128/79ad/b4b14962924d/b26b0a470058/04043014250-e1/04043014250-e1.jpg?ts=1769162357101&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-puff-sleeve-shirt-p04043014.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "LEATHER KNEE-HIGH BOOTS",
+            "product_category": "SHOES",
+            "color": "BROWN",
+            "price": "99.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/6706/619c/39c841639653/3495277dc005/12054610700-e3/12054610700-e3.jpg?ts=1758528340427&w=4800",
+            "product_url": "https://www.zara.com/es/en/leather-knee-high-boots-p12054610.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "DOUBLE-FACED COAT ZW COLLECTION",
+            "product_category": "COATS",
+            "color": "BROWN",
+            "price": "79.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/cf45/f953/232941cda438/14c24c2ab3e1/03581040700-e1/03581040700-e1.jpg?ts=1768215430533&w=4800",
+            "product_url": "https://www.zara.com/es/en/zw-collection-double-faced-coat-p03581040.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "LACE GAUZE SHIRT",
+            "product_category": "SHIRTS",
+            "color": "VANILLA",
+            "price": "29.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/4d78/c016/e9ad4bc280e0/a130a6e756ef/07521015727-e1/07521015727-e1.jpg?ts=1768900558206&w=4800",
+            "product_url": "https://www.zara.com/es/en/lace-gauze-shirt-p07521015.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          },
+          {
+            "product_name": "WOOL SHOULDER PAD JACKET SOSHIOTSUKI X ZARA",
+            "product_category": "JACKETS",
+            "color": "DARK BOTTLE GREEN",
+            "price": "99.95 EUR",
+            "explanation": "",
+            "image_url": "https://static.zara.net/assets/public/c9b1/0758/e2ff4c0fa692/9f35673033a6/04192165532-e1/04192165532-e1.jpg?ts=1764230736670&w=4800",
+            "product_url": "https://www.zara.com/es/en/wool-jacket-with-shoulder-pads-soshiotsuki-x-zara-p04192165.html",
+            "final_score": 0.0,
+            "relevance_score": 0.0,
+            "occasion_score": 0.0
+          }
+        ]
+      },
+      "eval": {
+        "parser": {
+          "parser_completeness": {
+            "score": 4,
+            "reasoning": "Step 1: Query requests a wedding guest outfit, preferably a midi dress in dusty pink under 100 euros. Step 2: Explicit constraints: occasion=wedding guest, category=dress, fit=midi, color=dusty pink (shade), price_max=100 euros. Step 3: Parsed output captured category (dresses), fit (midi), color (pink), price_max (100), and occasion (wedding_guest). Step 4: Minor omission: the parser reduced 'dusty pink' to 'pink' (lost shade qualifier). Step 5: Conclusion: nearly complete with one minor ambiguity -> score 4."
+          },
+          "parser_no_hallucination": {
+            "score": 5,
+            "reasoning": "Step 1: Query contains dress, dusty pink, midi, under 100 euros, wedding guest. Step 2: Parsed output lists dresses, pink, midi, price_max=100, occasion on=wedding_guest. Step 3: Each extracted constraint is explicitly stated or clearly implied. Step 4: No invented constraints present. Step 5: No hallucination -> score 5."
+          },
+          "parser_occasion_detection": {
+            "score": 5,
+            "reasoning": "Step 1: Query explicitly mentions 'wedding guest'. Step 2: Occasion is clearly present. Step 3: Parsed output sets occasion_mode='on' and occasion_target='wedding_guest'. Step 4-5: Mode and target correctly match the query. Step 6: Perfect match -> score 5."
+          }
+        },
+        "cross_model": {
+          "winner": "fashion_clip",
+          "clip_score": 2,
+          "fashionclip_score": 3,
+          "reasoning": "Step 1: Query asks for a wedding-guest midi dress, preferably dusty pink, price under 100 EUR. Step 2 (Set A / CLIP): Contains a pink satin belted dress (visually appropriate wedding style) but price 129 EUR (fails price constraint). Other four CLIP items are mostly non-pink (biscuit, sand, ecru, etc.), some are maxi or short rather than midi and several are casual/basic — so they fail color/length/occasion or price. Step 3 (Set B / FashionCLIP): Also includes the same pink satin (129 EUR) so again over budget. However FashionCLIP’s set contains more explicitly labelled midi dresses and items under 100 EUR (ruffled midi 49.95, lace midi 59.95, trench midi 35.95, soft fabric 25.95) that better match the requested midi length and budget. Most are neutral rather than dusty pink, so the color preference is not well satisfied across either set. Step 4: On hard constraints — price and midi fit — FashionCLIP matches the budget and midi requirement better overall; CLIP includes the pink item but it’s over budget and other picks miss color/length. Step 5: Occasion appropriateness — both sets include some wedding-appropriate silhouettes (satin, lace, ruffles), but FashionCLIP provides more midi silhouettes that read dressy/cocktail; CLIP has fewer suitable formal midi options. Step 6: Visual diversity — FashionCLIP offers a wider range of midi silhouettes (ruffle, lace, trench, belted) within budget; CLIP is more mixed with irrelevant colors/lengths. Step 7: Overall intent — user prioritized dusty pink under 100; neither set strongly delivers dusty pink under 100, but FashionCLIP better satisfies the budget + midi silhouette priority. Step 8: Scoring — CLIP: 2 (below average — only one pink but over budget and several irrelevant items). FashionCLIP: 3 (average — multiple true midis and within budget but misses the dusty-pink color preference). Step 9: Winner — fashion_clip."
+        },
+        "clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: Query asks for a wedding-guest midi dress in dusty pink under 100 EUR. Step2: Product category is DRESSES — matches. Step3: Color is PINK — matches requested pink/dusty pink. Step4: Fit: query requests midi; product name/metadata do not state 'midi' and the image could be midi-to-maxi but fit is uncertain — partial match. Step5: Price: product is 129.00 EUR, which exceeds the stated max 100 EUR — mismatch. Step6: Overall semantic alignment: mostly aligns on category and color but fails the price constraint and fit is uncertain. Step7: Score 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step1: Metadata: name, category DRESSES, color PINK, price 129.00 EUR; no description. Step2: Query and occasion present. Step3: Generated explanation: claims the dress is 'good for a wedding guest look', that its pink 'aligns with the query keywords for dresses, pink, midi' and 'suits celebratory daytime dressing.' Step4: Verification: claims about category and color are grounded in metadata; the claim that it is 'midi' is not supported by metadata or explicit description (possible hallucination). Step5: Explanation is partly specific (category, color) but also generic. Step6: It connects the product to the occasion but uses an unsupported 'midi' attribute. Step7: Penalise the hallucinated fit and mild generic phrasing. Score 2 (multiple issues: contains a hallucinated attribute and generic statements)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target is wedding_guest. Step2: Occasion expects a polished, semi-formal to formal dress. Step3: Typical wedding-guest styles include elegant midi/maxi satin dresses. Step4: Image shows a satin, belted, pink dress with a V-neck and long sleeves — visually appropriate and reasonably formal. Step5: Metadata (satin belted dress, pink) supports this. Step6: A guest could realistically wear this to many weddings (daytime or evening); length may be slightly long for some preferences but still appropriate. Step7: Score 4 (appropriate for the occasion)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in dusty pink under €100. Step 2: Product category = DRESSES — matches. Step 3: Color: metadata '758' and image show a dusty/blush pink with dark contrast lace — matches color preference. Step 4: Fit/style: product name and image indicate a short dress/mini slip style, not a midi — does not match fit requirement. Step 5: Price: 35.95 EUR — within budget. Step 6: Overall: matches category, color and price but fails the key 'midi' length constraint. Assigned 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name 'SHORT DRESS WITH CONTRAST LACE', category DRESSES, color '758', price 35.95 EUR, no description. Step 2: Query and occasion given. Step 3: Generated explanation claims the item 'fits the dresses, pink, midi keywords and provides a mid-length silhouette.' Step 4: Verification: 'dress' and 'pink' and price are grounded, but 'midi' and 'mid-length silhouette' are not present in metadata and contradict the product name/image (short dress) — hallucination. Step 5: Explanation is brief and somewhat useful but contains a specific incorrect claim about length. Step 6: Penalize for that hallucination; assigned 2 (multiple issues: contains hallucinated attribute)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Weddings typically expect semi-formal to formal dresses, often mid-length or longer depending on dress code. Step 3: The item is a short, lingerie-inspired slip dress with contrast lace: feminine and dressy but more casual/revealing than many wedding-appropriate options. Step 4: Image and metadata indicate a short silhouette and delicate lace trim which could work for a casual or informal wedding but may be inappropriate for formal ceremonies. Step 5: Verdict: borderline—could work in some contexts but not a clearly appropriate universal choice for a wedding guest. Assigned 3."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step1: Query requests a wedding-guest midi dress in dusty pink under €100. Step2: Product category is DRESSES — matches. Step3: Color is BISCUIT (beige), not pink — mismatch. Step4: Name includes MIDI and image shows mid-length silhouette — matches fit. Step5: Price €35.95 is under €100 — matches. Step6: Overall semantic alignment: a midi dress for a wedding fits intent but color requirement is not met. Step7: Score 4 (mostly relevant — matches most constraints except color)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step1: Metadata: name TRENCH COAT MIDI DRESS, category DRESSES, color BISCUIT, price 35.95 EUR. Step2: Query and occasion noted. Step3: Generated explanation: \"TRench COAT MIDI DRESS in BISCUIT offers a mid-length dress option for a wedding guest, matching the dresses, pink, midi query.\" Step4: Verification: correctly states dress/midi and occasion match; incorrectly claims it matches 'pink' — hallucination (color in metadata is BISCUIT). Step5: Explanation is brief and partly specific (midi, biscuit) but includes a false color claim. Step6: It partially connects product to query but contains an incorrect attribute. Step7: Penalize for hallucinated color — score 2 (multiple issues: hallucination and some generic phrasing)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target is wedding_guest. Step2: Appropriate styles: semi-formal to formal midi dresses in tasteful colors. Step3: Expected formality is moderate; modest, refined silhouettes work. Step4: Image shows a mid-length, modest, elegant dress with a neutral biscuit tone and simple detailing — visually appropriate. Step5: Metadata confirms category DRESSES and midi naming. Step6: A guest could comfortably wear this to most weddings (neutral color, modest cut), though color may be less festive than dusty pink. Step7: Score 4 (appropriate for the occasion)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in dusty pink under 100 EUR. Step 2: Product category is DRESSES — matches. Step 3: Product color is SAND / MARL, not pink — color mismatch with user preference. Step 4: Fit/style: image shows a midi-length silhouette with a knot detail, matching the requested midi fit. Step 5: Price is 25.95 EUR, well under 100 EUR — matches. Step 6: Overall semantic alignment: category, fit, and price match, but color requirement (dusty pink) is not met. Step 7: Score 3 (partially relevant — matches several constraints but misses key color preference)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name, category DRESSES, color SAND / MARL, price 25.95 EUR, empty description. Step 2: Query and occasion are wedding guest, dusty pink midi under 100 EUR. Step 3: Generated explanation states the item is 'in SAND / MARL' and 'aligning with the dresses, pink, midi keywords and feminine knot detail.' Step 4: Verification: claim that it is a dress and has a knot is supported; price and category are grounded. Claim that it aligns with 'pink' is a hallucination (metadata lists SAND / MARL, not pink). 'Midi' is implied by the image but not in metadata (minor). Step 5: Explanation is partly specific (mentions knot and color) but includes at least one incorrect attribute (pink) and overstates alignment. Step 6: It does not accurately connect to the user's color constraint. Step 7: Score 2 (contains hallucinated/misleading claim and limited usefulness)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Wedding guest attire typically calls for a neat, semi-formal dress in a tasteful color. Step 3: Expected styles include midi dresses, modest silhouettes, and refined details. Step 4: The image shows a simple, knee-to-calf length dress with a knot detail and neutral color — modest and polished. Step 5: Metadata (dress, sand/marl color, low price) supports a casual to semi-formal look. Step 6: A person could realistically wear this to many weddings, especially daytime or casual/semi-formal ones; may be less suitable for very formal evening weddings. Step 7: Score 4 (appropriate for the occasion in most contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query asks for a wedding guest midi dress in dusty pink under 100 EUR. Step 2: Product category = DRESSES — matches. Step 3: Product color = ECRU — does not match requested pink. Step 4: Product name = MAXI HIGH NECK DRESS — length/style = maxi, not midi, mismatch. Step 5: Price = 22.95 EUR — within the stated budget. Step 6: Overall semantic alignment: category and price match but two key constraints (color and midi fit) do not. Step 7: Score reflects partial relevance (matches some constraints but misses key ones)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata shows name MAXI HIGH NECK DRESS, category DRESSES, color ECRU, price 22.95 EUR. Step 2: Query and occasion noted. Step 3: Explanation: \"MAXI HIGH NECK DRESS in ECRU provides a refined wedding guest option; balanced coverage and softened drape support the wedding attendance cue.\" Step 4: Verification: the explanation correctly states name and color price-adjacent facts (name/color present). Step 5: Issues: claims like \"provides a refined wedding guest option\" and specifics about \"balanced coverage and softened drape\" are subjective and not supported by explicit metadata (no description provided) — mild inference. Step 6: Usefulness: gives a purchase-oriented claim but fails to address mismatches with the user's explicit constraints (not pink, maxi not midi). Step 7: Score reflects mostly grounded content but with some subjective/unverified claims and omission of important constraint mismatches."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Typical wedding-guest attire: semi-formal, avoid bridal shades. Step 3: Product visual: maxi, high-neck, neutral ecru (light/off-white). Step 4: Formality: the dress appears modest and potentially appropriate in silhouette. Step 5: Color concern: ecru is a near-white/neutral tone which can be inappropriate for guests (risk of resembling bridal shades). Step 6: Verdict: unlikely to be appropriate for many weddings due to color/possible clash with bride; could work only for very casual or explicitly beige-friendly dress codes. Step 7: Score 2."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: User wants a wedding-guest midi dress in pink under €100. Step 2: Product category = DRESSES matches. Step 3: Color = RED does not match requested pink (preference). Step 4: Fit = MIDI (name includes 'MIDI') matches. Step 5: Price = 35.95 EUR is within max €100. Step 6: Overall semantic alignment: mostly aligned (correct category, fit, price) but color preference not met. Step 7: Assigned 4 (mostly relevant — one notable mismatch: color)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name, category, color=RED, price=35.95 EUR, description empty. Step 2: Query and occasion noted. Step 3: Generated explanation: claims item is 'in RED' and 'aligning with the dresses, pink, midi keywords and a polished silhouette.' Step 4: Verification: claim of RED is correct; claim it aligns with 'pink' is false (hallucination). 'Polished silhouette' is an interpretive styling claim not supported by metadata and image shows a more casual tiered shape. Step 5: Explanation contains both a correct factual point and at least one clear hallucination plus a subjective unsupported styling claim. Step 6: It only partially connects to the query. Step 7: Assigned 2 (multiple issues: hallucination and unsupported/styley filler)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Occasion is wedding guest. Step 3: Typical expectations — semi-formal to formal midi dresses in subdued or festive colors. Step 4: Image shows a sleeveless tiered midi dress in bright red with a casual, relaxed silhouette. Step 5: Metadata confirms dress, midi, red, affordable. Step 6: Suitability: could work for some daytime or casual weddings but may be too casual or bold for formal ceremonies. Step 7: Assigned 3 (could work in some contexts — borderline)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in pink under 100 EUR. Step 2: Product category = DRESSES — matches. Step 3: Product color = LIGHT BROWN — does not match requested pink. Step 4: Product name includes MIDI — matches fit preference. Step 5: Price 39.95 EUR — within budget. Step 6: Overall semantic alignment: matches category, fit, and price but fails the explicit color constraint. Step 7: Score 3 (partially relevant: several constraints met but misses a key color requirement)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name=MIDI DRESS WITH BELT, category=DRESSES, color=LIGHT BROWN, price=39.95 EUR. Step 2: Query asks for pink midi under 100 for wedding guest. Step 3: Explanation claims the item 'matches the dresses, pink, midi query.' Step 4: Claim that it matches 'pink' is not supported by metadata (hallucination). Step 5: Explanation mentions midi and belted which are grounded, but includes an incorrect color-match claim and is otherwise generic. Step 6: Penalize for hallucination and low specificity. Score 2 (multiple issues: hallucinated color match and somewhat generic)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Typical wedding-guest attire = smart, semi-formal dresses (midi often appropriate). Step 3: Product image shows a modest, belted midi silhouette with neutral/light-brown color and a refined look. Step 4: Metadata confirms midi dress with belt. Step 5: A guest could realistically wear this to many weddings (depends on dress code and season). Step 6: Score 4 (appropriate for the occasion though not standout or season-specific)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a midi dress, pink (dusty pink preferred), under 100 EUR for a wedding guest. Step 2: Product category is DRESSES — matches. Step 3: Product color is CREAM, not pink/dusty pink — color mismatch. Step 4: Fit/style: product name is RUFFLED MIDI DRESS and image shows a midi-length ruffled dress — fits the requested midi fit. Step 5: Price 49.95 EUR — within budget. Step 6: Semantic alignment: overall intent (wedding guest midi dress under 100) largely met except for color preference. Step 7: Score reflects mostly relevant with one notable misalignment (color)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name RUFFLED MIDI DRESS, category DRESSES, color CREAM, price 49.95 EUR. Step 2: Query and occasion present. Step 3: Generated explanation: \"RUFFLED MIDI DRESS in CREAM is a dresses choice for a wedding guest, with a midi length that fits the query and adds soft detail.\" Step 4: Verified claims: name, color, and midi length are grounded in metadata; price not mentioned. Step 5: 'Adds soft detail' is a subjective observation supported by visible ruffles, not a hallucination. Step 6: Issue: the explanation states it \"fits the query\" despite the user specifying dusty pink preference — that overstates alignment on color. Step 7: Conclusion: mostly grounded and somewhat useful but slightly misleading about color match, so a mid-level score."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: wedding guest attire typically calls for semi-formal to formal dresses in muted or festive colors, avoiding white/ivory that could match the bride. Step 3: The dress is midi, ruffled, and visually semi-formal — appropriate in style and silhouette. Step 4: Color is cream (from metadata and visible in image), which can be borderline/inappropriate at some weddings because it resembles bridal white. Step 5: Given style it could work for many weddings, but the cream color makes it potentially problematic. Step 6: Therefore it's a borderline but usable choice in some contexts."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding-guest midi dress in dusty pink under 100 EUR. Step 2: Product category = DRESSES — matches. Step 3: Product color = BROWN — does not match requested pink/dusty pink. Step 4: Fit = name includes MIDI — matches the midi preference and image shows a midi/long silhouette. Step 5: Price = 39.95 EUR — within the <=100 EUR constraint. Step 6: Overall semantic alignment: matches category, fit, and price but fails the key color constraint. Step 7: Score 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name CHIFFON GODET MIDI DRESS, category DRESSES, color BROWN, price 39.95 EUR, empty description. Step 2: User query and occasion reviewed. Step 3: Generated explanation claims the dress is brown (correct) but also asserts it 'aligns with the dresses, pink, midi keywords' and references pink — which is not supported by metadata (hallucination). Step 4: Explanation is partly grounded (midi, dress) but includes incorrect color claims and vague justification. Step 5: Penalize for hallucinated color claim and mixed, somewhat generic reasoning. Step 6: Score 2 (multiple issues: hallucination + generic statements)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: Occasion specified: wedding_guest. Step 2: Typical wedding-guest attire: semi-formal to formal dresses, midi length often appropriate. Step 3: Image and metadata show a chiffon midi dress with a modest silhouette and neutral/dark brown color, which is reasonably appropriate for many weddings. Step 4: Not overly casual or swimwear; fabric and cut appear suitable. Step 5: Could be slightly atypical if the wedding calls for light/dusty tones, but generally acceptable. Step 6: Score 4 (appropriate for the occasion)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: Query requests a midi dress in pink under 100 EUR for a wedding guest. Step2: Category matches (DRESSES). Step3: Color does not match — product is DARK MINK (brown), not pink. Step4: Fit does not match — metadata and image show a short/mini dress, not midi. Step5: Price matches (35.95 EUR < 100). Step6: Overall semantic alignment is weak: matches category and price only, misses key color and length constraints. Score: 2."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Metadata: name indicates SHORT DRESS, color DARK MINK, price 35.95 EUR. Step2: Explanation claims 'midi-length' and references 'pink' — both contradict metadata/image. Step3: Explanation therefore contains clear hallucinations (length and color) and is not grounded. Step4: No useful, specific justification tied to actual metadata. Score: 1."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step1: occasion_target present: wedding_guest. Step2: Typical wedding-guest attire is more formal, often midi/soft colors for daytime weddings. Step3: Image and metadata show a short, dark-mink (brown) dress with casual pockets and a mini silhouette. Step4: This item is unlikely to be appropriate for many wedding guest contexts (too short and dark/less festive), though could work for very casual or evening events. Score: 2."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 2,
+              "reasoning": "Step 1 — Intent: user wants a wedding-guest outfit, preferably a midi dress in dusty pink and under €100. Step 2 — Review: all items are dresses; only Product 1 is dusty pink (satin belted) but priced €129 (over budget). Product 2 is pale pink with contrast lace but is a short mini, €35.95. Several other listings are midi length (Products 3, 6, 7, 8, 9) and all are under €100, but their colors are biscuit, red, light brown, cream, brown — not dusty pink. Step 3 — Coverage: the set covers the correct category (dresses) and includes affordable midis, but fails to provide a dusty-pink midi under €100. Step 4 — Visual diversity: moderate — a range of silhouettes and fabrics (satin, knit, ruffles, chiffon, sleeveless/long-sleeve) but many neutral/dark tones. Step 5 — Coherence with occasion: mixed — some pieces (satin pink, cream ruffle, chiffon midi) could work for a wedding, but several are too casual, too short, or the wrong color. Step 6 — Glaring omissions: no true dusty-pink midi within the stated budget; few elegant wedding-appropriate midis in dusty pink. Step 7 — Synthesis: majority of items are dresses and budget-friendly, but they do not satisfy the central constraints (dusty pink + midi + ≤€100). Conclusion: fewer than half of the recommendations actually fit the user’s stated preference, and the single dusty-pink option exceeds the budget."
+            }
+          }
+        },
+        "fashion_clip": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a wedding-guest midi dress in dusty pink under 100 EUR. Step 2: Product category is DRESSES — matches. Step 3: Color is PINK and image shows a dusty/powder pink — matches. Step 4: Fit requested midi; product name doesn’t state length but image appears to be midi/long — likely matches but not explicitly confirmed. Step 5: Price is 129.00 EUR, which exceeds the <=100 EUR constraint — mismatch. Step 6: Overall semantic intent (pink dress for wedding guest) aligns well except for the price constraint. Step 7: Given strong match on category, color and likely fit but failing price, score 4."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata shows name includes SATIN BELTED DRESS, category DRESSES, color PINK, price 129 EUR; no description/length specified. Step 2: Query and occasion noted. Step 3: Explanation claims: pink satin fabric, DRESSES category, aligns with wedding guest and mentions 'midi'. Step 4: 'Pink' and 'satin' and 'DRESSES' are directly supported by metadata; 'midi' is not specified in metadata (only inferred from image) — minor hallucination. Step 5: Explanation is somewhat specific (fabric and category) but short. Step 6: It connects product to the wedding query but asserts midi without grounding. Step 7: Penalise the unsupported 'midi' claim; overall mostly grounded and somewhat useful, so score 3."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is wedding_guest (present). Step 2: Occasion identified: wedding guest. Step 3: Typical expectations: semi-formal to formal, elegant fabrics and modest silhouette. Step 4: Image shows a satin, belted, modest silhouette in a soft pink — visually elegant and appropriate. Step 5: Metadata: satin belted dress, pink, supports a dressy look. Step 6: A person attending a wedding would realistically wear this item. Step 7: It fits the expected style and formality well, so score 4 (appropriate)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: User seeks a wedding guest midi dress in dusty pink under 100 EUR. Step 2: Product category is DRESSES — matches. Step 3: User wanted pink; product color is CREAM — mismatch. Step 4: Fit/style: product name is RUFFLED MIDI DRESS and the image shows a midi-length ruffled silhouette — matches fit. Step 5: Price is 49.95 EUR — within budget. Step 6: Overall semantic alignment: category, fit, and price align, but color requirement (dusty pink) is not met. Step 7: Score = 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step 1: Metadata: name RUFFLED MIDI DRESS, category DRESSES, color CREAM, price 49.95 EUR. Step 2: Query and occasion noted. Step 3: Explanation: \"Cream MIDI DRESS offers a polished silhouette for a wedding guest. It fits the ceremony mood referenced by the midi length and dressed-up lines.\" Step 4: Claims checked: color = cream (correct), midi length = in name/image (correct), suitability for wedding = subjective but reasonable — no explicit hallucinated attributes. Step 5: Explanation is brief and generic rather than specific about fabric, fit, or why it suits the wedding beyond length and silhouette. Step 6: It connects to the occasion but lacks detail and doesn't address the user's pink preference. Step 7: Score = 3 (mostly grounded but somewhat generic)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Identified occasion = wedding guest. Step 3: Appropriate wedding guest styles are dressy, refined midi or cocktail dresses. Step 4: Image shows a ruffled, midi-length cream dress with a feminine silhouette — visually dressy and suitable in style. Step 5: Metadata (midi, cream) supports this. Step 6: However cream/near-white shades can be inappropriate for some weddings (may compete with the bride), so suitability depends on venue/tradition. Step 7: Score = 3 (could work in some contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a midi dress in dusty pink under 100 EUR for a wedding guest. Step 2: Product category = DRESSES matches. Step 3: Product color = SAND / MARL does not match requested dusty pink (color mismatch). Step 4: Fit/style = knee-to-calf midi length with knot detail visible in image, aligns with 'midi' fit. Step 5: Price = 25.95 EUR is within the stated max 100 EUR. Step 6: Overall semantic alignment: name and image indicate a midi dress appropriate in silhouette but color deviates from 'dusty pink'. Step 7: Given matches on category, fit and price but a clear color mismatch, score 4."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name 'SOFT FABRIC DRESS WITH KNOT', category DRESSES, color SAND / MARL, price 25.95 EUR, no description. Step 2: Query and occasion noted. Step 3: Generated explanation claims: 'relaxed yet dressy', 'midi-inspired feel' and references 'pink/midi keywords'. Step 4: Verification: 'relaxed yet dressy' and 'midi-inspired' are partly inferable from name/image (soft fabric, knot, midi length), but the claim about 'pink' contradicts metadata (color = sand/marl) — hallucination. Step 5: Explanation is brief and partly generic; it references midi but misstates color. Step 6: It does not provide helpful, grounded detail and includes a hallucinated color claim. Step 7: Multiple issues (hallucination + generic phrasing) → score 2."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target = wedding_guest (present). Step 2: Occasion = wedding guest (typically semi-formal to formal, depends on wedding). Step 3: Expected styles vary; midi dresses can be appropriate, but fabric and formality matter. Step 4: Image shows a simple knit, casual-looking midi dress with a knot detail—more relaxed than formal. Step 5: Metadata (soft fabric, knot) reinforces a relaxed aesthetic. Step 6: This item could work for a casual or daytime wedding but may be too casual for formal/evening weddings. Step 7: Borderline suitability depending on wedding formality, score 3."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a wedding-guest midi dress in dusty pink under €100. Step 2: Product category = DRESSES — matches. Step 3: Color = BISCUIT (beige) — does not match requested pink/dusty pink. Step 4: Fit/style = name includes 'MIDI' and image shows a midi-length silhouette — matches fit. Step 5: Price = 35.95 EUR — within budget. Step 6: Semantic alignment = product is a midi dress appropriate for a guest look but color deviates from specified pink. Step 7: Score reflects good match on category, fit, and price but color mismatch."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name 'TRENCH COAT MIDI DRESS', category DRESSES, color BISCUIT, price 35.95 EUR. Step 2: Query and occasion noted. Step 3: Explanation: states BISCUIT Trench Coat Midi Dress combines midi length with tailored styling for a wedding guest setting and cites category/midi cue. Step 4: Claims checked: 'BISCUIT' and 'MIDI' and category match metadata; 'tailored styling' is visible in image (not explicitly in metadata) but not a clear hallucination. Step 5: Explanation is specific to attributes (length, style, category) rather than generic. Step 6: It connects product attributes to the wedding-guest intent. Step 7: No obvious hallucinations and useful guidance, so score 4."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Occasion = wedding guest (typically semi-formal/daytime). Step 3: Expected styles = elegant midi dresses, modest tailoring, neutral or soft colors. Step 4: Image shows a tailored, midi-length trench-style dress with a refined silhouette appropriate for daytime weddings. Step 5: Metadata (DRESSES, BISCUIT) supports a neutral, formal-leaning option. Step 6: A guest could realistically wear this to many weddings (daytime/semi-formal); slight concern that biscuit is very neutral but not plainly white. Step 7: Score 4 — appropriate for many wedding-guest contexts."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in dusty pink under 100 EUR. Step 2: Product category is DRESSES — matches. Step 3: Product color is BROWN — does not match requested pink/dusty pink. Step 4: Product name includes MIDI — matches fit preference. Step 5: Price 59.95 EUR — within stated max 100 EUR. Step 6: Image shows a lace long dress that appears midi-to-maxi length; overall intent (wedding guest dress) is partly met but color mismatch is a key constraint. Step 7: Partial relevance due to matching category, fit, and price but failing color."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name LACE MIDI DRESS, category DRESSES, color BROWN, price 59.95 EUR, empty description. Step 2: Query and occasion noted. Step 3: Generated explanation: calls it a Brown Lace MIDI DRESS and says it offers a refined choice for a wedding guest and matches midi silhouette. Step 4: Claims about brown color, lace, and midi silhouette are grounded in metadata; phrase 'Lace collection' is not present in metadata (minor unsupported phrase). Step 5: Explanation is specific to attributes (color, lace, midi) rather than generic. Step 6: It connects product to the wedding-guest intent. Step 7: Minor unsupported wording but overall well grounded and useful."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: Occasion specified: wedding_guest. Step 2: Typical wedding-guest attire is semi-formal to formal dresses, often elegant fabrics like lace. Step 3: Product image shows a lace, formal-looking long-sleeve dress with a refined silhouette. Step 4: Metadata indicates a lace midi dress; price and style suit an occasion-wear budget. Step 5: A guest could realistically wear this to many weddings; color brown is less conventional than pink but not clearly inappropriate. Step 6: Appropriate for the occasion in most contexts, so scored 4."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 4,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in pink under 100 EUR. Step 2: Product category = DRESSES — matches. Step 3: Product color = LIGHT BROWN — does not match requested dusty pink. Step 4: Fit = MIDI (name contains MIDI) — matches fit. Step 5: Price = 39.95 EUR — within budget. Step 6: Overall semantic alignment: product matches category, fit, and price but mismatches the preferred color. Step 7: Score 4 (mostly relevant; one clear minor misalignment: color)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata: name contains MIDI DRESS WITH BELT, category DRESSES, color LIGHT BROWN, price 39.95 EUR. Step 2: Query and occasion noted. Step 3: Explanation: states light brown midi dress with belt emphasizes defined waist and fits ceremony vibe. Step 4: Claims are grounded: color, midi, and belt are in metadata/image; 'emphasizes a defined waist' is a reasonable visual inference from the belt (not hallucinated). Step 5: Explanation is specific to attributes (belt, midi length) rather than generic. Step 6: It connects product to wedding guest intent. Step 7: No false attributes present; minor subjectivity about 'ceremony vibe' only. Score 4 (well-grounded and useful)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present = wedding_guest. Step 2: Occasion requires semi-formal to formal, tasteful attire. Step 3: Expected: modest, elegant midi styles often work. Step 4: Image shows a modest, belted midi silhouette with short sleeves and neutral tone — relatively formal and conservative. Step 5: Metadata confirms midi dress with belt, light brown color. Step 6: A guest could realistically wear this to many weddings (especially daytime or less formal ceremonies), though the muted brown is less festive than pink. Step 7: Score 4 (appropriate for the occasion with minor aesthetic caveat)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: User wants a wedding guest midi dress in dusty pink under €100. Step2: Product category is DRESSES — matches. Step3: Product color is BROWN — does not match requested pink/dusty pink. Step4: Product name includes MIDI — fit matches. Step5: Price is €39.95 — within budget. Step6: Semantic alignment: name and image show a midi dress suitable for occasion but color mismatch is a key constraint. Step7: Score 3 (partially relevant — matches category, fit, price but misses requested color)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step1: Metadata: name 'CHIFFON GODET MIDI DRESS', category DRESSES, color BROWN, price 39.95 EUR. Step2: Query and occasion reviewed. Step3: Explanation claims: chiffon, midi length, lightweight option, suitable for wedding daytime dressing. Step4: Verifiability: 'chiffon' and 'midi' are in the name — grounded; color brown is correct. 'Lightweight' and 'celebratory daytime' are subjective inferences not stated in metadata (minor hallucination). Step5: Explanation is somewhat specific (mentions fabric cue and length) but includes a small unsupported attribute. Step6: It links product to the occasion but doesn't address the user's color preference (dusty pink). Step7: Score 3 (mostly grounded and somewhat useful; contains one minor unsupported claim and omits addressing the user's color constraint)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step1: occasion_target present: wedding_guest. Step2: Occasion = wedding guest (typically semi-formal/daytime or evening depending). Step3: Expected: modest, dressy midi or cocktail styles. Step4: Image shows a midi-length, modest silhouette with chiffon-like drape and neutral brown color. Step5: Metadata supports midi dress in brown. Step6: A guest could realistically wear this to many daytime or less formal weddings; brown is less traditional than pastel but acceptable. Step7: Score 4 (appropriate for the occasion)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in dusty pink under €100. Step 2: Product category is DRESSES — matches. Step 3: Product color is DARK BROWN — does not match requested pink. Step 4: Product name includes MIDI — fit matches. Step 5: Price is €29.95 — within budget. Step 6: Overall semantic alignment: matches category, fit, and price but fails the requested color preference. Step 7: Score 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 4,
+                "reasoning": "Step 1: Metadata shows name includes 'Draped Velvet MIDI DRESS', category DRESSES, color DARK BROWN, price €29.95. Step 2: Query and occasion are wedding guest, midi, dusty pink under €100. Step 3: Generated explanation states velvet, dark brown, midi silhouette and suitability for a wedding. Step 4: All factual claims (velvet, midi, dark brown) are supported by metadata; no fabricated attributes. Step 5: Explanation is specific to material and silhouette rather than generic. Step 6: It connects the product to the wedding occasion by noting formal feel. Step 7: Minor issue: calling it a \"luxe option\" is a subjective judgment but not a factual hallucination. Score 4 (well-grounded and specific)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: wedding guest typically calls for semi-formal to formal attire. Step 3: velvet, draped details and a midi silhouette are appropriate for a wedding. Step 4: Image shows a long-sleeve draped velvet midi with a formal silhouette. Step 5: Metadata (Draped Velvet MIDI DRESS, DARK BROWN) supports this assessment. Step 6: A guest could realistically wear this to many weddings, though the dark brown color may be less traditional than lighter or more festive tones. Step 7: Score 4 (appropriate)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step 1: Query requests a wedding guest midi dress in dusty pink under 100 EUR. Step 2: Product category is DRESSES — matches. Step 3: Product color is BROWN, not pink — mismatch. Step 4: Fit: user asked for midi; metadata doesn't state length, but image shows a midi/tea length slip silhouette (uncertain) — partial match. Step 5: Price is 49.95 EUR — meets budget. Step 6: Overall semantic alignment: name 'Satin Lace Dress' fits wedding guest intent, but color and explicit midi claim do not match user constraints. Step 7: Score 3 (partially relevant)."
+              },
+              "explanation_quality": {
+                "score": 2,
+                "reasoning": "Step 1: Metadata: name 'ZW COLLECTION SATIN LACE DRESS', category DRESSES, color BROWN, price 49.95 EUR, no description. Step 2: Query and occasion noted. Step 3: Generated explanation claims: 'satin-lace finish' (supported by name), 'satin blend note supports a celebratory daytime evening vibe' (material/composition and vibe are not in metadata — inferred), and 'the pink/midi keywords' (incorrect: metadata color is brown and no midi specified). Step 4: Several claims cannot be confirmed and one is incorrect. Step 5: Explanation is partly specific (satin lace) but otherwise generic or inaccurate. Step 6: It fails to correctly connect attributes to the user's pink/midi constraint. Step 7: Penalize hallucinations and wrong claims. Score 2 (multiple issues: hallucinations and inaccurate statements)."
+              },
+              "occasion_appropriateness": {
+                "score": 4,
+                "reasoning": "Step 1: occasion_target present: wedding_guest. Step 2: Occasion is a wedding guest. Step 3: Typical expectations: semi-formal to formal dress, tasteful fabric and length. Step 4: Image shows a satin slip dress with lace trim and a midi-length silhouette; visually semi-formal and elegant. Step 5: Metadata: 'Satin Lace Dress', price and category support a dress suitable for events. Step 6: A guest could realistically wear this to many weddings (daytime or evening) though brown is less traditional than muted/pastel colors. Step 7: Score 4 — appropriate for the occasion with minor color/aesthetic caveat."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 3,
+                "reasoning": "Step1: User wants a midi dress, dusty pink, under 100 EUR for a wedding guest. Step2: Product category is DRESSES — matches. Step3: Color appears to be pink/dusty pink (metadata color code '758') — matches color constraint. Step4: Fit: metadata and name state 'SHORT DRESS' and image shows a short, above-knee length — does not match requested midi fit. Step5: Price is 35.95 EUR — within budget. Step6: Semantic alignment: matches category, color and price but fails the key requested length (midi). Step7: Score 3 (partially relevant — meets several constraints but misses the key fit requirement)."
+              },
+              "explanation_quality": {
+                "score": 3,
+                "reasoning": "Step1: Metadata: name 'SHORT DRESS WITH CONTRAST LACE', category DRESSES, color '758', price 35.95 EUR, no description. Step2: Query and occasion checked. Step3: Generated explanation: calls it 'Short Dress with Contrast Lace in a bold 758 hue adds a chic party-ready option for a wedding guest. The festive prompt supports a daytime celebration mood.' Step4: Verification: correctly uses product name and color code from metadata and connects to wedding guest; calling the hue 'bold' and 'party-ready' is subjective (not in metadata). Step5: Explanation is somewhat specific (name, color code) but otherwise generic styling claims. Step6: It links the product to the occasion (daytime celebration) but offers no concrete fit/length or styling advice despite the user request for a midi. Step7: Penalised for subjective/generic claims and lack of detail; Score 3 (mostly grounded but somewhat generic and missing critical fit-related connection)."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step1: occasion_target is 'wedding_guest'. Step2: Occasion identified: wedding guest (likely varying formality). Step3: Typical wedding guest attire is dressy and modest to semi-formal depending on wedding. Step4: Image shows a short, strappy, lace-trimmed dress with a lingerie-like silhouette. Step5: Metadata confirms short dress with contrast lace. Step6: Realistically: could work for a daytime or casual wedding if styled appropriately, but may be too short/lingerie-like for many ceremonies or formal receptions. Step7: Score 3 (borderline; appropriate in some contexts but not broadly appropriate)."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 2,
+              "reasoning": "Step1: User intent = wedding guest outfit, preferably a dusty-pink midi dress priced under €100.\nStep2: Reviewed metadata and images: only Product 1 is dusty pink visually but is a satin belted dress priced €129 (over budget). Other items (Products 2–10) are mostly cream, sand, biscuit, brown and dark tones; several are midi length but not dusty pink. Prices for many are under €100 but colors/styles are off.\nStep3: Coverage: the set contains multiple midi dresses and a range of price points, but it fails to deliver the requested dusty-pink midi under €100.\nStep4: Visual diversity: moderate — ruffled, satin, lace, velvet and knit styles appear, so styles vary.\nStep5: Coherence with occasion: several dresses (satin, lace, chiffon) could work for a wedding guest, but many dark/brown tones and casual knits are less appropriate for a typical wedding look.\nStep6: Glaring omissions: no true dusty-pink midi dress within the user’s budget; few clearly wedding-appropriate pink options.\nStep7: Synthesis: majority of items are dresses and some are suitable for weddings in style, but the core user constraints (dusty pink + under €100) are not met.\nConclusion: score 2 — partially relevant because fewer than half the items match the explicit color and price requirements."
+            }
+          }
+        },
+        "random": {
+          "items": [
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step1: Query requests a wedding guest midi dress in dusty pink under 100 EUR. Step2: Product category is TOPS, not dresses. Step3: Product color is BLACK / ECRU, not pink. Step4: Fit requested 'midi' (dress length) — item is a top, not applicable. Step5: Price 25.95 EUR meets price constraint but is irrelevant given other mismatches. Step6: Metadata and image show an asymmetric sleeveless top; semantic intent (midi dusty-pink dress) is not met. Overall: completely irrelevant."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1-3: No explanation was provided (empty string). Step4: There are no claims to verify against metadata. Step5: No content, so nothing useful or grounded for a shopper. Result: missing explanation / completely unhelpful."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step1: Occasion specified: wedding_guest. Step2: Typical wedding-guest attire expects a dress or more formal ensemble in occasion-appropriate colors. Step3: Image and metadata show a casual asymmetric sleeveless top in black/ecru with lace hem — informal and not a dress. Step4: As a standalone option for a wedding guest this is unlikely appropriate; it might work only as part of a more formal outfit (paired with a skirt or tailored pieces), so borderline but generally inappropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User requested a midi dress in dusty pink under 100 EUR for a wedding guest. Step 2: Product category is BAGS, not DRESSES (mismatch). Step 3: Product color is BROWN, not pink (mismatch). Step 4: No fit/ midi information (mismatch). Step 5: Price 29.95 EUR is within the stated max €100 (matches). Step 6: Overall semantic alignment fails — item is an accessory, not the requested dress. Step 7: Matches at most one constraint (price) so score 2."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Metadata present (name, category, color, price) but no description. Step 2: User query and occasion provided. Step 3: Generated explanation is empty. Step 4: No claims to verify; absence of explanation provides no grounded information. Step 5: Nothing specific is stated. Step 6: No connection to user query or occasion. Step 7: Empty explanation is unhelpful — score 1."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target = wedding_guest. Step 2: Occasion is a wedding guest outfit. Step 3: Typical expectations: semi-formal to formal attire and complementary accessories. Step 4: Image shows a small brown leather mini bowling bag with gold hardware — relatively polished but casual compared with formal clutches. Step 5: Metadata confirms category BAGS, color BROWN. Step 6: A small brown bag could be worn to a wedding depending on outfit and formality, but it is not an ideal or clearly formal choice. Step 7: Could work in some contexts — borderline, so score 3."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: User requested a wedding guest outfit: a midi dress in dusty pink under 100 EUR. Step 2: Product category is COATS, user asked for dresses → mismatch. Step 3: Product color is DARK BROWN, user requested pink → mismatch. Step 4: Fit: user wanted a midi dress, product is a coat (length not a midi dress) → mismatch. Step 5: Price is 149.00 EUR, above the stated max 100 EUR → mismatch. Step 6: Semantic alignment: product name and image show a dark brown suede coat, which does not align with intent for a dusty-pink midi wedding dress. Step 7: Conclusion: completely irrelevant to the query."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1–3: No explanation text was provided (explanation field is empty). Step 4: No claims to verify; nothing grounded. Step 5: No specific product attributes or useful shopping guidance were given. Step 6: Cannot connect to user's query or occasion. Step 7: Result: empty/nonexistent explanation — fails grounding and usefulness."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Occasion requires semi-formal to formal guest attire. Step 3: Typical expectations: dresses or smart suits; outerwear acceptable as a coat for colder weather. Step 4: Image shows a dark brown suede long coat with a classic tailored shape and buttons — relatively smart casual to smart. Step 5: Metadata confirms coat, dark brown, leather/suede, price. Step 6: A brown suede coat could be worn as outerwear to a wedding in cool weather but is not a substitute for the required guest outfit (dress/suit) and may be too casual or heavy for many wedding styles. Step 7: Score reflects that it could work as outerwear in some contexts but is not an ideal/primary wedding guest garment."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 1,
+                "reasoning": "Step 1: User asked for a wedding guest outfit, specifically a midi dress in dusty pink under 100 EUR. Step 2: Product category is TROUSERS (WIDE WAIST LEGGINGS) — does not match requested category 'dresses'. Step 3: Product color is BLACK — does not match requested pink/dusty pink. Step 4: Fit requested 'midi' (dress length) — product is leggings, not a midi fit. Step 5: Price 19.95 EUR meets the price constraint but price alone does not satisfy other key constraints. Step 6: Overall semantic alignment fails: item is active/casual bottoms, user requested a midi dress for a wedding guest. Step 7: Score 1 (completely irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Metadata available (name, category, color, price). Step 2: User query and occasion provided. Step 3: Generated explanation is empty/missing. Step 4: No claims to verify; therefore cannot be grounded or useful. Step 5: No specific attributes or helpful guidance given. Step 6: Does not connect product to the user's query or occasion. Step 7: Penalise absence of explanation — Score 1."
+              },
+              "occasion_appropriateness": {
+                "score": 1,
+                "reasoning": "Step 1: occasion_target is 'wedding_guest'. Step 2: Expected styles for a wedding guest are formal/semi-formal dresses or tailored outfits. Step 3: Typical formality is dressy; leggings are casual and body-hugging. Step 4: Image and metadata show black leggings/tapered trousers with wide waistband — casual/activewear silhouette. Step 5: Metadata confirms category TROUSERS, color BLACK. Step 6: Unlikely appropriate for a wedding guest (especially when user sought a midi dress); would be considered clearly inappropriate. Step 7: Score 1."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User requested a midi dress in dusty pink under 100 EUR for a wedding guest. Step 2: Product category is CARDIGANS — does not match requested category (dresses). Step 3: Product color metadata is 'ONLY ONE' and image shows navy/green color-block — not dusty pink. Step 4: Fit preference (midi) is for dresses; a cardigan has no midi fit — mismatch. Step 5: Price is 25.95 EUR, which is within the user's max price. Step 6: Overall semantic alignment is poor: this is a casual cardigan, not a dusty-pink midi dress. Step 7: Because it only matches the price constraint and none of the primary product constraints, score = 2 (mostly irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata: name, category, color field, price present; description empty. Step 2: User query and occasion noted. Step 3: Generated explanation is empty. Step 4: No claims to verify; no grounding in metadata. Step 5: No specific attributes or useful guidance provided. Step 6: No connection made to the user's request. Step 7: Because there is no explanation and nothing useful for a shopper, score = 1."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is wedding_guest. Step 2: Typical wedding-guest attire is a dress or formal/semi-formal outfit. Step 3: Cardigans can serve as layering pieces but are not usually the main outfit for a wedding. Step 4: The pictured cardigan is casual, color-blocked (navy body, green sleeves) and relatively informal. Step 5: Metadata confirms it's a cardigan priced affordably. Step 6: A person could realistically wear this cardigan as a topper over a dress at a casual or outdoor wedding, but it is borderline for more formal ceremonies. Step 7: Score = 3 (could work in some contexts)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: User wants a dusty-pink midi dress under €100 for a wedding guest. Step2: Product category is SHIRTS (does not match requested dresses). Step3: Product color is WHITE (does not match requested pink). Step4: Fit: product is a shirt, not a midi dress (mismatch). Step5: Price €29.95 is within the stated budget (matches price constraint). Step6: Overall semantic alignment is poor — item is a casual white puff-sleeve shirt, not a dusty-pink midi wedding guest dress. Step7: Score 2 because it only matches the price constraint."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Product metadata provided. Step2: User query and occasion present. Step3: Generated explanation is empty. Step4: No claims to verify; absence of explanation offers no grounded information. Step5: No specific attributes or useful guidance given. Step6: Does not connect product to user's request. Step7: Score 1 because the explanation is missing and therefore unhelpful."
+              },
+              "occasion_appropriateness": {
+                "score": 1,
+                "reasoning": "Step1: occasion_target is wedding_guest. Step2: wedding guest attire typically requires a dress or formal/semi-formal outfit and avoiding white in many cultures. Step3: The product is a casual white shirt (low formality, wrong color for guest etiquette). Step4: Image shows a plain white puff-sleeve shirt, not a dress or formal piece. Step5: Metadata confirms category SHIRTS, color WHITE. Step6: Unlikely a person would wear this alone as an appropriate wedding guest outfit. Step7: Score 1 — clearly inappropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: Query requests a wedding guest midi dress in dusty pink under €100. Step2: Product category is SHOES (LEATHER KNEE-HIGH BOOTS) — does not match requested 'dresses'. Step3: Product color is brown, not pink. Step4: Fit requested 'midi' — product is boots, not applicable. Step5: Price €99.95 is within the ≤€100 constraint. Step6: Overall semantic alignment is poor: item is a different category and color, only price constraint matches. Step7: Assigned score 2 (mostly irrelevant — matches at most one constraint)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Metadata available (name, category, color, price). Step2: Query and occasion present. Step3: Generated explanation is empty. Step4: There are no claims to verify; absence of explanation provides no grounded information. Step5: No specific attributes or helpful details are offered. Step6: No connection made between product and user's query/occasion. Step7: Assigned score 1 (missing/hallucination-equivalent — no useful grounded explanation)."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step1: occasion_target is 'wedding_guest'. Step2: Occasion = wedding guest. Step3: Typical wedding-guest attire leans formal/semi-formal dresses or tailored outfits. Step4: Image shows tall brown leather knee-high boots with a western-style toe — casual/edgy aesthetic. Step5: Metadata confirms shoes, brown, €99.95. Step6: While boots could work for some informal or outdoor/country weddings, they are generally unlikely to be appropriate for a typical wedding guest outfit. Step7: Assigned score 2 (unlikely to be appropriate)."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User requested a midi dress in dusty pink under 100 EUR for a wedding guest. Step 2: Product category is COATS (does not match requested 'dresses'). Step 3: Product color is BROWN (does not match 'pink'). Step 4: Fit/style: coat vs requested 'midi' dress (mismatch). Step 5: Price is 79.95 EUR, which is within the <=100 EUR constraint (matches one constraint). Step 6: Semantic alignment is poor — a brown double-faced coat does not satisfy the user's core intent for a dusty-pink midi wedding guest dress. Overall: mostly irrelevant (only price matches)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1: Product metadata provided (name, category, color, price) but description empty. Step 2: User query and occasion present. Step 3: Generated explanation is empty. Step 4: No claims to verify; no grounding. Step 5: No specific helpful details provided. Step 6: Does not connect product to query/occasion. Step 7: Empty/unhelpful — scores as completely uninformative."
+              },
+              "occasion_appropriateness": {
+                "score": 3,
+                "reasoning": "Step 1: occasion_target is 'wedding_guest'. Step 2: Expected items: formal/semi-formal dresses or coordinated outfits; outerwear acceptable as a complement. Step 3: Typical wedding guest outerwear should be polished and season-appropriate. Step 4: Image shows a short brown double-faced coat with faux-fur trim — relatively warm and moderately dressy but casual compared with formalwear. Step 5: Metadata confirms COATS, BROWN. Step 6: A brown coat like this could work as outerwear to a wedding in cooler weather but would not satisfy the primary need for a dusty-pink midi dress. Step 7: Could work in some contexts as outerwear, borderline appropriate."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step1: User wants a midi dress in dusty pink under 100 EUR for a wedding guest. Step2: Product category is SHIRTS — does not match requested 'dresses'. Step3: Product color is VANILLA — does not match 'pink/dusty pink'. Step4: Fit: no indication of 'midi' (item is a top), so fit mismatch. Step5: Price is 29.95 EUR — meets the price constraint. Step6: Semantic alignment is poor: name 'LACE GAUZE SHIRT' and image show a cream/vanilla long-sleeve blouse, not a dusty-pink midi dress. Step7: Overall score 2 because only the price constraint matches; category, color, and fit do not."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step1: Metadata available: name, category, color, price; description empty. Step2: User query and occasion present. Step3: Generated explanation is empty. Step4: No claims to verify; nothing is grounded. Step5: No specific useful information provided. Step6: No connection made to user's query or occasion. Step7: Score 1 because no explanation was provided (completely unhelpful)."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step1: occasion_target is 'wedding_guest'. Step2: Appropriate wedding-guest looks typically include dresses or dressy separates in formal/cocktail styles. Step3: Expected formality: semi-formal to formal depending on wedding. Step4: Image shows a casual/romantic cream blouse with lace details — a top rather than a full outfit. Step5: Metadata confirms it's a shirt in vanilla color. Step6: A standalone shirt is unlikely to be an appropriate primary wedding-guest outfit (could only work if styled with a dressy skirt or trousers and accessories). Step7: Score 2 = unlikely to be appropriate as-is for a wedding guest."
+              }
+            },
+            {
+              "item_relevance": {
+                "score": 2,
+                "reasoning": "Step 1: User wants a midi dress in dusty pink under 100 EUR for a wedding guest. Step 2: Product category is JACKETS — does not match requested 'dresses'. Step 3: Product color is DARK BOTTLE GREEN — does not match requested pink/dusty pink. Step 4: Fit: user requested midi — product is a jacket, not a midi fit. Step 5: Price is 99.95 EUR, which meets the <=100 EUR constraint. Step 6: Overall semantic alignment is poor: item is a wool shoulder-pad jacket, not a dusty-pink midi dress. Step 7: Given it only matches price and nothing else, score 2 (mostly irrelevant)."
+              },
+              "explanation_quality": {
+                "score": 1,
+                "reasoning": "Step 1-3: There is no generated explanation (empty). Step 4: No claims to verify; no grounding possible. Step 5: No specific product attributes discussed. Step 6: Does not connect to the user's query or occasion. Step 7: Blank explanation provides no useful information — score 1."
+              },
+              "occasion_appropriateness": {
+                "score": 2,
+                "reasoning": "Step 1: occasion_target is 'wedding_guest'. Step 2: Expected items: dresses or formal/semi-formal outfits in wedding-appropriate colors/styles. Step 3: Typical formality for a wedding guest is dressy; a jacket can be appropriate as outerwear but not as the main outfit. Step 4: Image shows a dark bottle-green, structured wool jacket with shoulder pads — fairly formal as outerwear but not a standalone wedding guest dress. Step 5: Metadata confirms it's a jacket in dark green. Step 6: A person could wear this jacket over a suitable dress, but by itself it would be unlikely to serve as the wedding guest outfit. Step 7: Score 2 (unlikely to be appropriate as the requested wedding guest item)."
+              }
+            }
+          ],
+          "set": {
+            "set_answer_relevance": {
+              "score": 1,
+              "reasoning": "Step 1: User intent — a wedding guest outfit, preferably a dusty pink midi dress under €100. Step 2: Reviewed products — all items are tops, bags, coats, trousers/leggings, cardigans, shirts, boots and jackets; colors are mostly dark neutrals or mixed (black, brown, green, vanilla) and prices vary (several under €100 but one coat and boots near/above €99). Step 3: Coverage — the set contains no dress at all, let alone a dusty pink midi dress under €100, so it fails to provide the primary requested item. Step 4: Visual diversity — items are diverse in category but stylistically more casual/seasonal (boots, suede coats, cardigans) rather than formal wedding guest wear. Step 5: Coherence with occasion — overall pieces do not convey a cohesive wedding-guest outfit (no formal dress; many outerwear/casual pieces). Step 6: Glaring omissions — missing the requested dusty pink midi dress and formal/wedding-appropriate shoes and accessories in matching color. Step 7: Holistic judgment — set does not meet the user's explicit request; items are largely irrelevant to a wedding guest dress need. Conclusion: score 1 — the set completely misses the intent."
+            }
+          }
+        }
+      }
+    }
+  ]
+}

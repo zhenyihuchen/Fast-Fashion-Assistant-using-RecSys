@@ -1,6 +1,4 @@
-# Item-level judge prompts
-# Each top-level key is a rubric name.
-# To A/B test, duplicate this file (e.g. item_judge_v2.yaml) and tweak the rubrics.
+# Item-level judge prompts — V2 (loosened scales for better score spread)
 
 system: "You are an expert evaluator for a fashion recommendation system."
 
@@ -20,11 +18,11 @@ item_relevance:
             the product name and description. Also examine the attached image.
     Step 7: Assign a score from 1 to 5.
   scale:
-    1: "completely irrelevant — wrong category, color, and style"
-    2: "mostly irrelevant — matches at most one constraint"
-    3: "partially relevant — matches some constraints but misses key ones"
-    4: "mostly relevant — matches most constraints with one minor misalignment"
-    5: "highly relevant — matches all stated constraints and overall intent"
+    1: "completely irrelevant — wrong product category entirely (e.g. returning a coat when the user asked for a dress), no overlap with the query's intent whatsoever"
+    2: "wrong category or completely wrong style direction — the product may share one superficial trait (e.g. same color) but the category, fit, or purpose is fundamentally different from what was requested"
+    3: "correct category but misses color, fit, or price — the product is the right type of garment but fails on one or more specific constraints the user stated; a shopper would consider it a weak match"
+    4: "correct category and general style direction with minor mismatches on secondary constraints — e.g. slightly above price range, close but not exact color shade, or fit not explicitly matching but visually reasonable"
+    5: "matches the main constraints (correct category plus correct color or correct fit) and overall intent — a shopper would recognise this as a good recommendation for their query"
 
 occasion_appropriateness:
   criteria: |
@@ -46,11 +44,11 @@ occasion_appropriateness:
             and comfortably wear this item.
     Step 7: Assign a score from 1 to 5.
   scale:
-    1: "clearly inappropriate — e.g. swimwear for a job interview"
-    2: "unlikely to be appropriate — wrong formality level or aesthetic"
-    3: "could work in some contexts — borderline, depends on interpretation"
-    4: "appropriate for the occasion — fits expected style and formality"
-    5: "clearly and ideally suited — exemplary, stands out as a great choice"
+    1: "completely inappropriate — the item contradicts the occasion's dress code entirely (e.g. casual sportswear for a wedding, swimwear for a job interview); no one would consider wearing this"
+    2: "wrong formality or aesthetic — the item belongs to a clearly different dress code level (e.g. a casual hoodie for a formal dinner, gym leggings for a business meeting); even if it is a nice item on its own, it does not fit this occasion"
+    3: "neutral — the item does not clash with the occasion but shows no particular awareness of it; a generic safe choice that could work anywhere (e.g. plain black trousers for a festival, a basic t-shirt for a date night)"
+    4: "appropriate — correct formality level and generally suitable style for the occasion; a person could comfortably attend wearing this item without feeling out of place"
+    5: "well suited — the item clearly fits the occasion's expected style, formality, and aesthetic; a shopper looking for this occasion would consider it a strong choice"
 
 explanation_quality:
   criteria: |
@@ -70,8 +68,8 @@ explanation_quality:
     Step 7: Penalise both hallucinated claims and generic filler statements.
     Step 8: Assign a score from 1 to 5.
   scale:
-    1: "hallucinated or completely generic — could describe any product"
-    2: "multiple issues: hallucinations AND/OR very generic statements"
-    3: "mostly grounded and somewhat useful — one or two minor issues"
-    4: "well-grounded and specific, clearly connects product to query/occasion"
-    5: "fully grounded, specific, and genuinely helpful for the purchase decision"
+    1: "hallucinated or completely generic — contains fabricated attributes not in the metadata (e.g. inventing a fabric, material, or feature that does not exist), or is so vague it could describe any product ('great item for you')"
+    2: "significant issues — either contains at least one hallucinated claim stated as fact (e.g. wrong color or material), or is entirely generic filler with no reference to specific product details"
+    3: "grounded but shallow — all claims are factually correct based on metadata, but the explanation merely restates product attributes without connecting them to the user's query or explaining why this product is a good match"
+    4: "grounded and useful — no hallucinations, references specific product attributes (name, color, category, price), and explains why the product fits the user's query; a shopper would find it helpful"
+    5: "grounded, specific, and connects to intent — every claim is verified against metadata, clearly explains the product-to-query fit, and if an occasion is present, mentions why the item suits it; reads as a thoughtful recommendation rather than a generic description"

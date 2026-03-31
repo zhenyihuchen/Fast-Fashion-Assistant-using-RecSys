@@ -4,6 +4,8 @@ All 5 product images are attached so the judge can visually assess diversity,
 style coherence, and occasion appropriateness across the full set — independently
 of any item-level scores.
 
+Rubric prompts are loaded from a YAML file (default: prompts/set_judge.yaml).
+
 Returns:
     {"set_answer_relevance": {"score": int, "reasoning": str}}
 """
@@ -11,6 +13,9 @@ from __future__ import annotations
 
 import json
 import traceback
+from pathlib import Path
+
+import yaml
 
 from evaluation._client import (
     MULTIMODAL_MODEL,
@@ -18,6 +23,8 @@ from evaluation._client import (
     load_image_b64,
     multimodal_semaphore,
 )
+
+DEFAULT_PROMPTS_PATH = Path(__file__).parent / "prompts" / "set_judge.yaml"
 
 SET_SCHEMA = {
     "type": "object",
@@ -36,51 +43,41 @@ SET_SCHEMA = {
     "required": ["set_answer_relevance"],
 }
 
-SET_PROMPT = """\
-You are an expert evaluator for a fashion recommendation system.
+_prompts_cache: dict[str, dict] = {}
 
-Product images for all items in the set are attached in order (Product 1 first,
-Product 5 last). Evaluate whether the complete set collectively addresses
-the user's overall shopping intent.
 
-=== SET ANSWER RELEVANCE ===
-Criteria:
-    Evaluate whether the complete set of recommended products collectively addresses
-    the user's overall shopping intent, using both the product metadata and the
-    attached images. Adapted from the RAG metric 'Answer Relevance'.
+def _get_prompts(path: Path = DEFAULT_PROMPTS_PATH) -> dict:
+    key = str(path)
+    if key not in _prompts_cache:
+        _prompts_cache[key] = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return _prompts_cache[key]
 
-Steps:
-  Step 1: Read the user query and identify the overall shopping intent — what the
-          user wants, in what context, and for what occasion (if any).
-  Step 2: Review each product's metadata (name, category, color, price) and visually
-          examine its attached image to understand its style and formality.
-  Step 3: Assess whether the set collectively covers what the user asked for —
-          do the products span the right categories, styles, and price points?
-  Step 4: Assess visual and stylistic diversity across the 5 images — are they
-          meaningfully different from each other, or nearly identical in style?
-  Step 5: Evaluate visual coherence with the stated occasion (if any) — do the
-          images convey the right formality level and aesthetic as a group?
-  Step 6: Identify glaring omissions — obvious product types the user mentioned
-          that are absent from the set.
-  Step 7: Synthesise your observations into a holistic set-level judgment.
-  Step 8: Assign a score from 1 to 5:
-            1 = set completely misses the intent — most items are irrelevant or visually inappropriate
-            2 = set partially relevant — fewer than half the items fit the intent
-            3 = set addresses intent moderately — majority fit but notable gaps or poor visual diversity
-            4 = set addresses intent well — strong majority fit with only minor gaps
-            5 = set fully and comprehensively addresses the intent with good visual diversity
 
-Evidence:
-{evidence}
-
-Respond ONLY with valid JSON in this exact format:
-{{"set_answer_relevance": {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}}}}"""
+def _build_set_prompt(prompts: dict) -> str:
+    rubric = prompts["set_answer_relevance"]
+    scale_lines = "\n".join(
+        f"            {k} = {v}" for k, v in rubric["scale"].items()
+    )
+    return (
+        "You are an expert evaluator for a fashion recommendation system.\n\n"
+        "Product images for all items in the set are attached in order (Product 1 first,\n"
+        "Product 5 last). Evaluate whether the complete set collectively addresses\n"
+        "the user's overall shopping intent.\n\n"
+        "=== SET ANSWER RELEVANCE ===\n"
+        f"Criteria:\n    {rubric['criteria'].strip()}\n\n"
+        f"Steps:\n  {rubric['steps'].strip()}\n"
+        f"{scale_lines}\n\n"
+        "Evidence:\n{evidence}\n\n"
+        "Respond ONLY with valid JSON in this exact format:\n"
+        '{{\"set_answer_relevance\": {{\"score\": <integer 1-5>, \"reasoning\": \"<step-by-step evaluation>\"}}}}'
+    )
 
 
 def run_set_judge(
     query: str,
     products: list[dict],
     parsed: dict,
+    prompts_path: Path = DEFAULT_PROMPTS_PATH,
 ) -> dict:
     """Evaluate the full recommendation set on set_answer_relevance.
 
@@ -115,7 +112,9 @@ def run_set_judge(
         "products":        products_summary,
     }
 
-    prompt = SET_PROMPT.format(
+    prompts = _get_prompts(prompts_path)
+    prompt_template = _build_set_prompt(prompts)
+    prompt = prompt_template.format(
         evidence=json.dumps(evidence, indent=2, ensure_ascii=False)
     )
 
@@ -131,7 +130,7 @@ def run_set_judge(
         with multimodal_semaphore:
             data = create_json_response(
                 model=MULTIMODAL_MODEL,
-                instructions="You are an expert evaluator for a fashion recommendation system.",
+                instructions=prompts.get("system", "You are an expert evaluator for a fashion recommendation system."),
                 user_text=prompt,
                 schema_name="set_evaluation",
                 schema=SET_SCHEMA,

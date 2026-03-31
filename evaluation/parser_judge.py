@@ -1,5 +1,7 @@
 """Parser-level judge: evaluates all 3 parser rubrics in a single text API call.
 
+Rubric prompts are loaded from a YAML file (default: prompts/parser_judge.yaml).
+
 Returns:
     {
         "parser_completeness":      {"score": int, "reasoning": str},
@@ -11,8 +13,54 @@ from __future__ import annotations
 
 import json
 import traceback
+from pathlib import Path
+
+import yaml
 
 from evaluation._client import TEXT_MODEL, create_json_response
+
+DEFAULT_PROMPTS_PATH = Path(__file__).parent / "prompts" / "parser_judge.yaml"
+
+_prompts_cache: dict[str, dict] = {}
+
+
+def _get_prompts(path: Path = DEFAULT_PROMPTS_PATH) -> dict:
+    key = str(path)
+    if key not in _prompts_cache:
+        _prompts_cache[key] = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return _prompts_cache[key]
+
+
+def _build_parser_prompt(prompts: dict) -> str:
+    rubric_order = ["parser_completeness", "parser_no_hallucination", "parser_occasion_detection"]
+    blocks = []
+    for i, name in enumerate(rubric_order, 1):
+        rubric = prompts[name]
+        title = name.upper().replace("_", " ")
+        scale_lines = "\n".join(
+            f"            {k} = {v}" for k, v in rubric["scale"].items()
+        )
+        blocks.append(
+            f"=== {i}. {title} ===\n"
+            f"Criteria:\n    {rubric['criteria'].strip()}\n\n"
+            f"Steps:\n  {rubric['steps'].strip()}\n"
+            f"{scale_lines}\n"
+        )
+
+    return (
+        "You are an expert evaluator for a fashion recommendation system.\n\n"
+        "Evaluate the output of a query parser on THREE dimensions simultaneously.\n"
+        "Think through each dimension carefully, then respond with a single JSON object.\n\n"
+        + "\n".join(blocks)
+        + "\nEvidence:\n{evidence}\n\n"
+        "Respond ONLY with valid JSON in this exact format:\n"
+        '{{\n'
+        '  "parser_completeness":       {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}},\n'
+        '  "parser_no_hallucination":   {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}},\n'
+        '  "parser_occasion_detection": {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}}\n'
+        '}}'
+    )
+
 
 PARSER_SCHEMA = {
     "type": "object",
@@ -53,80 +101,7 @@ PARSER_SCHEMA = {
     ],
 }
 
-PARSER_PROMPT = """\
-You are an expert evaluator for a fashion recommendation system.
-
-Evaluate the output of a query parser on THREE dimensions simultaneously.
-Think through each dimension carefully, then respond with a single JSON object.
-
-=== 1. PARSER COMPLETENESS ===
-Criteria:
-    Evaluate whether the query parser extracted ALL constraints that the user
-    explicitly mentioned in their natural-language query.
-
-Steps:
-  Step 1: Read the user's query carefully.
-  Step 2: Identify every constraint the user explicitly stated: item categories,
-          colors, fit preferences, price limits, and occasion.
-  Step 3: Compare these with the parsed output fields (categories, colors, fit,
-          price_min, price_max, occasion_mode, occasion_target).
-  Step 4: Note any constraint mentioned by the user that was NOT extracted.
-  Step 5: Assign a score from 1 to 5:
-            1 = missed most constraints (3 or more missed)
-            2 = missed several constraints (2 missed)
-            3 = missed exactly one constraint
-            4 = extracted nearly all — at most a minor ambiguous gap
-            5 = perfectly complete — every stated constraint was captured
-
-=== 2. PARSER NO HALLUCINATION ===
-Criteria:
-    Evaluate whether the query parser avoided extracting constraints that the
-    user did NOT explicitly mention or clearly imply in their query.
-
-Steps:
-  Step 1: Read the user's query carefully.
-  Step 2: Read the parsed output: categories, colors, fit, price range, occasion.
-  Step 3: For each extracted constraint, verify it was explicitly stated or
-          clearly implied by the user — not just a plausible guess.
-  Step 4: Identify any constraints in the parsed output NOT mentioned in the query.
-  Step 5: Assign a score from 1 to 5:
-            1 = many hallucinated constraints (3 or more invented)
-            2 = several hallucinated constraints (2 invented)
-            3 = exactly one hallucinated constraint
-            4 = no hallucinations, but one constraint is a borderline over-inference
-            5 = perfectly clean — no invented or over-inferred constraints
-
-=== 3. PARSER OCCASION DETECTION ===
-Criteria:
-    Evaluate whether the parser correctly identified whether an occasion was
-    mentioned in the query and mapped it to the correct occasion label.
-
-Steps:
-  Step 1: Read the user's query.
-  Step 2: Determine whether an occasion is clearly mentioned.
-  Step 3: Check the parsed output's occasion field: mode ('on'/'off') and target label.
-  Step 4: If NO occasion was mentioned: mode should be 'off' — penalise a false positive.
-  Step 5: If an occasion WAS mentioned: mode should be 'on' and target should match
-          the correct occasion type — penalise if wrong or missing.
-  Step 6: Assign a score from 1 to 5:
-            1 = completely wrong (e.g. occasion present but mode='off', or opposite error)
-            2 = wrong direction — clear false positive or false negative
-            3 = detected presence correctly but mapped to wrong occasion label
-            4 = correct mode and close label match, minor wording/capitalisation difference
-            5 = perfectly correct — right mode and exact occasion label
-
-Evidence:
-{evidence}
-
-Respond ONLY with valid JSON in this exact format:
-{{
-  "parser_completeness":       {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}},
-  "parser_no_hallucination":   {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}},
-  "parser_occasion_detection": {{"score": <integer 1-5>, "reasoning": "<step-by-step evaluation>"}}
-}}"""
-
-
-def run_parser_judge(query: str, parsed: dict) -> dict:
+def run_parser_judge(query: str, parsed: dict, prompts_path: Path = DEFAULT_PROMPTS_PATH) -> dict:
     """Evaluate query parsing quality on 3 rubrics in a single text call.
 
     Args:
@@ -152,14 +127,16 @@ def run_parser_judge(query: str, parsed: dict) -> dict:
         },
     }
 
-    prompt = PARSER_PROMPT.format(
+    prompts = _get_prompts(prompts_path)
+    prompt_template = _build_parser_prompt(prompts)
+    prompt = prompt_template.format(
         evidence=json.dumps(evidence, indent=2, ensure_ascii=False)
     )
 
     try:
         data = create_json_response(
             model=TEXT_MODEL,
-            instructions="You are an expert evaluator for a fashion recommendation system.",
+            instructions=prompts.get("system", "You are an expert evaluator for a fashion recommendation system."),
             user_text=prompt,
             schema_name="parser_evaluation",
             schema=PARSER_SCHEMA,

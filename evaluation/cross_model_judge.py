@@ -3,6 +3,8 @@
 All 10 product images are attached (5 CLIP first, then 5 FashionCLIP) so the
 judge can visually compare both sets independently — no pre-computed scores used.
 
+Rubric prompts are loaded from a YAML file (default: prompts/cross_model_judge.yaml).
+
 Returns:
     {
         "winner":            str,  # "clip" | "fashion_clip" | "tie"
@@ -15,6 +17,9 @@ from __future__ import annotations
 
 import json
 import traceback
+from pathlib import Path
+
+import yaml
 
 from evaluation._client import (
     MULTIMODAL_MODEL,
@@ -22,6 +27,47 @@ from evaluation._client import (
     load_image_b64,
     multimodal_semaphore,
 )
+
+DEFAULT_PROMPTS_PATH = Path(__file__).parent / "prompts" / "cross_model_judge.yaml"
+
+_prompts_cache: dict[str, dict] = {}
+
+
+def _get_prompts(path: Path = DEFAULT_PROMPTS_PATH) -> dict:
+    key = str(path)
+    if key not in _prompts_cache:
+        _prompts_cache[key] = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return _prompts_cache[key]
+
+
+def _build_cross_model_prompt(prompts: dict) -> str:
+    rubric = prompts["cross_model_preference"]
+    model_scale_lines = "\n".join(
+        f"            {k} = {v}" for k, v in rubric["model_scale"].items()
+    )
+    winner_scale_lines = "\n".join(
+        f"            {k} = {v}" for k, v in rubric["winner_scale"].items()
+    )
+    return (
+        "You are an expert evaluator for a fashion recommendation system.\n\n"
+        "10 product images are attached: the first 5 are CLIP's recommendations (Set A,\n"
+        "in list order), the next 5 are FashionCLIP's recommendations (Set B, in list order).\n\n"
+        "=== CROSS-MODEL PREFERENCE ===\n"
+        f"Criteria:\n    {rubric['criteria'].strip()}\n\n"
+        f"Steps:\n  {rubric['steps'].strip()}\n\n"
+        f"Model quality scores (1-5):\n{model_scale_lines}\n\n"
+        f"Winner decision:\n{winner_scale_lines}\n\n"
+        "Evidence:\n{evidence}\n\n"
+        "Think step by step through each evaluation step, then provide your final judgment.\n\n"
+        "Respond ONLY with valid JSON in this exact format:\n"
+        '{{\n'
+        '  "reasoning":         "<step-by-step evaluation>",\n'
+        '  "winner":            "<clip | fashion_clip | tie>",\n'
+        '  "clip_score":        <integer 1-5>,\n'
+        '  "fashionclip_score": <integer 1-5>\n'
+        '}}'
+    )
+
 
 CROSS_MODEL_SCHEMA = {
     "type": "object",
@@ -34,58 +80,6 @@ CROSS_MODEL_SCHEMA = {
     },
     "required": ["reasoning", "winner", "clip_score", "fashionclip_score"],
 }
-
-CROSS_MODEL_PROMPT = """\
-You are an expert evaluator for a fashion recommendation system.
-
-10 product images are attached: the first 5 are CLIP's recommendations (Set A,
-in list order), the next 5 are FashionCLIP's recommendations (Set B, in list order).
-
-=== CROSS-MODEL PREFERENCE ===
-Criteria:
-    Given two sets of fashion product recommendations for the same query — one
-    from CLIP (Set A) and one from FashionCLIP (Set B) — determine which model's
-    set better serves the user's needs. Use both the product metadata and the
-    attached images for your assessment.
-
-Steps:
-  Step 1: Read the user query, parsed constraints, and stated occasion.
-  Step 2: Review Set A (CLIP) — examine each product's metadata and its attached
-          image (images 1-5) to understand category, style, and visual quality.
-  Step 3: Review Set B (FashionCLIP) — examine each product's metadata and its
-          attached image (images 6-10).
-  Step 4: Compare both sets on relevance to the query and hard constraints
-          (category, color, fit, price range) — which set better matches?
-  Step 5: Compare both sets on visual occasion appropriateness (if applicable) —
-          which model's images better convey the right formality and aesthetic?
-  Step 6: Compare both sets on visual diversity — which set offers more
-          meaningfully different styles and options for the user?
-  Step 7: Consider which set better reflects the user's explicit intent overall,
-          accounting for both text metadata and visual appearance.
-  Step 8: Assign individual overall quality scores (1-5) to each model:
-            1 = very poor — most items irrelevant or visually inappropriate
-            2 = below average — minority of items meet the user's needs
-            3 = average — roughly half the items are suitable
-            4 = above average — majority of items are suitable and visually appropriate
-            5 = excellent — nearly all items highly relevant and visually appropriate
-  Step 9: Declare the winner or a tie:
-            clip         = CLIP is clearly better across most dimensions
-            fashion_clip = FashionCLIP is clearly better across most dimensions
-            tie          = Both sets are comparably good or no clear winner emerges
-
-Evidence:
-{evidence}
-
-Think step by step through each evaluation step, then provide your final judgment.
-
-Respond ONLY with valid JSON in this exact format:
-{{
-  "reasoning":         "<step-by-step evaluation>",
-  "winner":            "<clip | fashion_clip | tie>",
-  "clip_score":        <integer 1-5>,
-  "fashionclip_score": <integer 1-5>
-}}"""
-
 
 def _product_summary(products: list[dict]) -> list[dict]:
     return [
@@ -106,6 +100,7 @@ def run_cross_model_judge(
     parsed: dict,
     clip_products: list[dict],
     fc_products: list[dict],
+    prompts_path: Path = DEFAULT_PROMPTS_PATH,
 ) -> dict:
     """Pairwise CLIP vs FashionCLIP evaluation from raw product evidence.
 
@@ -132,7 +127,9 @@ def run_cross_model_judge(
         "set_b_fashionclip":  _product_summary(fc_products),
     }
 
-    prompt = CROSS_MODEL_PROMPT.format(
+    prompts = _get_prompts(prompts_path)
+    prompt_template = _build_cross_model_prompt(prompts)
+    prompt = prompt_template.format(
         evidence=json.dumps(evidence, indent=2, ensure_ascii=False)
     )
 
@@ -148,7 +145,7 @@ def run_cross_model_judge(
         with multimodal_semaphore:
             data = create_json_response(
                 model=MULTIMODAL_MODEL,
-                instructions="You are an expert evaluator for a fashion recommendation system.",
+                instructions=prompts.get("system", "You are an expert evaluator for a fashion recommendation system."),
                 user_text=prompt,
                 schema_name="cross_model_evaluation",
                 schema=CROSS_MODEL_SCHEMA,
