@@ -1,0 +1,36 @@
+# Cross-model pairwise judge prompts — V2 (loosened scales for better score spread)
+
+system: "You are an expert evaluator for a fashion recommendation system."
+
+cross_model_preference:
+  criteria: |
+    Given two sets of fashion product recommendations for the same query — one
+    from CLIP (Set A) and one from FashionCLIP (Set B) — determine which model's
+    set better serves the user's needs. Use both the product metadata and the
+    attached images for your assessment.
+  steps: |
+    Step 1: Read the user query, parsed constraints, and stated occasion.
+    Step 2: Review Set A (CLIP) — examine each product's metadata and its attached
+            image (images 1-5) to understand category, style, and visual quality.
+    Step 3: Review Set B (FashionCLIP) — examine each product's metadata and its
+            attached image (images 6-10).
+    Step 4: Compare both sets on relevance to the query and hard constraints
+            (category, color, fit, price range) — which set better matches?
+    Step 5: Compare both sets on visual occasion appropriateness (if applicable) —
+            which model's images better convey the right formality and aesthetic?
+    Step 6: Compare both sets on visual diversity — which set offers more
+            meaningfully different styles and options for the user?
+    Step 7: Consider which set better reflects the user's explicit intent overall,
+            accounting for both text metadata and visual appearance.
+    Step 8: Assign individual overall quality scores (1-5) to each model.
+    Step 9: Declare the winner or a tie.
+  model_scale:
+    1: "very poor — most items are from the wrong category entirely or have no connection to the query; the set would confuse a shopper"
+    2: "below average — fewer than half the items match the requested category or style direction; the set feels mostly random or misaligned"
+    3: "average — roughly half the items are from the correct category and match the general style, but there are notable gaps in color, price, or diversity"
+    4: "above average — most items match the requested category and style direction with reasonable variety; minor mismatches on secondary constraints (e.g. slightly off color or price) but the set serves the user's needs"
+    5: "good — the majority of items are relevant to the query with good diversity across styles; a shopper would find the set useful for their search even if not every item is a perfect match"
+  winner_scale:
+    clip: "CLIP's set is clearly more relevant and better serves the user's needs across the majority of evaluation dimensions"
+    fashion_clip: "FashionCLIP's set is clearly more relevant and better serves the user's needs across the majority of evaluation dimensions"
+    tie: "Both sets are comparably good, or each set excels in different dimensions with no clear overall winner"

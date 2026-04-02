@@ -1,14 +1,13 @@
-"""Compare occasion-enabled vs relevance-only results for tier-3 queries.
+"""Compare full pipeline vs no-pipeline baseline for tier-3 queries.
 
 Produces two outputs:
   1. Complete table across all rubrics for both conditions
-  2. Focused "Relevance-only vs Relevance+Occasion" across item_relevance
-     and occasion_appropriateness, per model
+  2. Focused comparison across item_relevance and occasion_appropriateness, per model
 
 Usage:
     python -m evaluation.ablation_table
-    python -m evaluation.ablation_table --occasion-results eval_a.json eval_b.json \
-                                        --no-occasion-results ablation.json
+    python -m evaluation.ablation_table --full-pipeline eval_a.json eval_b.json \
+                                        --baseline ablation.json
 """
 from __future__ import annotations
 
@@ -21,7 +20,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = ROOT / "evaluation" / "results"
-ABLATION_DIR = RESULTS_DIR / "ablation_no_occasion"
+ABLATION_DIR = RESULTS_DIR / "ablation_no_pipeline"
 
 MODEL_DISPLAY = {"clip": "CLIP", "fashion_clip": "FashionCLIP", "random": "Random"}
 ITEM_RUBRICS = ["item_relevance", "occasion_appropriateness", "explanation_quality"]
@@ -89,8 +88,8 @@ def build_full_comparison(occ_pq: list[dict], no_occ_pq: list[dict]) -> pd.DataF
     """Build a complete rubric table for both conditions side-by-side."""
     rows = []
     for condition_label, pq in [
-        ("Relevance + Occasion", occ_pq),
-        ("Relevance Only", no_occ_pq),
+        ("Full Pipeline", occ_pq),
+        ("No Pipeline", no_occ_pq),
     ]:
         models = _detect_models(pq)
         n_queries = len(pq)
@@ -188,8 +187,8 @@ def build_focused_comparison(occ_pq: list[dict], no_occ_pq: list[dict]) -> pd.Da
     rows = []
 
     for condition_label, pq in [
-        ("Relevance Only", no_occ_pq),
-        ("Relevance + Occasion", occ_pq),
+        ("No Pipeline", no_occ_pq),
+        ("Full Pipeline", occ_pq),
     ]:
         models = _detect_models(pq)
         for model in models:
@@ -221,11 +220,11 @@ def build_focused_comparison(occ_pq: list[dict], no_occ_pq: list[dict]) -> pd.Da
     pivot.columns.name = None
 
     # Add delta column
-    if "Relevance Only" in pivot.columns and "Relevance + Occasion" in pivot.columns:
-        pivot["Δ"] = (pivot["Relevance + Occasion"] - pivot["Relevance Only"]).round(2)
+    if "No Pipeline" in pivot.columns and "Full Pipeline" in pivot.columns:
+        pivot["Δ"] = (pivot["Full Pipeline"] - pivot["No Pipeline"]).round(2)
 
     # Reorder columns
-    desired = ["Model", "Rubric", "Relevance Only", "Relevance + Occasion", "Δ"]
+    desired = ["Model", "Rubric", "No Pipeline", "Full Pipeline", "Δ"]
     cols = [c for c in desired if c in pivot.columns]
     return pivot[cols]
 
@@ -238,13 +237,13 @@ def print_and_save(
 ) -> None:
     print("\n" + "=" * 100)
     print("  OUTPUT 1: COMPLETE TABLE — Complex queries (Tier 3)")
-    print("  Relevance + Occasion (α=0.6, β=0.4) vs Relevance Only (α=1.0, β=0.0)")
+    print("  Full Pipeline vs No Pipeline (raw embedding similarity)")
     print("=" * 100)
     print(df_full.to_string(index=False))
 
     print("\n" + "=" * 100)
     print("  OUTPUT 2: FOCUSED COMPARISON — item_relevance & occasion_appropriateness")
-    print("  Δ = (Relevance + Occasion) − (Relevance Only)")
+    print("  Δ = (Full Pipeline) − (No Pipeline)")
     print("=" * 100)
     print(df_focused.to_string(index=False))
 
@@ -258,45 +257,45 @@ def print_and_save(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Occasion ablation comparison tables")
+    parser = argparse.ArgumentParser(description="Full pipeline vs no-pipeline ablation tables")
     parser.add_argument(
-        "--occasion-results", type=Path, nargs="+", default=None,
-        help="Eval JSON(s) with occasion scoring enabled. Default: all eval_*.json in results/",
+        "--full-pipeline", type=Path, nargs="+", default=None,
+        help="Eval JSON(s) from the full pipeline. Default: all eval_*.json in results/",
     )
     parser.add_argument(
-        "--no-occasion-results", type=Path, nargs="+", default=None,
-        help="Eval JSON(s) from ablation (no occasion). Default: all in results/ablation_no_occasion/",
+        "--baseline", type=Path, nargs="+", default=None,
+        help="Eval JSON(s) from no-pipeline baseline. Default: all in results/ablation_no_pipeline/",
     )
     parser.add_argument(
         "--out", type=Path, default=RESULTS_DIR,
     )
     args = parser.parse_args()
 
-    # Load occasion-enabled results (existing runs, filtered to tier 3)
-    if args.occasion_results:
-        occ_paths = args.occasion_results
+    # Load full pipeline results (filtered to tier 3)
+    if args.full_pipeline:
+        full_paths = args.full_pipeline
     else:
-        occ_paths = sorted(RESULTS_DIR.glob("eval_*.json"))
-    if not occ_paths:
-        print("No occasion-enabled result files found.")
+        full_paths = sorted(RESULTS_DIR.glob("eval_*.json"))
+    if not full_paths:
+        print("No full pipeline result files found.")
         return
-    occ_pq = _filter_tier3(_merge_jsons(occ_paths))
-    print(f"Occasion-enabled: {len(occ_pq)} tier-3 queries from {len(occ_paths)} file(s)")
+    full_pq = _filter_tier3(_merge_jsons(full_paths))
+    print(f"Full Pipeline: {len(full_pq)} tier-3 queries from {len(full_paths)} file(s)")
 
-    # Load relevance-only ablation results
-    if args.no_occasion_results:
-        no_occ_paths = args.no_occasion_results
+    # Load no-pipeline baseline results
+    if args.baseline:
+        base_paths = args.baseline
     else:
-        no_occ_paths = sorted(ABLATION_DIR.glob("eval_*.json"))
-    if not no_occ_paths:
-        print(f"No ablation result files found in {ABLATION_DIR}")
-        print("Run `python -m evaluation.run_ablation` first.")
+        base_paths = sorted(ABLATION_DIR.glob("eval_*.json"))
+    if not base_paths:
+        print(f"No baseline result files found in {ABLATION_DIR}")
+        print("Run `python -m evaluation.run_ablation --mode no-pipeline` first.")
         return
-    no_occ_pq = _merge_jsons(no_occ_paths)  # already tier-3 only
-    print(f"Relevance-only:   {len(no_occ_pq)} tier-3 queries from {len(no_occ_paths)} file(s)")
+    base_pq = _merge_jsons(base_paths)  # already tier-3 only
+    print(f"No Pipeline:   {len(base_pq)} tier-3 queries from {len(base_paths)} file(s)")
 
-    df_full = build_full_comparison(occ_pq, no_occ_pq)
-    df_focused = build_focused_comparison(occ_pq, no_occ_pq)
+    df_full = build_full_comparison(full_pq, base_pq)
+    df_focused = build_focused_comparison(full_pq, base_pq)
     print_and_save(df_full, df_focused, args.out)
 
 

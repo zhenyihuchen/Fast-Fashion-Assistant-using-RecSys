@@ -286,29 +286,52 @@ def _safe_stdev(values: list) -> float | None:
 def aggregate_results(per_query: list[dict]) -> dict:
     """Compute mean ± std for every rubric across queries."""
 
+    def _eval_ok(q: dict) -> dict:
+        """Return the eval dict only if it is a proper result (not an error stub)."""
+        ev = q.get("eval", {})
+        if not isinstance(ev, dict) or "error" in ev:
+            return {}
+        return ev
+
     def collect_item_scores(model_key: str, rubric_name: str) -> list:
         scores = []
         for q in per_query:
-            model_data = q.get("eval", {}).get(model_key, {})
+            model_data = _eval_ok(q).get(model_key, {})
+            if not isinstance(model_data, dict):
+                continue
             for item_result in model_data.get("items", []):
+                if not isinstance(item_result, dict):
+                    continue
                 s = item_result.get(rubric_name, {}).get("score")
                 if s is not None:
                     scores.append(s)
         return scores
 
     def collect_set_scores(model_key: str, rubric_name: str) -> list:
-        return [
-            q["eval"][model_key]["set"].get(rubric_name, {}).get("score")
-            for q in per_query
-            if model_key in q.get("eval", {}) and "set" in q["eval"][model_key]
-        ]
+        scores = []
+        for q in per_query:
+            ev = _eval_ok(q)
+            model_data = ev.get(model_key, {})
+            if not isinstance(model_data, dict):
+                continue
+            set_data = model_data.get("set", {})
+            if not isinstance(set_data, dict):
+                continue
+            s = set_data.get(rubric_name, {}).get("score")
+            if s is not None:
+                scores.append(s)
+        return scores
 
     def collect_parser_scores(rubric_name: str) -> list:
-        return [
-            q["eval"]["parser"].get(rubric_name, {}).get("score")
-            for q in per_query
-            if "parser" in q.get("eval", {})
-        ]
+        scores = []
+        for q in per_query:
+            parser_data = _eval_ok(q).get("parser", {})
+            if not isinstance(parser_data, dict):
+                continue
+            s = parser_data.get(rubric_name, {}).get("score")
+            if s is not None:
+                scores.append(s)
+        return scores
 
     item_rubric_names = [
         "item_relevance", "occasion_appropriateness", "explanation_quality",
@@ -319,8 +342,9 @@ def aggregate_results(per_query: list[dict]) -> dict:
     # Collect all model keys dynamically (clip, fashion_clip, random, ...)
     model_keys = set()
     for q in per_query:
-        for key in q.get("eval", {}):
-            if key not in ("parser", "cross_model"):
+        ev = _eval_ok(q)
+        for key in ev:
+            if key not in ("parser", "cross_model", "error"):
                 model_keys.add(key)
     model_keys = sorted(model_keys)
 
@@ -341,7 +365,7 @@ def aggregate_results(per_query: list[dict]) -> dict:
         agg["parser"][rubric_name] = {"mean": _safe_mean(vals), "std": _safe_stdev(vals), "n": len(vals)}
 
     # Cross-model win rates
-    winners = [q["eval"].get("cross_model", {}).get("winner") for q in per_query]
+    winners = [_eval_ok(q).get("cross_model", {}).get("winner") for q in per_query]
     agg["cross_model"] = {
         "clip_wins": winners.count("clip"),
         "fashionclip_wins": winners.count("fashion_clip"),

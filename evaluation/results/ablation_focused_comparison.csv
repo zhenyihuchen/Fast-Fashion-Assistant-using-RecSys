@@ -1,7 +1,7 @@
-Model,Rubric,Relevance Only,Relevance + Occasion,Δ
-CLIP,item_relevance,3.25,3.05,-0.2
-CLIP,occasion_appropriateness,3.2,3.25,0.05
-FashionCLIP,item_relevance,3.0,3.25,0.25
-FashionCLIP,occasion_appropriateness,3.6,3.7,0.1
-Random,item_relevance,1.3,1.7,0.4
-Random,occasion_appropriateness,1.7,2.4,0.7
+Model,Rubric,No Pipeline,Full Pipeline,Δ
+CLIP,item_relevance,3.35,3.64,0.29
+CLIP,occasion_appropriateness,3.83,3.96,0.13
+FashionCLIP,item_relevance,3.8,3.91,0.11
+FashionCLIP,occasion_appropriateness,4.0,4.12,0.12
+Random,item_relevance,1.4,1.36,-0.04
+Random,occasion_appropriateness,2.48,2.48,0.0

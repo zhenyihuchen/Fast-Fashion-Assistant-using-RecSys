@@ -16,11 +16,19 @@ from __future__ import annotations
 
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 from evaluation.cross_model_judge import run_cross_model_judge
 from evaluation.item_judge import run_item_judge
 from evaluation.parser_judge import run_parser_judge
 from evaluation.set_judge import run_set_judge
+
+# ── V2 prompt paths (loosened scales for better score spread) ────────────────
+_PROMPTS_DIR = Path(__file__).parent / "prompts"
+ITEM_PROMPTS_PATH    = _PROMPTS_DIR / "item_judge_v2.yaml"
+SET_PROMPTS_PATH     = _PROMPTS_DIR / "set_judge_v2.yaml"
+PARSER_PROMPTS_PATH  = _PROMPTS_DIR / "parser_judge_v2.yaml"
+CROSS_PROMPTS_PATH   = _PROMPTS_DIR / "cross_model_judge_v2.yaml"
 
 _ITEM_RUBRICS = ("item_relevance", "occasion_appropriateness", "explanation_quality")
 
@@ -33,7 +41,7 @@ def evaluate_parser(query: str, parsed: dict) -> dict[str, dict]:
     Returns:
         {rubric_name: {"score": int, "reasoning": str}, ...}
     """
-    return run_parser_judge(query, parsed)
+    return run_parser_judge(query, parsed, prompts_path=PARSER_PROMPTS_PATH)
 
 
 def evaluate_item(product: dict, query: str, parsed: dict) -> dict[str, dict]:
@@ -42,7 +50,7 @@ def evaluate_item(product: dict, query: str, parsed: dict) -> dict[str, dict]:
     Returns:
         {rubric_name: {"score": int|None, "reasoning": str}, ...}
     """
-    return run_item_judge(query, product, parsed)
+    return run_item_judge(query, product, parsed, prompts_path=ITEM_PROMPTS_PATH)
 
 
 def evaluate_set(products: list[dict], query: str, parsed: dict) -> dict[str, dict]:
@@ -51,7 +59,7 @@ def evaluate_set(products: list[dict], query: str, parsed: dict) -> dict[str, di
     Returns:
         {"set_answer_relevance": {"score": int, "reasoning": str}}
     """
-    return run_set_judge(query, products, parsed)
+    return run_set_judge(query, products, parsed, prompts_path=SET_PROMPTS_PATH)
 
 
 def evaluate_cross_model(
@@ -65,7 +73,7 @@ def evaluate_cross_model(
     Returns:
         {"winner": str, "clip_score": int, "fashionclip_score": int, "reasoning": str}
     """
-    return run_cross_model_judge(query, parsed, clip_products, fc_products)
+    return run_cross_model_judge(query, parsed, clip_products, fc_products, prompts_path=CROSS_PROMPTS_PATH)
 
 
 # ── Full pipeline evaluation ─────────────────────────────────────────────────
@@ -110,22 +118,22 @@ def evaluate_query_result(
         futures: dict = {}
 
         # Parser
-        futures[ex.submit(run_parser_judge, query, parsed)] = ("parser",)
+        futures[ex.submit(run_parser_judge, query, parsed, PARSER_PROMPTS_PATH)] = ("parser",)
 
         # Item evals — all products across all models
         for model_name, products in rows_by_model.items():
             for i, product in enumerate(products):
-                f = ex.submit(run_item_judge, query, product, parsed)
+                f = ex.submit(run_item_judge, query, product, parsed, ITEM_PROMPTS_PATH)
                 futures[f] = ("item", model_name, i)
 
         # Set evals — one per model
         for model_name, products in rows_by_model.items():
-            f = ex.submit(run_set_judge, query, products, parsed)
+            f = ex.submit(run_set_judge, query, products, parsed, SET_PROMPTS_PATH)
             futures[f] = ("set", model_name)
 
         # Cross-model
         if clip_products and fc_products:
-            f = ex.submit(run_cross_model_judge, query, parsed, clip_products, fc_products)
+            f = ex.submit(run_cross_model_judge, query, parsed, clip_products, fc_products, CROSS_PROMPTS_PATH)
             futures[f] = ("cross_model",)
 
         for f in as_completed(futures):
