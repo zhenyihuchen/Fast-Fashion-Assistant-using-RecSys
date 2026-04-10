@@ -1,7 +1,0 @@
-Model,Rubric,Relevance Only,Relevance + Occasion,Δ
-CLIP,item_relevance,3.5,3.8,0.3
-CLIP,occasion_appropriateness,3.73,3.73,0.0
-FashionCLIP,item_relevance,3.78,4.05,0.27
-FashionCLIP,occasion_appropriateness,3.94,3.81,-0.13
-Random,item_relevance,1.45,1.43,-0.02
-Random,occasion_appropriateness,2.32,2.36,0.04
