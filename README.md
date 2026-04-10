@@ -9,6 +9,24 @@ evaluation framework.
 
 ---
 
+## Pipeline overview
+
+### Offline pipeline (precompute)
+Scraping, embedding computation for both CLIP and FashionCLIP, and FAISS
+index construction. Runs once to build the RAG knowledge base that the
+runtime pipeline queries.
+
+![Offline pipeline](docs/offline_pipeline.png)
+
+### Online pipeline (runtime inference)
+At query time: query parsing, metadata filtering, candidate retrieval,
+occasion scoring, final ranking, and explanation generation. Stages 3–6
+run independently for CLIP and FashionCLIP.
+
+![Online pipeline](docs/online_pipeline.png)
+
+---
+
 ## Folder structure
 
 ```
