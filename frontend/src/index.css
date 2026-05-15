@@ -13,6 +13,7 @@
 
   body {
     font-family: "Inter", system-ui, sans-serif;
+    font-size: 17px;
     background: #ffffff;
     color: #111111;
     -webkit-font-smoothing: antialiased;

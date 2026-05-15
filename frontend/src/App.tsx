@@ -87,6 +87,7 @@ export default function App() {
   const [sessions, setSessions] = useState<Session[]>(() => loadStoredState().sessions);
   const [currentId, setCurrentId] = useState<string>(() => loadStoredState().currentId);
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const retitledSessionsRef = useRef<Record<string, boolean>>({});
@@ -356,31 +357,60 @@ export default function App() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar
-        sessions={sessions}
-        currentId={currentId}
-        onSelect={setCurrentId}
-        onDelete={handleDeleteSession}
-        onNew={handleNewSession}
-        onClear={handleClear}
-      />
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — always visible on md+, slide-in overlay on mobile */}
+      <div className={[
+        "fixed inset-y-0 left-0 z-30 md:static md:z-auto md:flex md:shrink-0 transition-transform duration-200",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+      ].join(" ")}>
+        <Sidebar
+          sessions={sessions}
+          currentId={currentId}
+          onSelect={(id) => { setCurrentId(id); setSidebarOpen(false); }}
+          onDelete={handleDeleteSession}
+          onNew={handleNewSession}
+          onClear={handleClear}
+          onClose={() => setSidebarOpen(false)}
+        />
+      </div>
 
       {/* Main chat area */}
       <div className="flex flex-col flex-1 min-w-0">
         {/* Header */}
-        <header className="shrink-0 flex items-center justify-between px-8 py-4 border-b border-ink-100">
-          <div>
-            <h2 className="text-sm font-semibold text-ink-900">{current.label}</h2>
-            <p className="text-xs text-ink-400 mt-0.5">
-              {loading ? "Processing your request…" : "Ready"}
-            </p>
+        <header className="shrink-0 flex items-center justify-between px-4 md:px-8 py-4 border-b border-ink-100">
+          <div className="flex items-center gap-3">
+            {/* Hamburger — mobile only */}
+            <button
+              className="md:hidden p-1 rounded text-ink-600 hover:text-ink-900"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <rect y="3" width="20" height="2" rx="1"/>
+                <rect y="9" width="20" height="2" rx="1"/>
+                <rect y="15" width="20" height="2" rx="1"/>
+              </svg>
+            </button>
+            <div>
+              <h2 className="text-sm font-semibold text-ink-900">{current.label}</h2>
+              <p className="text-xs text-ink-400 mt-0.5">
+                {loading ? "Processing your request…" : "Ready"}
+              </p>
+            </div>
           </div>
           {/* Model badge strip */}
           <div className="flex gap-2">
             {["CLIP", "FashionCLIP"].map((m) => (
               <span
                 key={m}
-                className="px-2.5 py-1 rounded-full border border-ink-200 text-[10px] font-semibold tracking-widest uppercase text-ink-500"
+                className="hidden sm:inline px-2.5 py-1 rounded-full border border-ink-200 text-[10px] font-semibold tracking-widest uppercase text-ink-500"
               >
                 {m}
               </span>
@@ -389,7 +419,7 @@ export default function App() {
         </header>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6">
           {current.messages.map((msg) => (
             <ChatMessage key={msg.id} msg={msg} />
           ))}
@@ -397,7 +427,7 @@ export default function App() {
         </div>
 
         {/* Input */}
-        <div className="shrink-0 px-8 py-4 border-t border-ink-100 bg-white">
+        <div className="shrink-0 px-4 md:px-8 py-4 border-t border-ink-100 bg-white">
           <ChatInput
             onSubmit={handleSubmit}
             disabled={loading}

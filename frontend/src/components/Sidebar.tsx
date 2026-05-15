@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import type { Session } from "../types";
 
 interface Props {
@@ -8,15 +8,26 @@ interface Props {
   onDelete: (id: string) => void;
   onNew: () => void;
   onClear: () => void;
+  onClose: () => void;
 }
 
-export default function Sidebar({ sessions, currentId, onSelect, onDelete, onNew, onClear }: Props) {
+export default function Sidebar({ sessions, currentId, onSelect, onDelete, onNew, onClear, onClose }: Props) {
   return (
     <aside className="flex flex-col h-full w-60 bg-ink-900 text-white shrink-0">
       {/* Brand */}
-      <div className="px-6 pt-8 pb-6 border-b border-ink-800">
-        <p className="text-[10px] tracking-[0.25em] uppercase text-ink-400 mb-1">Zara</p>
-        <h1 className="text-lg font-semibold leading-tight">Fashion Assistant</h1>
+      <div className="px-6 pt-8 pb-6 border-b border-ink-800 flex items-start justify-between">
+        <div>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-ink-400 mb-1">Zara</p>
+          <h1 className="text-lg font-semibold leading-tight">Fashion Assistant</h1>
+        </div>
+        {/* Close button — mobile only */}
+        <button
+          onClick={onClose}
+          className="md:hidden mt-1 text-ink-400 hover:text-white transition-colors"
+          aria-label="Close menu"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Sessions list */}
