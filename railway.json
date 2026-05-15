@@ -1,5 +1,8 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "pip install -r backend/requirements.txt"
+  },
   "deploy": {
     "startCommand": "uvicorn backend.api:app --host 0.0.0.0 --port $PORT",
     "healthcheckPath": "/health",
