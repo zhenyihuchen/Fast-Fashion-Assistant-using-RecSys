@@ -404,7 +404,7 @@ export default function App() {
             placeholder={placeholder}
           />
           <p className="text-center text-[10px] text-ink-300 mt-2 tracking-wide">
-            Powered by CLIP · FashionCLIP · Groq
+            Powered by CLIP · FashionCLIP
           </p>
         </div>
       </div>

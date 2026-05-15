@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import type { ProductRow } from "../types";
 
 interface Props {
@@ -9,8 +9,10 @@ interface Props {
 
 export default function ProductCard({ product, rank }: Props) {
   const [imgError, setImgError] = useState(false);
+  const [explanationOpen, setExplanationOpen] = useState(false);
 
   // const scorePercent = ((product.final_display / 10) * 100).toFixed(0);
+  const hasLongExplanation = Boolean(product.explanation && product.explanation.length > 140);
 
   return (
     <article className="group flex flex-col bg-white border border-ink-100 rounded-xl overflow-hidden hover:shadow-md hover:border-ink-300 transition-all duration-200 animate-fade-in">
@@ -78,9 +80,36 @@ export default function ProductCard({ product, rank }: Props) {
 
         {/* Explanation */}
         {product.explanation && (
-          <p className="text-xs text-ink-600 leading-relaxed line-clamp-3">
-            {product.explanation}
-          </p>
+          <div className="space-y-2">
+            <p
+              className={[
+                "text-xs text-ink-600 leading-relaxed",
+                explanationOpen ? "" : "line-clamp-3",
+              ].join(" ")}
+            >
+              {product.explanation}
+            </p>
+            {hasLongExplanation && (
+              <button
+                type="button"
+                onClick={() => setExplanationOpen((open) => !open)}
+                aria-expanded={explanationOpen}
+                className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-ink-700 hover:text-ink-950 transition-colors"
+              >
+                {explanationOpen ? (
+                  <>
+                    Show less
+                    <ChevronUp size={12} />
+                  </>
+                ) : (
+                  <>
+                    Show full explanation
+                    <ChevronDown size={12} />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         )}
 
         {/* CTA */}
