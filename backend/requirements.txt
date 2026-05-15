@@ -6,10 +6,8 @@ pandas
 numpy
 pyarrow
 openai
-groq
 faiss-cpu
 torch
-torchvision
 open_clip_torch
 fashion-clip
 transformers

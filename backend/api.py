@@ -32,7 +32,6 @@ import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from groq import Groq
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -59,8 +58,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_TRANSCRIBE_MODEL = os.getenv("OPENAI_TRANSCRIBE_MODEL", "gpt-4o-mini-transcribe")
 OPENAI_SESSION_TITLE_MODEL = os.getenv("OPENAI_SESSION_TITLE_MODEL", "gpt-5-nano")
@@ -117,8 +114,7 @@ def _add_display_scores(rows: list[dict]) -> None:
 
 
 def _build_summary(rows: list[dict], parsed: dict) -> str:
-    """Ask Groq for a short friendly summary of the top picks."""
-    if not GROQ_API_KEY:
+    if _openai_client is None:
         return "Here are your top picks:"
     evidence = {
         "occasion": (parsed.get("occasion") or {}).get("target"),
@@ -147,9 +143,8 @@ def _build_summary(rows: list[dict], parsed: dict) -> str:
         ],
     }
     try:
-        client = Groq(api_key=GROQ_API_KEY)
-        resp = client.chat.completions.create(
-            model=GROQ_MODEL,
+        resp = _openai_client.chat.completions.create(
+            model=OPENAI_SESSION_TITLE_MODEL,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": json.dumps(user)},

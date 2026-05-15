@@ -1,0 +1,12 @@
+offline/data/images/
+myenv/
+.env
+frontend/node_modules/
+frontend/dist/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+results_test/
+docs/
+evaluation/
